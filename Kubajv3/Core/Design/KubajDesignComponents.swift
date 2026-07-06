@@ -31,6 +31,8 @@ struct KubajHeaderActionButton: View {
 }
 
 struct KubajHeader: View {
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
     HStack {
       HStack(spacing: 12) {
@@ -40,23 +42,23 @@ struct KubajHeader: View {
 
         Text(L10n.App.name)
           .font(.system(size: 20, weight: .bold))
-          .foregroundStyle(KubajColor.textHeading)
+          .foregroundStyle(KubajThemeColors.textHeading(colorScheme))
           .tracking(-1)
       }
 
       Spacer()
 
       Circle()
-        .fill(KubajColor.inputBackground)
+        .fill(KubajThemeColors.inputBackground(colorScheme))
         .frame(width: 32, height: 32)
         .overlay {
           Image(systemName: "person.fill")
             .font(.system(size: 14))
-            .foregroundStyle(KubajColor.textSecondary)
+            .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         }
         .overlay {
           Circle()
-            .stroke(KubajColor.borderSubtle, lineWidth: 1)
+            .stroke(KubajThemeColors.borderSubtle(colorScheme), lineWidth: 1)
         }
     }
     .padding(.horizontal, KubajMetric.horizontalPadding)
@@ -65,7 +67,7 @@ struct KubajHeader: View {
     .background(.ultraThinMaterial)
     .overlay(alignment: .bottom) {
       Rectangle()
-        .fill(KubajColor.borderSubtle)
+        .fill(KubajThemeColors.borderSubtle(colorScheme))
         .frame(height: 1)
     }
   }
@@ -77,7 +79,7 @@ struct KubajInputField: View {
   var keyboard: UIKeyboardType = .decimalPad
   var trailingActionTitle: String?
   var onTrailingAction: (() -> Void)?
-  var isFocused: Bool = false
+  var isFocused: Bool? = nil
   var selectAllOnFocus: Bool = false
   var returnKeyType: UIReturnKeyType = .next
   var onBeginEditing: (() -> Void) = {}
@@ -251,13 +253,15 @@ struct KubajStatsCard: View {
   let averageDiameter: String
   let onReset: () -> Void
 
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
       HStack(alignment: .top) {
         VStack(alignment: .leading, spacing: 4) {
           Text(L10n.Home.totalVolume)
             .font(KubajFont.labelCaps())
-            .foregroundStyle(KubajColor.textSecondary)
+            .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
             .tracking(2)
             .textCase(.uppercase)
 
@@ -268,7 +272,7 @@ struct KubajStatsCard: View {
               .tracking(-0.9)
             Text(L10n.Home.cubicMeterUnit)
               .font(.system(size: 18, weight: .semibold))
-              .foregroundStyle(KubajColor.textMuted)
+              .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
           }
         }
 
@@ -276,12 +280,12 @@ struct KubajStatsCard: View {
 
         Button(action: onReset) {
           Circle()
-            .fill(KubajColor.inputBackground)
+            .fill(KubajThemeColors.inputBackground(colorScheme))
             .frame(width: 40, height: 40)
             .overlay {
               Image(systemName: "arrow.counterclockwise")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(KubajColor.textSecondary)
+                .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
             }
         }
       }
@@ -293,25 +297,25 @@ struct KubajStatsCard: View {
       .padding(.top, 1)
       .overlay(alignment: .top) {
         Rectangle()
-          .fill(KubajColor.borderSubtle)
+          .fill(KubajThemeColors.borderSubtle(colorScheme))
           .frame(height: 1)
       }
       .padding(.top, 16)
     }
     .padding(KubajMetric.horizontalPadding)
-    .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
+    .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
   }
 
   private func statBlock(title: String, value: String) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       Text(title)
         .font(KubajFont.labelCaps())
-        .foregroundStyle(KubajColor.textSecondary)
+        .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .textCase(.uppercase)
         .tracking(1)
       Text(value)
         .font(KubajFont.statValue())
-        .foregroundStyle(KubajColor.textPrimary)
+        .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
     }
   }
 }
@@ -393,24 +397,25 @@ enum AppTab: CaseIterable, Identifiable {
 struct KubajStatTile: View {
   let title: String
   let value: String
-  var valueColor: Color = KubajColor.textPrimary
+  var valueColor: Color? = nil
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       Text(title)
         .font(.system(size: 10, weight: .bold))
-        .foregroundStyle(KubajColor.textSecondary)
+        .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .textCase(.uppercase)
         .tracking(0.5)
 
       Text(value)
         .font(.system(size: 24, weight: .bold))
-        .foregroundStyle(valueColor)
+        .foregroundStyle(valueColor ?? KubajThemeColors.textPrimary(colorScheme))
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(20)
-    .background(Color.white, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
-    .shadow(color: .black.opacity(0.05), radius: 1, y: 1)
+    .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+    .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.05), radius: 1, y: 1)
   }
 }
 
@@ -418,6 +423,7 @@ struct KubajSectionHeader: View {
   let overline: String?
   let title: String
   let subtitle: String?
+  @Environment(\.colorScheme) private var colorScheme
 
   init(overline: String? = nil, title: String, subtitle: String? = nil) {
     self.overline = overline
@@ -430,20 +436,20 @@ struct KubajSectionHeader: View {
       if let overline {
         Text(overline)
           .font(.system(size: 12, weight: .regular))
-          .foregroundStyle(KubajColor.textSecondary)
+          .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
           .textCase(.uppercase)
           .tracking(1.2)
       }
 
       Text(title)
         .font(.system(size: 30, weight: .heavy))
-        .foregroundStyle(KubajColor.textPrimary)
+        .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
         .tracking(-0.75)
 
       if let subtitle {
         Text(subtitle)
           .font(.system(size: 16))
-          .foregroundStyle(KubajColor.textSecondary)
+          .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
           .fixedSize(horizontal: false, vertical: true)
       }
     }
@@ -456,21 +462,22 @@ struct KubajFormField: View {
   let placeholder: String
   @Binding var text: String
   var keyboard: UIKeyboardType = .default
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       Text(label)
         .font(.system(size: 12, weight: .medium))
-        .foregroundStyle(KubajColor.textSecondary)
+        .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .padding(.leading, 4)
 
       TextField(placeholder, text: $text)
         .keyboardType(keyboard)
         .font(.system(size: 16))
-        .foregroundStyle(KubajColor.textPrimary)
+        .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(KubajColor.inputBackground, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+        .background(KubajThemeColors.inputBackground(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
     }
   }
 }
@@ -478,12 +485,13 @@ struct KubajFormField: View {
 struct KubajSecondaryButton: View {
   let title: String
   let action: () -> Void
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     Button(action: action) {
       Text(title)
         .font(.system(size: 16, weight: .semibold))
-        .foregroundStyle(KubajColor.textSecondary)
+        .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
@@ -527,29 +535,31 @@ struct KubajRectPrimaryButton: View {
 struct KubajSettingsCard<Content: View>: View {
   let title: String
   @ViewBuilder var content: Content
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
       Text(title)
         .font(.system(size: 14, weight: .bold))
-        .foregroundStyle(KubajColor.textSecondary)
+        .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .textCase(.uppercase)
         .tracking(1)
 
       content
     }
     .padding(KubajMetric.horizontalPadding)
-    .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
+    .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
   }
 }
 
 struct KubajSettingsSectionLabel: View {
   let title: String
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     Text(title)
       .font(.system(size: 12, weight: .semibold))
-      .foregroundStyle(KubajColor.textMuted)
+      .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
       .textCase(.uppercase)
       .tracking(1.2)
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -562,6 +572,7 @@ struct KubajSettingsToggleRow: View {
   let systemImage: String
   let iconColor: Color
   @Binding var isOn: Bool
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     HStack(spacing: 12) {
@@ -576,7 +587,7 @@ struct KubajSettingsToggleRow: View {
 
       Text(title)
         .font(.system(size: 16, weight: .medium))
-        .foregroundStyle(KubajColor.textPrimary)
+        .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
 
       Spacer()
 
@@ -605,7 +616,7 @@ struct KubajFormulaOptionButton: View {
           .font(.system(size: 12, weight: .medium))
           .multilineTextAlignment(.center)
       }
-      .foregroundStyle(isSelected ? Color.white : KubajColor.textPrimary)
+      .foregroundStyle(isSelected ? Color.white : KubajThemeColors.textPrimary(colorScheme))
       .frame(maxWidth: .infinity)
       .padding(.vertical, 12)
       .background {
@@ -622,7 +633,7 @@ struct KubajFormulaOptionButton: View {
       }
       .overlay {
         RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium)
-          .stroke(isSelected ? Color.clear : KubajColor.borderSubtle, lineWidth: 1)
+          .stroke(isSelected ? Color.clear : KubajThemeColors.borderSubtle(colorScheme), lineWidth: 1)
       }
       .shadow(color: isSelected ? KubajColor.primary.opacity(0.2) : .clear, radius: 8, y: 4)
     }
@@ -680,6 +691,8 @@ struct KubajExportManagementCard: View {
   var isEnabled: Bool = true
   let action: () -> Void
 
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
     VStack(spacing: 16) {
       VStack(spacing: 12) {
@@ -695,10 +708,10 @@ struct KubajExportManagementCard: View {
         VStack(spacing: 4) {
           Text(title)
             .font(.system(size: 18, weight: .bold))
-            .foregroundStyle(KubajColor.textPrimary)
+            .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
           Text(subtitle)
             .font(.system(size: 14))
-            .foregroundStyle(KubajColor.textSecondary)
+            .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
             .multilineTextAlignment(.center)
         }
       }
@@ -707,13 +720,13 @@ struct KubajExportManagementCard: View {
       Button(action: action) {
         Text(buttonTitle)
           .font(.system(size: 16, weight: .semibold))
-          .foregroundStyle(KubajColor.textPrimary)
+          .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
           .frame(maxWidth: .infinity)
           .padding(.vertical, 12)
-          .background(Color.white, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+          .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
           .overlay {
             RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium)
-              .stroke(KubajColor.borderSubtle, lineWidth: 1)
+              .stroke(KubajThemeColors.borderSubtle(colorScheme), lineWidth: 1)
           }
       }
       .buttonStyle(.plain)
@@ -721,8 +734,8 @@ struct KubajExportManagementCard: View {
       .opacity(isEnabled ? 1 : 0.5)
     }
     .padding(20)
-    .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: 20))
-    .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
+    .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: 20))
+    .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.04), radius: 4, y: 2)
   }
 }
 

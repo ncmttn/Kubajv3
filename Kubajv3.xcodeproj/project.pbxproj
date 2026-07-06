@@ -49,6 +49,7 @@
 		H10000010000000000000008 /* KubajAppLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000008 /* KubajAppLinks.swift */; };
 		H10000010000000000000009 /* LogEntryDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000009 /* LogEntryDisplay.swift */; };
 		H10000010000000000000010 /* KubajLogTableComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000010 /* KubajLogTableComponents.swift */; };
+		H10000010000000000000011 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000011 /* SplashView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,6 +107,7 @@
 		H20000010000000000000008 /* KubajAppLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajAppLinks.swift; sourceTree = "<group>"; };
 		H20000010000000000000009 /* LogEntryDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryDisplay.swift; sourceTree = "<group>"; };
 		H20000010000000000000010 /* KubajLogTableComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajLogTableComponents.swift; sourceTree = "<group>"; };
+		H20000010000000000000011 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +230,7 @@
 				A40000010000000000000020 /* Export */,
 				A40000010000000000000023 /* Onboarding */,
 				A40000010000000000000022 /* Settings */,
+				A40000010000000000000027 /* Splash */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -273,7 +276,14 @@
 			path = Hollow;
 			sourceTree = "<group>";
 		};
-		A40000010000000000000015 /* FolderSelection */ = {
+		A40000010000000000000027 /* Splash */ = {
+			isa = PBXGroup;
+			children = (
+				H20000010000000000000011 /* SplashView.swift */,
+			);
+			path = Splash;
+			sourceTree = "<group>";
+		};		A40000010000000000000015 /* FolderSelection */ = {
 			isa = PBXGroup;
 			children = (
 				C20000010000000000000005 /* FolderSelectionView.swift */,
@@ -515,6 +525,7 @@
 				H10000010000000000000008 /* KubajAppLinks.swift in Sources */,
 				H10000010000000000000009 /* LogEntryDisplay.swift in Sources */,
 				H10000010000000000000010 /* KubajLogTableComponents.swift in Sources */,
+				H10000010000000000000011 /* SplashView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

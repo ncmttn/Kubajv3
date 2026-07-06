@@ -118,7 +118,7 @@ struct KubajLogTableRow: View {
     private func rowActionButton(
         systemName: String,
         tint: Color,
-        background: Color = KubajColor.inputBackground,
+        background: Color? = nil,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -126,7 +126,7 @@ struct KubajLogTableRow: View {
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(tint)
                 .frame(width: 28, height: 28)
-                .background(background, in: RoundedRectangle(cornerRadius: 7))
+                .background(background ?? KubajThemeColors.inputBackground(colorScheme), in: RoundedRectangle(cornerRadius: 7))
         }
         .buttonStyle(.plain)
     }

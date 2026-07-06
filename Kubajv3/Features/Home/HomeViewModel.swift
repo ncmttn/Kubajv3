@@ -127,10 +127,30 @@ final class HomeViewModel {
         )
     }
 
+    func addEquivalentEntry(diameterCm: Int, lengthM: Double, quantity: Int) {
+        guard diameterCm > 0, lengthM > 0, quantity > 0 else {
+            return
+        }
+
+        let volume = ForestryCalculator.huber(
+            midDiameterCm: Double(diameterCm),
+            lengthM: lengthM
+        )
+
+        appendEntry(
+            diameterCm: Double(diameterCm),
+            lengthM: lengthM,
+            quantity: quantity,
+            volumeM3: volume,
+            calculationMethod: activeCalculationMethod,
+            isHollow: true,
+            isLumber: false
+        )
+    }
+
     func deleteEntry(id: UUID) {
         draftEntries.removeAll { $0.id == id }
     }
-
     func increaseQuantity(id: UUID) {
         guard let index = draftEntries.firstIndex(where: { $0.id == id }) else {
             return

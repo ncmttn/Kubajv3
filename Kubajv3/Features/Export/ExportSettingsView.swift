@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ExportSettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var fieldValues: [String]
     let exportKind: ExportKind
@@ -34,7 +35,7 @@ struct ExportSettingsView: View {
                         }
                     }
                     .padding(32)
-                    .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: 32))
+                    .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: 32))
 
                     KubajRectPrimaryButton(
                         title: confirmTitle,
@@ -46,7 +47,7 @@ struct ExportSettingsView: View {
                 .padding(.horizontal, KubajMetric.horizontalPadding)
                 .padding(.vertical, 24)
             }
-            .background(KubajColor.background)
+            .background(KubajThemeColors.background(colorScheme))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

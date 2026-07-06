@@ -3788,7 +3788,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Henüz hesaplanmış tomruk yok. Ana sayfadan giriş yapın."
+            "value": "Henüz hesaplanmış ürün yok. Ana sayfadan giriş yapın."
           }
         }
       }
@@ -5251,6 +5251,124 @@
         }
       }
     },
+    "hollow.add_diameter_format": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld cm hinzufügen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add %lld cm"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir %lld cm"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisää %lld cm"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter %lld cm"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar %lld cm"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить %lld см"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lägg till %lld cm"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld cm Ekle"
+          }
+        }
+      }
+    },
+    "hollow.alternative_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit alternativem Durchmesser hinzufügen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add with alternative diameter"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir con diámetro alternativo"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisää vaihtoehtoisella halkaisijalla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter avec un diamètre alternatif"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar com diâmetro alternativo"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить с другим диаметром"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lägg till med alternativ diameter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternatif çap ile ekle"
+          }
+        }
+      }
+    },
     "hollow.equivalent_diameter_format": {
       "extractionState": "manual",
       "localizations": {
@@ -6308,7 +6426,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Henüz tomruk eklenmedi"
+            "value": "Henüz ürün eklenmedi"
           }
         }
       }
@@ -9077,7 +9195,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kübaj Orman Hesaplama"
+            "value": "Necmettin ÖZARSLAN"
           }
         }
       }
@@ -10555,6 +10673,20 @@
             "value": "İçi Boş"
           }
         }
+      }
+    },
+    "splash.tagline": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Holzvolumen berechnen" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Timber volume calculation" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cálculo del volumen de madera" } },
+        "fi": { "stringUnit": { "state": "translated", "value": "Puutavaran tilavuuslaskenta" } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Calcul du volume de bois" } },
+        "pt": { "stringUnit": { "state": "translated", "value": "Cálculo do volume de madeira" } },
+        "ru": { "stringUnit": { "state": "translated", "value": "Расчёт объёма древесины" } },
+        "sv": { "stringUnit": { "state": "translated", "value": "Beräkning av virkesvolym" } },
+        "tr": { "stringUnit": { "state": "translated", "value": "Ürün hacmi hesaplama" } }
       }
     },
     "tab.home": {

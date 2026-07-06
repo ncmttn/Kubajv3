@@ -16,15 +16,9 @@ struct Kubajv3App: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if preferences.hasCompletedOnboarding {
-                    ContentView()
-                } else {
-                    OnboardingView()
-                }
-            }
-            .environment(preferences)
-            .environment(\.locale, Locale(identifier: preferences.appLanguage.localeIdentifier))
+            RootView()
+                .environment(preferences)
+                .environment(\.locale, Locale(identifier: preferences.appLanguage.localeIdentifier))
         }
         .modelContainer(sharedModelContainer)
     }
@@ -64,6 +58,35 @@ struct Kubajv3App: App {
 
         for storeURL in relatedURLs where fileManager.fileExists(atPath: storeURL.path) {
             try? fileManager.removeItem(at: storeURL)
+        }
+    }
+}
+
+private struct RootView: View {
+    @Environment(AppPreferences.self) private var preferences
+    @State private var isActive = false
+
+    var body: some View {
+        ZStack {
+            if isActive {
+                Group {
+                    if preferences.hasCompletedOnboarding {
+                        ContentView()
+                    } else {
+                        OnboardingView()
+                    }
+                }
+                .transition(.opacity)
+            } else {
+                SplashView()
+                    .transition(.opacity)
+            }
+        }
+        .task {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            withAnimation(.easeInOut(duration: 0.45)) {
+                isActive = true
+            }
         }
     }
 }

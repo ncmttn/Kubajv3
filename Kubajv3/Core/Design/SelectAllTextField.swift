@@ -6,7 +6,7 @@ struct SelectAllTextField: UIViewRepresentable {
     var placeholder: String
     var keyboardType: UIKeyboardType
     var returnKeyType: UIReturnKeyType
-    var isFocused: Bool
+    var isFocused: Bool?
     var selectAllOnFocus: Bool
     var onReturn: () -> Void
     var onBeginEditing: () -> Void
@@ -29,8 +29,8 @@ struct SelectAllTextField: UIViewRepresentable {
         }
         uiView.returnKeyType = returnKeyType
 
-        if isFocused && !uiView.isFirstResponder {
-            if uiView.window != nil {
+        if isFocused == true {
+            if !uiView.isFirstResponder, uiView.window != nil {
                 uiView.becomeFirstResponder()
                 if selectAllOnFocus {
                     DispatchQueue.main.async {
@@ -38,7 +38,7 @@ struct SelectAllTextField: UIViewRepresentable {
                     }
                 }
             }
-        } else if !isFocused && uiView.isFirstResponder {
+        } else if isFocused == false, uiView.isFirstResponder {
             uiView.resignFirstResponder()
         }
     }

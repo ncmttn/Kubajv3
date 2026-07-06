@@ -278,10 +278,10 @@ struct GroupingView: View {
         VStack(spacing: 12) {
             Image(systemName: "square.stack.3d.up.slash")
                 .font(.system(size: 40))
-                .foregroundStyle(KubajColor.textMuted)
+                .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
             Text(viewModel.selectedFolder == nil ? L10n.Grouping.draftEmptyState : L10n.Grouping.selectFolderPrompt)
                 .font(.subheadline)
-                .foregroundStyle(KubajColor.textMuted)
+                .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)

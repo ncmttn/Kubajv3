@@ -11,6 +11,7 @@ struct HollowCalculationView: View {
     @State private var previewResult: HollowCalculationResult?
 
     let onAdd: (Double, Double, Double, Int) -> Void
+    var onAddDiameter: (Int, Double, Int) -> Void = { _, _, _ in }
 
     var body: some View {
         NavigationStack {
@@ -32,6 +33,14 @@ struct HollowCalculationView: View {
                         isEnabled: canSubmit
                     ) {
                         submit()
+                    }
+
+                    if let previewResult, let values = parsedValues {
+                        alternativeButtons(
+                            equivalent: previewResult.equivalentSolidDiameterCm,
+                            length: values.2,
+                            quantity: values.3
+                        )
                     }
                 }
                 .padding(.horizontal, KubajMetric.horizontalPadding)
@@ -86,6 +95,38 @@ struct HollowCalculationView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(KubajMetric.horizontalPadding)
         .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
+    }
+
+    @ViewBuilder
+    private func alternativeButtons(equivalent: Int, length: Double, quantity: Int) -> some View {
+        VStack(spacing: 10) {
+            Text(L10n.Hollow.alternativeTitle)
+                .font(KubajFont.labelCaps())
+                .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
+                .textCase(.uppercase)
+                .tracking(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack(spacing: 12) {
+                if equivalent - 1 > 0 {
+                    KubajOutlineCapsuleButton(
+                        title: L10n.Hollow.addDiameter(equivalent - 1),
+                        systemImage: "minus"
+                    ) {
+                        onAddDiameter(equivalent - 1, length, quantity)
+                        dismiss()
+                    }
+                }
+
+                KubajOutlineCapsuleButton(
+                    title: L10n.Hollow.addDiameter(equivalent + 1),
+                    systemImage: "plus"
+                ) {
+                    onAddDiameter(equivalent + 1, length, quantity)
+                    dismiss()
+                }
+            }
+        }
     }
 
     private func updatePreview() {

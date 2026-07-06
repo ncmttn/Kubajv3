@@ -19,6 +19,10 @@ enum L10n {
         static let name = String(localized: "app.name")
     }
 
+    enum Splash {
+        static let tagline = String(localized: "splash.tagline")
+    }
+
     enum Tab {
         static let home = String(localized: "tab.home")
         static let groups = String(localized: "tab.grouping")
@@ -312,6 +316,14 @@ enum L10n {
         static let length = String(localized: "hollow.length")
         static let quantity = String(localized: "hollow.quantity")
         static let addToList = String(localized: "hollow.add_to_list")
+        static let alternativeTitle = String(localized: "hollow.alternative_title")
+
+        static func addDiameter(_ diameter: Int) -> String {
+            String(
+                format: String(localized: "hollow.add_diameter_format"),
+                diameter
+            )
+        }
 
         static func equivalentDiameter(_ diameter: Int) -> String {
             String(

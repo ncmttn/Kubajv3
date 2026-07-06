@@ -68,15 +68,25 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $isHollowPresented) {
-            HollowCalculationView { outer, inner, length, quantity in
-                viewModel.addHollowEntry(
-                    outerDiameterCm: outer,
-                    innerDiameterCm: inner,
-                    lengthM: length,
-                    quantity: quantity
-                )
-                HapticFeedback.medium()
-            }
+            HollowCalculationView(
+                onAdd: { outer, inner, length, quantity in
+                    viewModel.addHollowEntry(
+                        outerDiameterCm: outer,
+                        innerDiameterCm: inner,
+                        lengthM: length,
+                        quantity: quantity
+                    )
+                    HapticFeedback.medium()
+                },
+                onAddDiameter: { diameter, length, quantity in
+                    viewModel.addEquivalentEntry(
+                        diameterCm: diameter,
+                        lengthM: length,
+                        quantity: quantity
+                    )
+                    HapticFeedback.medium()
+                }
+            )
         }
         .confirmationDialog(
             L10n.Home.confirmClearTitle,
@@ -173,7 +183,7 @@ struct HomeView: View {
                     HapticFeedback.light()
                 },
                 isFocused: viewModel.focusedInputField == .diameter,
-                selectAllOnFocus: viewModel.shouldSelectAllOnDiameterFocus && viewModel.focusedInputField == .diameter,
+                selectAllOnFocus: true,
                 returnKeyType: viewModel.nextField(after: .diameter) == nil ? .done : .next,
                 onBeginEditing: {
                     viewModel.focusedInputField = .diameter
@@ -186,7 +196,7 @@ struct HomeView: View {
                 title: L10n.Home.topDiameterCm,
                 text: $viewModel.topDiameterInput,
                 isFocused: viewModel.focusedInputField == .topDiameter,
-                selectAllOnFocus: viewModel.shouldSelectAllOnDiameterFocus && viewModel.focusedInputField == .topDiameter,
+                selectAllOnFocus: true,
                 returnKeyType: viewModel.nextField(after: .topDiameter) == nil ? .done : .next,
                 onBeginEditing: {
                     viewModel.focusedInputField = .topDiameter
@@ -199,6 +209,7 @@ struct HomeView: View {
                 title: L10n.Home.buttDiameterCm,
                 text: $viewModel.buttDiameterInput,
                 isFocused: viewModel.focusedInputField == .buttDiameter,
+                selectAllOnFocus: true,
                 returnKeyType: viewModel.nextField(after: .buttDiameter) == nil ? .done : .next,
                 onBeginEditing: {
                     viewModel.focusedInputField = .buttDiameter
@@ -210,6 +221,7 @@ struct HomeView: View {
                 title: L10n.Home.midDiameterCm,
                 text: $viewModel.midDiameterInput,
                 isFocused: viewModel.focusedInputField == .midDiameter,
+                selectAllOnFocus: true,
                 returnKeyType: viewModel.nextField(after: .midDiameter) == nil ? .done : .next,
                 onBeginEditing: {
                     viewModel.focusedInputField = .midDiameter
@@ -221,7 +233,7 @@ struct HomeView: View {
                 title: L10n.Lumber.widthCm,
                 text: $viewModel.widthInput,
                 isFocused: viewModel.focusedInputField == .width,
-                selectAllOnFocus: viewModel.shouldSelectAllOnDiameterFocus && viewModel.focusedInputField == .width,
+                selectAllOnFocus: true,
                 returnKeyType: viewModel.nextField(after: .width) == nil ? .done : .next,
                 onBeginEditing: {
                     viewModel.focusedInputField = .width
@@ -234,6 +246,7 @@ struct HomeView: View {
                 title: L10n.Lumber.thicknessCm,
                 text: $viewModel.thicknessInput,
                 isFocused: viewModel.focusedInputField == .thickness,
+                selectAllOnFocus: true,
                 returnKeyType: viewModel.nextField(after: .thickness) == nil ? .done : .next,
                 onBeginEditing: {
                     viewModel.focusedInputField = .thickness
@@ -245,6 +258,7 @@ struct HomeView: View {
                 title: L10n.Home.lengthM,
                 text: $viewModel.lengthInput,
                 isFocused: viewModel.focusedInputField == .length,
+                selectAllOnFocus: true,
                 returnKeyType: viewModel.nextField(after: .length) == nil ? .done : .next,
                 onBeginEditing: {
                     viewModel.focusedInputField = .length
@@ -257,6 +271,7 @@ struct HomeView: View {
                 text: $viewModel.quantityInput,
                 keyboard: .numberPad,
                 isFocused: viewModel.focusedInputField == .quantity,
+                selectAllOnFocus: true,
                 returnKeyType: .done,
                 onBeginEditing: {
                     viewModel.focusedInputField = .quantity

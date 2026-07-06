@@ -2,13 +2,14 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Environment(AppPreferences.self) private var preferences
+    @Environment(\.colorScheme) private var colorScheme
     @State private var currentStep = 0
 
     private let stepCount = 3
 
     var body: some View {
         ZStack {
-            KubajColor.background
+            KubajThemeColors.background(colorScheme)
                 .ignoresSafeArea()
 
             Circle()
@@ -61,14 +62,14 @@ struct OnboardingView: View {
     private var illustrationCard: some View {
         ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 40)
-                .fill(KubajColor.surface)
+                .fill(KubajThemeColors.surface(colorScheme))
                 .aspectRatio(4 / 5, contentMode: .fit)
                 .overlay {
                     Image(systemName: stepIcon)
                         .font(.system(size: 80, weight: .light))
                         .foregroundStyle(KubajColor.primary.opacity(0.35))
                 }
-                .shadow(color: KubajColor.textPrimary.opacity(0.05), radius: 25, y: 12)
+                .shadow(color: KubajThemeColors.textPrimary(colorScheme).opacity(0.05), radius: 25, y: 12)
 
             HStack(spacing: 8) {
                 Image(systemName: "tree.fill")
@@ -102,7 +103,7 @@ struct OnboardingView: View {
             VStack(spacing: 0) {
                 Text(stepTitleLine1)
                     .font(.system(size: 44, weight: .heavy))
-                    .foregroundStyle(KubajColor.textPrimary)
+                    .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
                     .tracking(-2.2)
                 Text(stepTitleLine2)
                     .font(.system(size: 44, weight: .heavy))
@@ -113,7 +114,7 @@ struct OnboardingView: View {
 
             Text(stepSubtitle)
                 .font(.system(size: 18))
-                .foregroundStyle(KubajColor.textSecondary)
+                .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -156,7 +157,7 @@ struct OnboardingView: View {
         HStack(spacing: 8) {
             ForEach(0..<stepCount, id: \.self) { index in
                 Capsule()
-                    .fill(index == currentStep ? KubajColor.primary : KubajColor.inputBackground)
+                    .fill(index == currentStep ? KubajColor.primary : KubajThemeColors.inputBackground(colorScheme))
                     .frame(width: index == currentStep ? 32 : 6, height: 6)
                     .shadow(color: index == currentStep ? KubajColor.primary.opacity(0.3) : .clear, radius: 6)
             }
