@@ -45,7 +45,6 @@
 		H10000010000000000000002 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000002 /* AppLanguage.swift */; };
 		H10000010000000000000003 /* KubajThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000003 /* KubajThemeColors.swift */; };
 		H10000010000000000000004 /* SelectAllTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000004 /* SelectAllTextField.swift */; };
-		H10000010000000000000005 /* LumberCalculationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000005 /* LumberCalculationView.swift */; };
 		H10000010000000000000006 /* FoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000006 /* FoldersView.swift */; };
 		H10000010000000000000008 /* KubajAppLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000008 /* KubajAppLinks.swift */; };
 		H10000010000000000000009 /* LogEntryDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000009 /* LogEntryDisplay.swift */; };
@@ -104,7 +103,6 @@
 		H20000010000000000000002 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		H20000010000000000000003 /* KubajThemeColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajThemeColors.swift; sourceTree = "<group>"; };
 		H20000010000000000000004 /* SelectAllTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectAllTextField.swift; sourceTree = "<group>"; };
-		H20000010000000000000005 /* LumberCalculationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumberCalculationView.swift; sourceTree = "<group>"; };
 		H20000010000000000000006 /* FoldersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldersView.swift; sourceTree = "<group>"; };
 		H20000010000000000000008 /* KubajAppLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajAppLinks.swift; sourceTree = "<group>"; };
 		H20000010000000000000009 /* LogEntryDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryDisplay.swift; sourceTree = "<group>"; };
@@ -226,7 +224,6 @@
 			children = (
 				A40000010000000000000013 /* Home */,
 				A40000010000000000000014 /* Hollow */,
-				A40000010000000000000024 /* Lumber */,
 				A40000010000000000000025 /* Folders */,
 				A40000010000000000000015 /* FolderSelection */,
 				A40000010000000000000019 /* Grouping */,
@@ -363,14 +360,6 @@
 				E20000010000000000000004 /* SettingsView.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		A40000010000000000000024 /* Lumber */ = {
-			isa = PBXGroup;
-			children = (
-				H20000010000000000000005 /* LumberCalculationView.swift */,
-			);
-			path = Lumber;
 			sourceTree = "<group>";
 		};
 		A40000010000000000000025 /* Folders */ = {
@@ -524,7 +513,6 @@
 				H10000010000000000000002 /* AppLanguage.swift in Sources */,
 				H10000010000000000000003 /* KubajThemeColors.swift in Sources */,
 				H10000010000000000000004 /* SelectAllTextField.swift in Sources */,
-				H10000010000000000000005 /* LumberCalculationView.swift in Sources */,
 				H10000010000000000000006 /* FoldersView.swift in Sources */,
 				H10000010000000000000008 /* KubajAppLinks.swift in Sources */,
 				H10000010000000000000009 /* LogEntryDisplay.swift in Sources */,
