@@ -18,23 +18,23 @@ enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
     var displayName: String {
         switch self {
         case .tr:
-            String(localized: "language.turkish")
+            L10n.tr("language.turkish")
         case .en:
-            String(localized: "language.english")
+            L10n.tr("language.english")
         case .de:
-            String(localized: "language.german")
+            L10n.tr("language.german")
         case .es:
-            String(localized: "language.spanish")
+            L10n.tr("language.spanish")
         case .pt:
-            String(localized: "language.portuguese")
+            L10n.tr("language.portuguese")
         case .fr:
-            String(localized: "language.french")
+            L10n.tr("language.french")
         case .sv:
-            String(localized: "language.swedish")
+            L10n.tr("language.swedish")
         case .fi:
-            String(localized: "language.finnish")
+            L10n.tr("language.finnish")
         case .ru:
-            String(localized: "language.russian")
+            L10n.tr("language.russian")
         }
     }
 }

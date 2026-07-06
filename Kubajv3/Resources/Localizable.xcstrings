@@ -10686,7 +10686,7 @@
         "pt": { "stringUnit": { "state": "translated", "value": "Cálculo do volume de madeira" } },
         "ru": { "stringUnit": { "state": "translated", "value": "Расчёт объёма древесины" } },
         "sv": { "stringUnit": { "state": "translated", "value": "Beräkning av virkesvolym" } },
-        "tr": { "stringUnit": { "state": "translated", "value": "Ürün hacmi hesaplama" } }
+        "tr": { "stringUnit": { "state": "translated", "value": "Odun hacmi hesaplama" } }
       }
     },
     "tab.home": {

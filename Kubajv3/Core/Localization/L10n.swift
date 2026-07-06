@@ -15,73 +15,77 @@ enum DisplayFormatting {
 }
 
 enum L10n {
+    static func tr(_ key: String) -> String {
+        AppLocalization.string(key)
+    }
+
     enum App {
-        static let name = String(localized: "app.name")
+        static var name: String { L10n.tr("app.name") }
     }
 
     enum Splash {
-        static let tagline = String(localized: "splash.tagline")
+        static var tagline: String { L10n.tr("splash.tagline") }
     }
 
     enum Tab {
-        static let home = String(localized: "tab.home")
-        static let groups = String(localized: "tab.grouping")
-        static let folders = String(localized: "tab.folders")
-        static let settings = String(localized: "tab.settings")
+        static var home: String { L10n.tr("tab.home") }
+        static var groups: String { L10n.tr("tab.grouping") }
+        static var folders: String { L10n.tr("tab.folders") }
+        static var settings: String { L10n.tr("tab.settings") }
     }
 
     enum Common {
-        static let cancel = String(localized: "common.cancel")
+        static var cancel: String { L10n.tr("common.cancel") }
     }
 
     enum Home {
-        static let diameterCm = String(localized: "home.diameter_cm")
-        static let topDiameterCm = String(localized: "home.top_diameter_cm")
-        static let buttDiameterCm = String(localized: "home.butt_diameter_cm")
-        static let midDiameterCm = String(localized: "home.mid_diameter_cm")
-        static let lengthM = String(localized: "home.length_m")
-        static let quantity = String(localized: "home.quantity")
-        static let addEntry = String(localized: "home.add_entry")
-        static let calculate = String(localized: "home.calculate")
-        static let calculateHollow = String(localized: "home.calculate_hollow")
-        static let calculateLumber = String(localized: "home.calculate_lumber")
-        static let keyboardNext = String(localized: "home.keyboard_next")
-        static let confirmClearTitle = String(localized: "home.confirm_clear_title")
-        static let confirmClearMessage = String(localized: "home.confirm_clear_message")
-        static let confirmClearAction = String(localized: "home.confirm_clear_action")
-        static let confirmDeleteTitle = String(localized: "home.confirm_delete_title")
-        static let confirmDeleteMessage = String(localized: "home.confirm_delete_message")
-        static let confirmDeleteAction = String(localized: "home.confirm_delete_action")
-        static let lumberBadge = String(localized: "home.lumber_badge")
-        static let save = String(localized: "home.save")
-        static let emptyState = String(localized: "home.empty_state")
-        static let swipeDelete = String(localized: "home.swipe_delete")
-        static let swipeDecrease = String(localized: "home.swipe_decrease")
-        static let swipeIncrease = String(localized: "home.swipe_increase")
-        static let hollowBadge = String(localized: "home.hollow_badge")
-        static let totalVolume = String(localized: "home.total_volume")
-        static let logsCount = String(localized: "home.logs_count")
-        static let avgDiameter = String(localized: "home.avg_diameter")
-        static let cubicMeterUnit = String(localized: "home.cubic_meter_unit")
-        static let recentAdditions = String(localized: "home.recent_additions")
-        static let liveBadge = String(localized: "home.live_badge")
-        static let viewFullHistory = String(localized: "home.view_full_history")
-        static let openGrouping = String(localized: "home.open_grouping")
-        static let diameterIncrement = String(localized: "home.diameter_increment")
-        static let tableNo = String(localized: "home.table_no")
-        static let tableLength = String(localized: "home.table_length")
-        static let tableQty = String(localized: "home.table_qty")
-        static let tableDiameter = String(localized: "home.table_diameter")
-        static let tableVol = String(localized: "home.table_vol")
-        static let tableActions = String(localized: "home.table_actions")
-        static let saveFileTitle = String(localized: "home.save_file_title")
-        static let saveFileMessage = String(localized: "home.save_file_message")
-        static let saveFilePlaceholder = String(localized: "home.save_file_placeholder")
-        static let saveFileConfirm = String(localized: "home.save_file_confirm")
+        static var diameterCm: String { L10n.tr("home.diameter_cm") }
+        static var topDiameterCm: String { L10n.tr("home.top_diameter_cm") }
+        static var buttDiameterCm: String { L10n.tr("home.butt_diameter_cm") }
+        static var midDiameterCm: String { L10n.tr("home.mid_diameter_cm") }
+        static var lengthM: String { L10n.tr("home.length_m") }
+        static var quantity: String { L10n.tr("home.quantity") }
+        static var addEntry: String { L10n.tr("home.add_entry") }
+        static var calculate: String { L10n.tr("home.calculate") }
+        static var calculateHollow: String { L10n.tr("home.calculate_hollow") }
+        static var calculateLumber: String { L10n.tr("home.calculate_lumber") }
+        static var keyboardNext: String { L10n.tr("home.keyboard_next") }
+        static var confirmClearTitle: String { L10n.tr("home.confirm_clear_title") }
+        static var confirmClearMessage: String { L10n.tr("home.confirm_clear_message") }
+        static var confirmClearAction: String { L10n.tr("home.confirm_clear_action") }
+        static var confirmDeleteTitle: String { L10n.tr("home.confirm_delete_title") }
+        static var confirmDeleteMessage: String { L10n.tr("home.confirm_delete_message") }
+        static var confirmDeleteAction: String { L10n.tr("home.confirm_delete_action") }
+        static var lumberBadge: String { L10n.tr("home.lumber_badge") }
+        static var save: String { L10n.tr("home.save") }
+        static var emptyState: String { L10n.tr("home.empty_state") }
+        static var swipeDelete: String { L10n.tr("home.swipe_delete") }
+        static var swipeDecrease: String { L10n.tr("home.swipe_decrease") }
+        static var swipeIncrease: String { L10n.tr("home.swipe_increase") }
+        static var hollowBadge: String { L10n.tr("home.hollow_badge") }
+        static var totalVolume: String { L10n.tr("home.total_volume") }
+        static var logsCount: String { L10n.tr("home.logs_count") }
+        static var avgDiameter: String { L10n.tr("home.avg_diameter") }
+        static var cubicMeterUnit: String { L10n.tr("home.cubic_meter_unit") }
+        static var recentAdditions: String { L10n.tr("home.recent_additions") }
+        static var liveBadge: String { L10n.tr("home.live_badge") }
+        static var viewFullHistory: String { L10n.tr("home.view_full_history") }
+        static var openGrouping: String { L10n.tr("home.open_grouping") }
+        static var diameterIncrement: String { L10n.tr("home.diameter_increment") }
+        static var tableNo: String { L10n.tr("home.table_no") }
+        static var tableLength: String { L10n.tr("home.table_length") }
+        static var tableQty: String { L10n.tr("home.table_qty") }
+        static var tableDiameter: String { L10n.tr("home.table_diameter") }
+        static var tableVol: String { L10n.tr("home.table_vol") }
+        static var tableActions: String { L10n.tr("home.table_actions") }
+        static var saveFileTitle: String { L10n.tr("home.save_file_title") }
+        static var saveFileMessage: String { L10n.tr("home.save_file_message") }
+        static var saveFilePlaceholder: String { L10n.tr("home.save_file_placeholder") }
+        static var saveFileConfirm: String { L10n.tr("home.save_file_confirm") }
 
         static func dimensions(diameter: Double, length: Double) -> String {
             String(
-                format: String(localized: "home.dimensions_format"),
+                format: L10n.tr("home.dimensions_format"),
                 DisplayFormatting.diameter(diameter),
                 DisplayFormatting.length(length)
             )
@@ -89,7 +93,7 @@ enum L10n {
 
         static func dimFormat(length: Double, diameter: Double) -> String {
             String(
-                format: String(localized: "home.dim_format"),
+                format: L10n.tr("home.dim_format"),
                 DisplayFormatting.length(length),
                 DisplayFormatting.diameter(diameter)
             )
@@ -97,7 +101,7 @@ enum L10n {
 
         static func smalianDimFormat(top: Double, butt: Double, length: Double) -> String {
             String(
-                format: String(localized: "home.smalian_dim_format"),
+                format: L10n.tr("home.smalian_dim_format"),
                 DisplayFormatting.diameter(top),
                 DisplayFormatting.diameter(butt),
                 DisplayFormatting.length(length)
@@ -106,7 +110,7 @@ enum L10n {
 
         static func smalianDiameterFormat(top: Double, butt: Double) -> String {
             String(
-                format: String(localized: "home.smalian_diameter_format"),
+                format: L10n.tr("home.smalian_diameter_format"),
                 DisplayFormatting.diameter(top),
                 DisplayFormatting.diameter(butt)
             )
@@ -114,7 +118,7 @@ enum L10n {
 
         static func lumberDimFormat(width: Double, thickness: Double, length: Double) -> String {
             String(
-                format: String(localized: "home.lumber_dim_format"),
+                format: L10n.tr("home.lumber_dim_format"),
                 DisplayFormatting.diameter(width),
                 DisplayFormatting.diameter(thickness),
                 DisplayFormatting.length(length)
@@ -123,7 +127,7 @@ enum L10n {
 
         static func lumberDiameterFormat(width: Double, thickness: Double) -> String {
             String(
-                format: String(localized: "home.lumber_diameter_format"),
+                format: L10n.tr("home.lumber_diameter_format"),
                 DisplayFormatting.diameter(width),
                 DisplayFormatting.diameter(thickness)
             )
@@ -131,14 +135,14 @@ enum L10n {
 
         static func diameterValue(_ value: Double) -> String {
             String(
-                format: String(localized: "home.diameter_value_format"),
+                format: L10n.tr("home.diameter_value_format"),
                 DisplayFormatting.diameter(value)
             )
         }
 
         static func rowSummary(quantity: Int, volume: Double) -> String {
             String(
-                format: String(localized: "home.row_summary_format"),
+                format: L10n.tr("home.row_summary_format"),
                 quantity,
                 DisplayFormatting.volume(volume)
             )
@@ -146,38 +150,38 @@ enum L10n {
     }
 
     enum Grouping {
-        static let overline = String(localized: "grouping.overline")
-        static let title = String(localized: "grouping.figma_title")
-        static let subtitle = String(localized: "grouping.subtitle")
-        static let selectFolder = String(localized: "grouping.select_folder")
-        static let noFolderSelected = String(localized: "grouping.no_folder_selected")
-        static let selectFolderPrompt = String(localized: "grouping.select_folder_prompt")
-        static let emptyState = String(localized: "grouping.empty_state")
-        static let draftSession = String(localized: "grouping.draft_session")
-        static let draftEmptyState = String(localized: "grouping.draft_empty_state")
-        static let sortAscending = String(localized: "grouping.sort_ascending")
-        static let sortDescending = String(localized: "grouping.sort_descending")
-        static let exportPDF = String(localized: "grouping.export_pdf")
-        static let exportCSV = String(localized: "grouping.export_csv")
-        static let deleteFile = String(localized: "grouping.delete_file")
-        static let confirmDeleteFileTitle = String(localized: "grouping.confirm_delete_file_title")
-        static let confirmDeleteFileMessage = String(localized: "grouping.confirm_delete_file_message")
-        static let totalVolume = String(localized: "grouping.total_volume")
-        static let activeBatches = String(localized: "grouping.active_batches")
-        static let avgDiameter = String(localized: "grouping.avg_diameter")
-        static let logCount = String(localized: "grouping.log_count")
-        static let columnDiameter = String(localized: "grouping.column_diameter")
-        static let columnLength = String(localized: "grouping.column_length")
-        static let columnQuantity = String(localized: "grouping.column_quantity")
-        static let columnVolume = String(localized: "grouping.column_volume")
-        static let summaryLogs = String(localized: "grouping.summary_logs")
-        static let summaryVolume = String(localized: "grouping.summary_volume")
-        static let exportCardTitle = String(localized: "grouping.export_card_title")
-        static let exportCardSubtitle = String(localized: "grouping.export_card_subtitle")
+        static var overline: String { L10n.tr("grouping.overline") }
+        static var title: String { L10n.tr("grouping.figma_title") }
+        static var subtitle: String { L10n.tr("grouping.subtitle") }
+        static var selectFolder: String { L10n.tr("grouping.select_folder") }
+        static var noFolderSelected: String { L10n.tr("grouping.no_folder_selected") }
+        static var selectFolderPrompt: String { L10n.tr("grouping.select_folder_prompt") }
+        static var emptyState: String { L10n.tr("grouping.empty_state") }
+        static var draftSession: String { L10n.tr("grouping.draft_session") }
+        static var draftEmptyState: String { L10n.tr("grouping.draft_empty_state") }
+        static var sortAscending: String { L10n.tr("grouping.sort_ascending") }
+        static var sortDescending: String { L10n.tr("grouping.sort_descending") }
+        static var exportPDF: String { L10n.tr("grouping.export_pdf") }
+        static var exportCSV: String { L10n.tr("grouping.export_csv") }
+        static var deleteFile: String { L10n.tr("grouping.delete_file") }
+        static var confirmDeleteFileTitle: String { L10n.tr("grouping.confirm_delete_file_title") }
+        static var confirmDeleteFileMessage: String { L10n.tr("grouping.confirm_delete_file_message") }
+        static var totalVolume: String { L10n.tr("grouping.total_volume") }
+        static var activeBatches: String { L10n.tr("grouping.active_batches") }
+        static var avgDiameter: String { L10n.tr("grouping.avg_diameter") }
+        static var logCount: String { L10n.tr("grouping.log_count") }
+        static var columnDiameter: String { L10n.tr("grouping.column_diameter") }
+        static var columnLength: String { L10n.tr("grouping.column_length") }
+        static var columnQuantity: String { L10n.tr("grouping.column_quantity") }
+        static var columnVolume: String { L10n.tr("grouping.column_volume") }
+        static var summaryLogs: String { L10n.tr("grouping.summary_logs") }
+        static var summaryVolume: String { L10n.tr("grouping.summary_volume") }
+        static var exportCardTitle: String { L10n.tr("grouping.export_card_title") }
+        static var exportCardSubtitle: String { L10n.tr("grouping.export_card_subtitle") }
 
         static func rowSummary(quantity: Int, volume: Double, recordCount: Int) -> String {
             String(
-                format: String(localized: "grouping.row_summary_format"),
+                format: L10n.tr("grouping.row_summary_format"),
                 quantity,
                 DisplayFormatting.volume(volume),
                 recordCount
@@ -186,53 +190,53 @@ enum L10n {
 
         static func volumeValue(_ volume: Double) -> String {
             String(
-                format: String(localized: "grouping.volume_value_format"),
+                format: L10n.tr("grouping.volume_value_format"),
                 DisplayFormatting.volume(volume)
             )
         }
 
         static func lengthValue(_ length: Double) -> String {
             String(
-                format: String(localized: "grouping.length_value_format"),
+                format: L10n.tr("grouping.length_value_format"),
                 DisplayFormatting.length(length)
             )
         }
 
         static func sectionSummary(diameter: Double) -> String {
             String(
-                format: String(localized: "grouping.section_summary_format"),
+                format: L10n.tr("grouping.section_summary_format"),
                 DisplayFormatting.diameter(diameter)
             )
         }
     }
 
     enum Export {
-        static let settingsTitle = String(localized: "export.settings_title")
-        static let confirmPDF = String(localized: "export.confirm_pdf")
-        static let confirmCSV = String(localized: "export.confirm_csv")
-        static let pdfTitle = String(localized: "export.pdf_title")
-        static let pdfColumnDiameter = String(localized: "export.pdf_column_diameter")
-        static let pdfColumnLength = String(localized: "export.pdf_column_length")
-        static let pdfColumnQuantity = String(localized: "export.pdf_column_quantity")
-        static let pdfColumnVolume = String(localized: "export.pdf_column_volume")
-        static let csvColumnDiameter = String(localized: "export.csv_column_diameter")
-        static let csvColumnLength = String(localized: "export.csv_column_length")
-        static let csvColumnQuantity = String(localized: "export.csv_column_quantity")
-        static let csvColumnVolume = String(localized: "export.csv_column_volume")
-        static let totalRowLabel = String(localized: "export.total_row_label")
+        static var settingsTitle: String { L10n.tr("export.settings_title") }
+        static var confirmPDF: String { L10n.tr("export.confirm_pdf") }
+        static var confirmCSV: String { L10n.tr("export.confirm_csv") }
+        static var pdfTitle: String { L10n.tr("export.pdf_title") }
+        static var pdfColumnDiameter: String { L10n.tr("export.pdf_column_diameter") }
+        static var pdfColumnLength: String { L10n.tr("export.pdf_column_length") }
+        static var pdfColumnQuantity: String { L10n.tr("export.pdf_column_quantity") }
+        static var pdfColumnVolume: String { L10n.tr("export.pdf_column_volume") }
+        static var csvColumnDiameter: String { L10n.tr("export.csv_column_diameter") }
+        static var csvColumnLength: String { L10n.tr("export.csv_column_length") }
+        static var csvColumnQuantity: String { L10n.tr("export.csv_column_quantity") }
+        static var csvColumnVolume: String { L10n.tr("export.csv_column_volume") }
+        static var totalRowLabel: String { L10n.tr("export.total_row_label") }
 
         static func optionalFieldLabel(index: Int) -> String {
             switch index {
             case 0:
-                String(localized: "export.optional_field_1_label")
+                L10n.tr("export.optional_field_1_label")
             case 1:
-                String(localized: "export.optional_field_2_label")
+                L10n.tr("export.optional_field_2_label")
             case 2:
-                String(localized: "export.optional_field_3_label")
+                L10n.tr("export.optional_field_3_label")
             case 3:
-                String(localized: "export.optional_field_4_label")
+                L10n.tr("export.optional_field_4_label")
             case 4:
-                String(localized: "export.optional_field_5_label")
+                L10n.tr("export.optional_field_5_label")
             default:
                 ""
             }
@@ -241,15 +245,15 @@ enum L10n {
         static func optionalFieldPlaceholder(index: Int) -> String {
             switch index {
             case 0:
-                String(localized: "export.optional_field_1_placeholder")
+                L10n.tr("export.optional_field_1_placeholder")
             case 1:
-                String(localized: "export.optional_field_2_placeholder")
+                L10n.tr("export.optional_field_2_placeholder")
             case 2:
-                String(localized: "export.optional_field_3_placeholder")
+                L10n.tr("export.optional_field_3_placeholder")
             case 3:
-                String(localized: "export.optional_field_4_placeholder")
+                L10n.tr("export.optional_field_4_placeholder")
             case 4:
-                String(localized: "export.optional_field_5_placeholder")
+                L10n.tr("export.optional_field_5_placeholder")
             default:
                 ""
             }
@@ -258,104 +262,104 @@ enum L10n {
         static func reportFieldLabel(_ field: ReportField) -> String {
             switch field {
             case .companyName:
-                String(localized: "export.report.company_name_label")
+                L10n.tr("export.report.company_name_label")
             case .reportDate:
-                String(localized: "export.report.report_date_label")
+                L10n.tr("export.report.report_date_label")
             case .location:
-                String(localized: "export.report.location_label")
+                L10n.tr("export.report.location_label")
             case .reporter:
-                String(localized: "export.report.reporter_label")
+                L10n.tr("export.report.reporter_label")
             case .projectCode:
-                String(localized: "export.report.project_code_label")
+                L10n.tr("export.report.project_code_label")
             }
         }
 
         static func reportFieldPlaceholder(_ field: ReportField) -> String {
             switch field {
             case .companyName:
-                String(localized: "export.report.company_name_placeholder")
+                L10n.tr("export.report.company_name_placeholder")
             case .reportDate:
-                String(localized: "export.report.report_date_placeholder")
+                L10n.tr("export.report.report_date_placeholder")
             case .location:
-                String(localized: "export.report.location_placeholder")
+                L10n.tr("export.report.location_placeholder")
             case .reporter:
-                String(localized: "export.report.reporter_placeholder")
+                L10n.tr("export.report.reporter_placeholder")
             case .projectCode:
-                String(localized: "export.report.project_code_placeholder")
+                L10n.tr("export.report.project_code_placeholder")
             }
         }
     }
 
     enum Folders {
-        static let title = String(localized: "folders.title")
-        static let subtitle = String(localized: "folders.subtitle")
-        static let emptyState = String(localized: "folders.empty_state")
+        static var title: String { L10n.tr("folders.title") }
+        static var subtitle: String { L10n.tr("folders.subtitle") }
+        static var emptyState: String { L10n.tr("folders.empty_state") }
 
         static func recordCount(_ count: Int) -> String {
-            String(format: String(localized: "folders.record_count_format"), count)
+            String(format: L10n.tr("folders.record_count_format"), count)
         }
     }
 
     enum Lumber {
-        static let title = String(localized: "lumber.title")
-        static let widthCm = String(localized: "lumber.width_cm")
-        static let thicknessCm = String(localized: "lumber.thickness_cm")
-        static let lengthM = String(localized: "lumber.length_m")
-        static let quantity = String(localized: "lumber.quantity")
-        static let addToList = String(localized: "lumber.add_to_list")
+        static var title: String { L10n.tr("lumber.title") }
+        static var widthCm: String { L10n.tr("lumber.width_cm") }
+        static var thicknessCm: String { L10n.tr("lumber.thickness_cm") }
+        static var lengthM: String { L10n.tr("lumber.length_m") }
+        static var quantity: String { L10n.tr("lumber.quantity") }
+        static var addToList: String { L10n.tr("lumber.add_to_list") }
 
         static func previewVolume(_ volume: String) -> String {
-            String(format: String(localized: "lumber.preview_volume_format"), volume)
+            String(format: L10n.tr("lumber.preview_volume_format"), volume)
         }
     }
 
     enum Hollow {
-        static let title = String(localized: "hollow.title")
-        static let outerDiameter = String(localized: "hollow.outer_diameter")
-        static let innerDiameter = String(localized: "hollow.inner_diameter")
-        static let length = String(localized: "hollow.length")
-        static let quantity = String(localized: "hollow.quantity")
-        static let addToList = String(localized: "hollow.add_to_list")
-        static let alternativeTitle = String(localized: "hollow.alternative_title")
+        static var title: String { L10n.tr("hollow.title") }
+        static var outerDiameter: String { L10n.tr("hollow.outer_diameter") }
+        static var innerDiameter: String { L10n.tr("hollow.inner_diameter") }
+        static var length: String { L10n.tr("hollow.length") }
+        static var quantity: String { L10n.tr("hollow.quantity") }
+        static var addToList: String { L10n.tr("hollow.add_to_list") }
+        static var alternativeTitle: String { L10n.tr("hollow.alternative_title") }
 
         static func addDiameter(_ diameter: Int) -> String {
             String(
-                format: String(localized: "hollow.add_diameter_format"),
+                format: L10n.tr("hollow.add_diameter_format"),
                 diameter
             )
         }
 
         static func equivalentDiameter(_ diameter: Int) -> String {
             String(
-                format: String(localized: "hollow.equivalent_diameter_format"),
+                format: L10n.tr("hollow.equivalent_diameter_format"),
                 diameter
             )
         }
 
         static func netVolume(_ volume: Double) -> String {
             String(
-                format: String(localized: "hollow.net_volume_format"),
+                format: L10n.tr("hollow.net_volume_format"),
                 DisplayFormatting.volume(volume)
             )
         }
     }
 
     enum FolderSelection {
-        static let title = String(localized: "folder_selection.title")
-        static let createFolder = String(localized: "folder_selection.create_folder")
-        static let createSubfolder = String(localized: "folder_selection.create_subfolder")
-        static let namePlaceholder = String(localized: "folder_selection.name_placeholder")
-        static let noFolders = String(localized: "folder_selection.no_folders")
-        static let noSubfolders = String(localized: "folder_selection.no_subfolders")
-        static let confirmSave = String(localized: "folder_selection.confirm_save")
-        static let create = String(localized: "folder_selection.create")
+        static var title: String { L10n.tr("folder_selection.title") }
+        static var createFolder: String { L10n.tr("folder_selection.create_folder") }
+        static var createSubfolder: String { L10n.tr("folder_selection.create_subfolder") }
+        static var namePlaceholder: String { L10n.tr("folder_selection.name_placeholder") }
+        static var noFolders: String { L10n.tr("folder_selection.no_folders") }
+        static var noSubfolders: String { L10n.tr("folder_selection.no_subfolders") }
+        static var confirmSave: String { L10n.tr("folder_selection.confirm_save") }
+        static var create: String { L10n.tr("folder_selection.create") }
     }
 
     enum Formula {
-        static let smalian = String(localized: "calculation_method.smalian")
-        static let huber = String(localized: "calculation_method.huber")
-        static let newton = String(localized: "calculation_method.newton")
-        static let ulker = String(localized: "calculation_method.ulker")
+        static var smalian: String { L10n.tr("calculation_method.smalian") }
+        static var huber: String { L10n.tr("calculation_method.huber") }
+        static var newton: String { L10n.tr("calculation_method.newton") }
+        static var ulker: String { L10n.tr("calculation_method.ulker") }
 
         static func displayName(for method: CalculationMethod) -> String {
             switch method {
@@ -372,81 +376,81 @@ enum L10n {
     }
 
     enum Model {
-        static let folder = String(localized: "model.folder")
-        static let logRecord = String(localized: "model.log_record")
+        static var folder: String { L10n.tr("model.folder") }
+        static var logRecord: String { L10n.tr("model.log_record") }
     }
 
     enum Settings {
-        static let title = String(localized: "settings.title")
-        static let generalSection = String(localized: "settings.general_section")
-        static let highVolumeAlerts = String(localized: "settings.high_volume_alerts")
-        static let darkMode = String(localized: "settings.dark_mode")
-        static let hapticFeedback = String(localized: "settings.haptic_feedback")
-        static let enginePreferencesSection = String(localized: "settings.engine_preferences_section")
-        static let calculationMethod = String(localized: "settings.calculation_method")
-        static let dataManagementSection = String(localized: "settings.data_management_section")
-        static let exportPdfTitle = String(localized: "settings.export_pdf_title")
-        static let exportPdfSubtitle = String(localized: "settings.export_pdf_subtitle")
-        static let generatePdf = String(localized: "settings.generate_pdf")
-        static let exportExcelTitle = String(localized: "settings.export_excel_title")
-        static let exportExcelSubtitle = String(localized: "settings.export_excel_subtitle")
-        static let exportSpreadsheet = String(localized: "settings.export_spreadsheet")
-        static let formulaSmalianSubtitle = String(localized: "settings.formula_smalian_subtitle")
-        static let formulaHuberSubtitle = String(localized: "settings.formula_huber_subtitle")
-        static let formulaNewtonSubtitle = String(localized: "settings.formula_newton_subtitle")
-        static let formulaUlkerSubtitle = String(localized: "settings.formula_ulker_subtitle")
-        static let supportSection = String(localized: "settings.support_section")
-        static let rateUsTitle = String(localized: "settings.rate_us_title")
-        static let rateUsSubtitle = String(localized: "settings.rate_us_subtitle")
-        static let contactTitle = String(localized: "settings.contact_title")
-        static let contactSubtitle = String(localized: "settings.contact_subtitle")
-        static let contactEmailSubject = String(localized: "settings.contact_email_subject")
-        static let reportHeaderTitle = String(localized: "settings.report_header_title")
-        static let reportHeaderSubtitle = String(localized: "settings.report_header_subtitle")
-        static let saveReportHeader = String(localized: "settings.save_report_header")
-        static let outputInfoTitle = String(localized: "settings.output_info_title")
-        static let outputInfoBody = String(localized: "settings.output_info_body")
-        static let professionalLookTitle = String(localized: "settings.professional_look_title")
-        static let previewDraftTitle = String(localized: "settings.preview_draft_title")
-        static let calculationSection = String(localized: "settings.calculation_section")
-        static let defaultFormula = String(localized: "settings.default_formula")
-        static let appearanceSection = String(localized: "settings.appearance_section")
-        static let theme = String(localized: "settings.theme")
-        static let languageSection = String(localized: "settings.language_section")
-        static let languagePickerTitle = String(localized: "settings.language_picker_title")
-        static let openLanguageSettings = String(localized: "settings.open_language_settings")
-        static let aboutSection = String(localized: "settings.about_section")
-        static let versionLabel = String(localized: "settings.version_label")
-        static let footerCompany = String(localized: "settings.footer_company")
+        static var title: String { L10n.tr("settings.title") }
+        static var generalSection: String { L10n.tr("settings.general_section") }
+        static var highVolumeAlerts: String { L10n.tr("settings.high_volume_alerts") }
+        static var darkMode: String { L10n.tr("settings.dark_mode") }
+        static var hapticFeedback: String { L10n.tr("settings.haptic_feedback") }
+        static var enginePreferencesSection: String { L10n.tr("settings.engine_preferences_section") }
+        static var calculationMethod: String { L10n.tr("settings.calculation_method") }
+        static var dataManagementSection: String { L10n.tr("settings.data_management_section") }
+        static var exportPdfTitle: String { L10n.tr("settings.export_pdf_title") }
+        static var exportPdfSubtitle: String { L10n.tr("settings.export_pdf_subtitle") }
+        static var generatePdf: String { L10n.tr("settings.generate_pdf") }
+        static var exportExcelTitle: String { L10n.tr("settings.export_excel_title") }
+        static var exportExcelSubtitle: String { L10n.tr("settings.export_excel_subtitle") }
+        static var exportSpreadsheet: String { L10n.tr("settings.export_spreadsheet") }
+        static var formulaSmalianSubtitle: String { L10n.tr("settings.formula_smalian_subtitle") }
+        static var formulaHuberSubtitle: String { L10n.tr("settings.formula_huber_subtitle") }
+        static var formulaNewtonSubtitle: String { L10n.tr("settings.formula_newton_subtitle") }
+        static var formulaUlkerSubtitle: String { L10n.tr("settings.formula_ulker_subtitle") }
+        static var supportSection: String { L10n.tr("settings.support_section") }
+        static var rateUsTitle: String { L10n.tr("settings.rate_us_title") }
+        static var rateUsSubtitle: String { L10n.tr("settings.rate_us_subtitle") }
+        static var contactTitle: String { L10n.tr("settings.contact_title") }
+        static var contactSubtitle: String { L10n.tr("settings.contact_subtitle") }
+        static var contactEmailSubject: String { L10n.tr("settings.contact_email_subject") }
+        static var reportHeaderTitle: String { L10n.tr("settings.report_header_title") }
+        static var reportHeaderSubtitle: String { L10n.tr("settings.report_header_subtitle") }
+        static var saveReportHeader: String { L10n.tr("settings.save_report_header") }
+        static var outputInfoTitle: String { L10n.tr("settings.output_info_title") }
+        static var outputInfoBody: String { L10n.tr("settings.output_info_body") }
+        static var professionalLookTitle: String { L10n.tr("settings.professional_look_title") }
+        static var previewDraftTitle: String { L10n.tr("settings.preview_draft_title") }
+        static var calculationSection: String { L10n.tr("settings.calculation_section") }
+        static var defaultFormula: String { L10n.tr("settings.default_formula") }
+        static var appearanceSection: String { L10n.tr("settings.appearance_section") }
+        static var theme: String { L10n.tr("settings.theme") }
+        static var languageSection: String { L10n.tr("settings.language_section") }
+        static var languagePickerTitle: String { L10n.tr("settings.language_picker_title") }
+        static var openLanguageSettings: String { L10n.tr("settings.open_language_settings") }
+        static var aboutSection: String { L10n.tr("settings.about_section") }
+        static var versionLabel: String { L10n.tr("settings.version_label") }
+        static var footerCompany: String { L10n.tr("settings.footer_company") }
 
         static func footerVersion(_ version: String) -> String {
-            String(format: String(localized: "settings.footer_version_format"), L10n.App.name.uppercased(), version)
+            String(format: L10n.tr("settings.footer_version_format"), L10n.App.name.uppercased(), version)
         }
 
         static func themeName(for theme: AppTheme) -> String {
             switch theme {
             case .system:
-                String(localized: "settings.theme_system")
+                L10n.tr("settings.theme_system")
             case .light:
-                String(localized: "settings.theme_light")
+                L10n.tr("settings.theme_light")
             case .dark:
-                String(localized: "settings.theme_dark")
+                L10n.tr("settings.theme_dark")
             }
         }
     }
 
     enum Onboarding {
-        static let nextStep = String(localized: "onboarding.next_step")
-        static let skipIntro = String(localized: "onboarding.skip_intro")
-        static let getStarted = String(localized: "onboarding.get_started")
-        static let step1TitleLine1 = String(localized: "onboarding.step1_title_line1")
-        static let step1TitleLine2 = String(localized: "onboarding.step1_title_line2")
-        static let step1Subtitle = String(localized: "onboarding.step1_subtitle")
-        static let step2TitleLine1 = String(localized: "onboarding.step2_title_line1")
-        static let step2TitleLine2 = String(localized: "onboarding.step2_title_line2")
-        static let step2Subtitle = String(localized: "onboarding.step2_subtitle")
-        static let step3TitleLine1 = String(localized: "onboarding.step3_title_line1")
-        static let step3TitleLine2 = String(localized: "onboarding.step3_title_line2")
-        static let step3Subtitle = String(localized: "onboarding.step3_subtitle")
+        static var nextStep: String { L10n.tr("onboarding.next_step") }
+        static var skipIntro: String { L10n.tr("onboarding.skip_intro") }
+        static var getStarted: String { L10n.tr("onboarding.get_started") }
+        static var step1TitleLine1: String { L10n.tr("onboarding.step1_title_line1") }
+        static var step1TitleLine2: String { L10n.tr("onboarding.step1_title_line2") }
+        static var step1Subtitle: String { L10n.tr("onboarding.step1_subtitle") }
+        static var step2TitleLine1: String { L10n.tr("onboarding.step2_title_line1") }
+        static var step2TitleLine2: String { L10n.tr("onboarding.step2_title_line2") }
+        static var step2Subtitle: String { L10n.tr("onboarding.step2_subtitle") }
+        static var step3TitleLine1: String { L10n.tr("onboarding.step3_title_line1") }
+        static var step3TitleLine2: String { L10n.tr("onboarding.step3_title_line2") }
+        static var step3Subtitle: String { L10n.tr("onboarding.step3_subtitle") }
     }
 }

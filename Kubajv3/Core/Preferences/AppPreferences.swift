@@ -19,6 +19,7 @@ final class AppPreferences {
     var appLanguage: AppLanguage {
         didSet {
             UserDefaults.standard.set(appLanguage.rawValue, forKey: AppPreferenceKey.appLanguage)
+            AppLocalization.apply(languageCode: appLanguage.localeIdentifier)
         }
     }
 
@@ -59,6 +60,8 @@ final class AppPreferences {
         }
 
         isHighVolumeAlertsEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.isHighVolumeAlertsEnabled)
+
+        AppLocalization.apply(languageCode: appLanguage.localeIdentifier)
     }
 
     static var settingsCalculationMethods: [CalculationMethod] {
