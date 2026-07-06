@@ -32,6 +32,10 @@
 		D10000010000000000000006 /* GroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000006 /* GroupingView.swift */; };
 		D10000010000000000000007 /* ExportSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000007 /* ExportSettingsView.swift */; };
 		D10000010000000000000008 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000008 /* ShareSheet.swift */; };
+		E10000010000000000000001 /* AppPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000001 /* AppPreferenceKey.swift */; };
+		E10000010000000000000002 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000002 /* AppTheme.swift */; };
+		E10000010000000000000003 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000003 /* AppPreferences.swift */; };
+		E10000010000000000000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000004 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +76,10 @@
 		D20000010000000000000006 /* GroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupingView.swift; sourceTree = "<group>"; };
 		D20000010000000000000007 /* ExportSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportSettingsView.swift; sourceTree = "<group>"; };
 		D20000010000000000000008 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		E20000010000000000000001 /* AppPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferenceKey.swift; sourceTree = "<group>"; };
+		E20000010000000000000002 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		E20000010000000000000003 /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
+		E20000010000000000000004 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +149,7 @@
 				A40000010000000000000011 /* Haptics */,
 				A40000010000000000000012 /* Design */,
 				A40000010000000000000016 /* Sharing */,
+				A40000010000000000000021 /* Preferences */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -188,6 +197,7 @@
 				A40000010000000000000015 /* FolderSelection */,
 				A40000010000000000000019 /* Grouping */,
 				A40000010000000000000020 /* Export */,
+				A40000010000000000000022 /* Settings */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -275,6 +285,24 @@
 				D20000010000000000000007 /* ExportSettingsView.swift */,
 			);
 			path = Export;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000021 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				E20000010000000000000001 /* AppPreferenceKey.swift */,
+				E20000010000000000000002 /* AppTheme.swift */,
+				E20000010000000000000003 /* AppPreferences.swift */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000022 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				E20000010000000000000004 /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -399,6 +427,10 @@
 				D10000010000000000000006 /* GroupingView.swift in Sources */,
 				D10000010000000000000007 /* ExportSettingsView.swift in Sources */,
 				D10000010000000000000008 /* ShareSheet.swift in Sources */,
+				E10000010000000000000001 /* AppPreferenceKey.swift in Sources */,
+				E10000010000000000000002 /* AppTheme.swift in Sources */,
+				E10000010000000000000003 /* AppPreferences.swift in Sources */,
+				E10000010000000000000004 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

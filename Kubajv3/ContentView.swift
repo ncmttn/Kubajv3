@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var preferences = AppPreferences.shared
+
     var body: some View {
         TabView {
             HomeView()
@@ -10,9 +12,16 @@ struct ContentView: View {
 
             GroupingView()
                 .tabItem {
-                    Label(L10n.Tab.grouping, systemImage: "square.stack.3d.up")
+                    Label(L10n.Tab.records, systemImage: "folder")
+                }
+
+            SettingsView()
+                .tabItem {
+                    Label(L10n.Tab.settings, systemImage: "gearshape")
                 }
         }
+        .environment(preferences)
+        .preferredColorScheme(preferences.appTheme.colorScheme)
     }
 }
 

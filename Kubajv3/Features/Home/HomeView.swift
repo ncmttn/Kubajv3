@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppPreferences.self) private var preferences
 
     var body: some View {
         NavigationStack {
@@ -26,6 +27,9 @@ struct HomeView: View {
                 .padding()
             }
             .navigationTitle(L10n.App.name)
+            .onAppear {
+                viewModel.preferences = preferences
+            }
             .sheet(isPresented: $viewModel.isHollowSheetPresented) {
                 HollowCalculationView { outer, inner, length, quantity in
                     viewModel.addHollowEntry(
@@ -208,5 +212,6 @@ private struct DraftLogEntryRow: View {
 
 #Preview {
     HomeView()
+        .environment(AppPreferences.shared)
         .modelContainer(for: [Folder.self, LogRecord.self], inMemory: true)
 }

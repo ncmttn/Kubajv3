@@ -11,7 +11,11 @@ final class HomeViewModel {
     var isHollowSheetPresented = false
     var isFolderSelectionPresented = false
 
-    var defaultCalculationMethod: CalculationMethod = .huber
+    var preferences: AppPreferences?
+
+    private var activeCalculationMethod: CalculationMethod {
+        preferences?.defaultCalculationMethod ?? .huber
+    }
 
     var sortedEntries: [DraftLogEntry] {
         draftEntries.sorted { $0.createdAt > $1.createdAt }
@@ -39,7 +43,7 @@ final class HomeViewModel {
             lengthM: length,
             quantity: quantity,
             volumeM3: volume,
-            calculationMethod: defaultCalculationMethod,
+            calculationMethod: activeCalculationMethod,
             isHollow: false
         )
         clearInputFields()
@@ -71,7 +75,7 @@ final class HomeViewModel {
             lengthM: lengthM,
             quantity: quantity,
             volumeM3: result.netVolumeM3,
-            calculationMethod: defaultCalculationMethod,
+            calculationMethod: activeCalculationMethod,
             isHollow: true
         )
     }
@@ -116,7 +120,7 @@ final class HomeViewModel {
     }
 
     private func volumeForStandardEntry(diameterCm: Double, lengthM: Double) -> Double {
-        switch defaultCalculationMethod {
+        switch activeCalculationMethod {
         case .smalian, .ulker:
             ForestryCalculator.standardCylinder(diameterCm: diameterCm, lengthM: lengthM)
         case .huber:

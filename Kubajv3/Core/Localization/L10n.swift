@@ -21,7 +21,8 @@ enum L10n {
 
     enum Tab {
         static let home = String(localized: "tab.home")
-        static let grouping = String(localized: "tab.grouping")
+        static let records = String(localized: "tab.records")
+        static let settings = String(localized: "tab.settings")
     }
 
     enum Common {
@@ -185,5 +186,28 @@ enum L10n {
     enum Model {
         static let folder = String(localized: "model.folder")
         static let logRecord = String(localized: "model.log_record")
+    }
+
+    enum Settings {
+        static let title = String(localized: "settings.title")
+        static let calculationSection = String(localized: "settings.calculation_section")
+        static let defaultFormula = String(localized: "settings.default_formula")
+        static let appearanceSection = String(localized: "settings.appearance_section")
+        static let theme = String(localized: "settings.theme")
+        static let languageSection = String(localized: "settings.language_section")
+        static let openLanguageSettings = String(localized: "settings.open_language_settings")
+        static let aboutSection = String(localized: "settings.about_section")
+        static let versionLabel = String(localized: "settings.version_label")
+
+        static func themeName(for theme: AppTheme) -> String {
+            switch theme {
+            case .system:
+                String(localized: "settings.theme_system")
+            case .light:
+                String(localized: "settings.theme_light")
+            case .dark:
+                String(localized: "settings.theme_dark")
+            }
+        }
     }
 }
