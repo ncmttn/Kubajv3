@@ -11,7 +11,7 @@ final class LogRecord {
     var isHollow: Bool
     var createdAt: Date
 
-    var istif: Istif?
+    var folder: Folder?
 
     init(
         diameterCm: Double,
@@ -21,7 +21,7 @@ final class LogRecord {
         calculationMethod: CalculationMethod,
         isHollow: Bool = false,
         createdAt: Date = .now,
-        istif: Istif? = nil
+        folder: Folder? = nil
     ) {
         self.diameterCm = diameterCm
         self.lengthM = lengthM
@@ -30,6 +30,6 @@ final class LogRecord {
         self.calculationMethod = calculationMethod
         self.isHollow = isHollow
         self.createdAt = createdAt
-        self.istif = istif
+        self.folder = folder
     }
 }

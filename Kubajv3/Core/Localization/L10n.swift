@@ -27,8 +27,7 @@ enum L10n {
     }
 
     enum Model {
-        static let bolme = String(localized: "model.bolme")
-        static let istif = String(localized: "model.istif")
+        static let folder = String(localized: "model.folder")
         static let logRecord = String(localized: "model.log_record")
     }
 }

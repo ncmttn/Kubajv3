@@ -5,8 +5,7 @@ import SwiftData
 struct Kubajv3App: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Bolme.self,
-            Istif.self,
+            Folder.self,
             LogRecord.self,
         ])
         let configuration = ModelConfiguration(

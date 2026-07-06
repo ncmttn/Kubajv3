@@ -9,8 +9,7 @@
 /* Begin PBXBuildFile section */
 		A10000010000000000000001 /* Kubajv3App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000001 /* Kubajv3App.swift */; };
 		A10000010000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000002 /* ContentView.swift */; };
-		A10000010000000000000003 /* Bolme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000003 /* Bolme.swift */; };
-		A10000010000000000000004 /* Istif.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000004 /* Istif.swift */; };
+		A10000010000000000000003 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000003 /* Folder.swift */; };
 		A10000010000000000000005 /* LogRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000005 /* LogRecord.swift */; };
 		A10000010000000000000006 /* CalculationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000006 /* CalculationMethod.swift */; };
 		A10000010000000000000007 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000007 /* L10n.swift */; };
@@ -21,8 +20,7 @@
 /* Begin PBXFileReference section */
 		A20000010000000000000001 /* Kubajv3App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kubajv3App.swift; sourceTree = "<group>"; };
 		A20000010000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A20000010000000000000003 /* Bolme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bolme.swift; sourceTree = "<group>"; };
-		A20000010000000000000004 /* Istif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Istif.swift; sourceTree = "<group>"; };
+		A20000010000000000000003 /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		A20000010000000000000005 /* LogRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRecord.swift; sourceTree = "<group>"; };
 		A20000010000000000000006 /* CalculationMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculationMethod.swift; sourceTree = "<group>"; };
 		A20000010000000000000007 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
@@ -73,8 +71,7 @@
 		A40000010000000000000004 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				A20000010000000000000003 /* Bolme.swift */,
-				A20000010000000000000004 /* Istif.swift */,
+				A20000010000000000000003 /* Folder.swift */,
 				A20000010000000000000005 /* LogRecord.swift */,
 				A20000010000000000000006 /* CalculationMethod.swift */,
 			);
@@ -186,8 +183,7 @@
 			files = (
 				A10000010000000000000001 /* Kubajv3App.swift in Sources */,
 				A10000010000000000000002 /* ContentView.swift in Sources */,
-				A10000010000000000000003 /* Bolme.swift in Sources */,
-				A10000010000000000000004 /* Istif.swift in Sources */,
+				A10000010000000000000003 /* Folder.swift in Sources */,
 				A10000010000000000000005 /* LogRecord.swift in Sources */,
 				A10000010000000000000006 /* CalculationMethod.swift in Sources */,
 				A10000010000000000000007 /* L10n.swift in Sources */,
