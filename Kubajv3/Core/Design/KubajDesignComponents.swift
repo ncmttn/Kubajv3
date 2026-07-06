@@ -93,6 +93,8 @@ struct KubajInputField: View {
         .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .textCase(.uppercase)
         .tracking(1)
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
         .padding(.leading, 8)
         .padding(.bottom, 6)
 
@@ -143,6 +145,8 @@ struct KubajPrimaryButton: View {
     Button(action: action) {
       Text(title)
         .font(KubajFont.button())
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
@@ -175,6 +179,8 @@ struct KubajOutlineCapsuleButton: View {
         }
         Text(title)
           .font(KubajFont.button())
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
       }
       .foregroundStyle(KubajColor.primary)
       .frame(maxWidth: .infinity)

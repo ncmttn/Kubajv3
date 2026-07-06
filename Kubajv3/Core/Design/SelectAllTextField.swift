@@ -19,6 +19,9 @@ struct SelectAllTextField: UIViewRepresentable {
         textField.returnKeyType = returnKeyType
         textField.autocorrectionType = .no
         textField.placeholder = placeholder
+        textField.adjustsFontSizeToFitWidth = true
+        textField.minimumFontSize = 11
+        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textChanged), for: .editingChanged)
         return textField
     }
