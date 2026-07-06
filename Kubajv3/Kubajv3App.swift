@@ -76,6 +76,7 @@ private struct RootView: View {
                         OnboardingView()
                     }
                 }
+                .id(preferences.appLanguage)
                 .transition(.opacity)
             } else {
                 SplashView()
