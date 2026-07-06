@@ -247,7 +247,7 @@ enum AppTab: CaseIterable, Identifiable {
     case .home:
       "house.fill"
     case .groups:
-      "person.2.fill"
+      "square.stack.3d.up.fill"
     case .hollow:
       "circle.dotted"
     case .settings:
@@ -255,3 +255,157 @@ enum AppTab: CaseIterable, Identifiable {
     }
   }
 }
+
+struct KubajStatTile: View {
+  let title: String
+  let value: String
+  var valueColor: Color = KubajColor.textPrimary
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      Text(title)
+        .font(.system(size: 10, weight: .bold))
+        .foregroundStyle(KubajColor.textSecondary)
+        .textCase(.uppercase)
+        .tracking(0.5)
+
+      Text(value)
+        .font(.system(size: 24, weight: .bold))
+        .foregroundStyle(valueColor)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(20)
+    .background(Color.white, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+    .shadow(color: .black.opacity(0.05), radius: 1, y: 1)
+  }
+}
+
+struct KubajSectionHeader: View {
+  let overline: String?
+  let title: String
+  let subtitle: String?
+
+  init(overline: String? = nil, title: String, subtitle: String? = nil) {
+    self.overline = overline
+    self.title = title
+    self.subtitle = subtitle
+  }
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      if let overline {
+        Text(overline)
+          .font(.system(size: 12, weight: .regular))
+          .foregroundStyle(KubajColor.textSecondary)
+          .textCase(.uppercase)
+          .tracking(1.2)
+      }
+
+      Text(title)
+        .font(.system(size: 30, weight: .heavy))
+        .foregroundStyle(KubajColor.textPrimary)
+        .tracking(-0.75)
+
+      if let subtitle {
+        Text(subtitle)
+          .font(.system(size: 16))
+          .foregroundStyle(KubajColor.textSecondary)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+}
+
+struct KubajFormField: View {
+  let label: String
+  let placeholder: String
+  @Binding var text: String
+  var keyboard: UIKeyboardType = .default
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text(label)
+        .font(.system(size: 12, weight: .medium))
+        .foregroundStyle(KubajColor.textSecondary)
+        .padding(.leading, 4)
+
+      TextField(placeholder, text: $text)
+        .keyboardType(keyboard)
+        .font(.system(size: 16))
+        .foregroundStyle(KubajColor.textPrimary)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(KubajColor.inputBackground, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+    }
+  }
+}
+
+struct KubajSecondaryButton: View {
+  let title: String
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Text(title)
+        .font(.system(size: 16, weight: .semibold))
+        .foregroundStyle(KubajColor.textSecondary)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+    }
+  }
+}
+
+struct KubajRectPrimaryButton: View {
+  let title: String
+  var systemImage: String? = nil
+  var isEnabled: Bool = true
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      HStack(spacing: 8) {
+        if let systemImage {
+          Image(systemName: systemImage)
+            .font(.system(size: 16, weight: .bold))
+        }
+        Text(title)
+          .font(.system(size: 16, weight: .bold))
+      }
+      .foregroundStyle(.white)
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 16)
+      .background(
+        LinearGradient(
+          colors: isEnabled ? [KubajColor.primary, KubajColor.primaryEnd] : [KubajColor.textMuted, KubajColor.textMuted],
+          startPoint: .leading,
+          endPoint: .trailing
+        ),
+        in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium)
+      )
+      .shadow(color: KubajColor.primary.opacity(isEnabled ? 0.15 : 0), radius: 8, y: 4)
+    }
+    .disabled(!isEnabled)
+  }
+}
+
+struct KubajSettingsCard<Content: View>: View {
+  let title: String
+  @ViewBuilder var content: Content
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      Text(title)
+        .font(.system(size: 14, weight: .bold))
+        .foregroundStyle(KubajColor.textSecondary)
+        .textCase(.uppercase)
+        .tracking(1)
+
+      content
+    }
+    .padding(KubajMetric.horizontalPadding)
+    .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
+  }
+}
+

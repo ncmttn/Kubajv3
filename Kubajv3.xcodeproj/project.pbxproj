@@ -38,6 +38,8 @@
 		E10000010000000000000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000004 /* SettingsView.swift */; };
 		F10000010000000000000001 /* KubajDesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000010000000000000001 /* KubajDesignTokens.swift */; };
 		F10000010000000000000002 /* KubajDesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000010000000000000002 /* KubajDesignComponents.swift */; };
+		G10000010000000000000001 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G20000010000000000000001 /* OnboardingView.swift */; };
+		G10000010000000000000002 /* ReportHeaderPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = G20000010000000000000002 /* ReportHeaderPreferences.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +86,8 @@
 		E20000010000000000000004 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F20000010000000000000001 /* KubajDesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajDesignTokens.swift; sourceTree = "<group>"; };
 		F20000010000000000000002 /* KubajDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajDesignComponents.swift; sourceTree = "<group>"; };
+		G20000010000000000000001 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		G20000010000000000000002 /* ReportHeaderPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportHeaderPreferences.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,6 +205,7 @@
 				A40000010000000000000015 /* FolderSelection */,
 				A40000010000000000000019 /* Grouping */,
 				A40000010000000000000020 /* Export */,
+				A40000010000000000000023 /* Onboarding */,
 				A40000010000000000000022 /* Settings */,
 			);
 			path = Features;
@@ -299,8 +304,17 @@
 				E20000010000000000000001 /* AppPreferenceKey.swift */,
 				E20000010000000000000002 /* AppTheme.swift */,
 				E20000010000000000000003 /* AppPreferences.swift */,
+				G20000010000000000000002 /* ReportHeaderPreferences.swift */,
 			);
 			path = Preferences;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000023 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				G20000010000000000000001 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		A40000010000000000000022 /* Settings */ = {
@@ -439,6 +453,8 @@
 				E10000010000000000000004 /* SettingsView.swift in Sources */,
 				F10000010000000000000001 /* KubajDesignTokens.swift in Sources */,
 				F10000010000000000000002 /* KubajDesignComponents.swift in Sources */,
+				G10000010000000000000001 /* OnboardingView.swift in Sources */,
+				G10000010000000000000002 /* ReportHeaderPreferences.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

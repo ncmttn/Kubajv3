@@ -10,37 +10,43 @@ struct ExportSettingsView: View {
     init(exportKind: ExportKind, onExport: @escaping (ExportMetadata) -> Void) {
         self.exportKind = exportKind
         self.onExport = onExport
-        _fieldValues = State(initialValue: Array(repeating: "", count: ExportMetadata.maximumFieldCount))
+        let stored = ReportField.allCases.map { ReportHeaderPreferences.value(for: $0) }
+        _fieldValues = State(initialValue: stored)
     }
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.clear
-                    .background(.ultraThinMaterial)
-                    .ignoresSafeArea()
+            ScrollView {
+                VStack(spacing: 32) {
+                    KubajSectionHeader(
+                        title: L10n.Export.settingsTitle,
+                        subtitle: L10n.Settings.reportHeaderSubtitle
+                    )
 
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(0..<ExportMetadata.maximumFieldCount, id: \.self) { index in
-                            fieldCard(index: index)
+                    VStack(spacing: 24) {
+                        ForEach(ReportField.allCases) { field in
+                            KubajFormField(
+                                label: L10n.Export.reportFieldLabel(field),
+                                placeholder: L10n.Export.reportFieldPlaceholder(field),
+                                text: binding(for: field),
+                                keyboard: field == .contactPhone ? .phonePad : .default
+                            )
                         }
-
-                        Button {
-                            onExport(ExportMetadata(fields: fieldValues))
-                            dismiss()
-                        } label: {
-                            Text(confirmTitle)
-                                .fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                        }
-                        .buttonStyle(.borderedProminent)
                     }
-                    .padding()
+                    .padding(32)
+                    .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: 32))
+
+                    KubajRectPrimaryButton(
+                        title: confirmTitle,
+                        systemImage: exportKind == .pdf ? "doc.richtext" : "tablecells"
+                    ) {
+                        saveAndExport()
+                    }
                 }
+                .padding(.horizontal, KubajMetric.horizontalPadding)
+                .padding(.vertical, 24)
             }
-            .navigationTitle(L10n.Export.settingsTitle)
+            .background(KubajColor.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -61,16 +67,19 @@ struct ExportSettingsView: View {
         }
     }
 
-    private func fieldCard(index: Int) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(L10n.Export.optionalFieldLabel(index: index))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            TextField(L10n.Export.optionalFieldPlaceholder(index: index), text: $fieldValues[index])
-                .textFieldStyle(.roundedBorder)
+    private func binding(for field: ReportField) -> Binding<String> {
+        Binding(
+            get: { fieldValues[field.rawValue] },
+            set: { fieldValues[field.rawValue] = $0 }
+        )
+    }
+
+    private func saveAndExport() {
+        for field in ReportField.allCases {
+            ReportHeaderPreferences.setValue(fieldValues[field.rawValue], for: field)
         }
-        .padding()
-        .glassCard(material: .ultraThinMaterial)
+        onExport(ExportMetadata(fields: fieldValues))
+        dismiss()
     }
 }
 

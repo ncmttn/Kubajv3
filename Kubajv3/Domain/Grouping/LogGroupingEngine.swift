@@ -10,6 +10,23 @@ struct GroupingKey: Hashable, Sendable {
     }
 }
 
+struct DiameterSection: Identifiable, Equatable {
+    let diameterCm: Double
+    let groups: [LogGroup]
+
+    var id: String {
+        "\(diameterCm)"
+    }
+
+    var totalLogs: Int {
+        groups.reduce(0) { $0 + $1.totalQuantity }
+    }
+
+    var totalVolumeM3: Double {
+        groups.reduce(0) { $0 + $1.totalVolumeM3 }
+    }
+}
+
 struct LogGroup: Identifiable, Equatable {
     let key: GroupingKey
     let records: [LogRecord]

@@ -3,6 +3,8 @@ import SwiftData
 
 @main
 struct Kubajv3App: App {
+    @State private var preferences = AppPreferences.shared
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Folder.self,
@@ -25,7 +27,14 @@ struct Kubajv3App: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if preferences.hasCompletedOnboarding {
+                    ContentView()
+                } else {
+                    OnboardingView()
+                }
+            }
+            .environment(preferences)
         }
         .modelContainer(sharedModelContainer)
     }

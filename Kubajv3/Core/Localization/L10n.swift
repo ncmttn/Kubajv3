@@ -91,15 +91,31 @@ enum L10n {
     }
 
     enum Grouping {
-        static let title = String(localized: "grouping.title")
+        static let overline = String(localized: "grouping.overline")
+        static let title = String(localized: "grouping.figma_title")
+        static let subtitle = String(localized: "grouping.subtitle")
         static let selectFolder = String(localized: "grouping.select_folder")
         static let noFolderSelected = String(localized: "grouping.no_folder_selected")
         static let selectFolderPrompt = String(localized: "grouping.select_folder_prompt")
         static let emptyState = String(localized: "grouping.empty_state")
+        static let draftSession = String(localized: "grouping.draft_session")
+        static let draftEmptyState = String(localized: "grouping.draft_empty_state")
         static let sortAscending = String(localized: "grouping.sort_ascending")
         static let sortDescending = String(localized: "grouping.sort_descending")
         static let exportPDF = String(localized: "grouping.export_pdf")
         static let exportCSV = String(localized: "grouping.export_csv")
+        static let totalVolume = String(localized: "grouping.total_volume")
+        static let activeBatches = String(localized: "grouping.active_batches")
+        static let avgDiameter = String(localized: "grouping.avg_diameter")
+        static let logCount = String(localized: "grouping.log_count")
+        static let columnDiameter = String(localized: "grouping.column_diameter")
+        static let columnLength = String(localized: "grouping.column_length")
+        static let columnQuantity = String(localized: "grouping.column_quantity")
+        static let columnVolume = String(localized: "grouping.column_volume")
+        static let summaryLogs = String(localized: "grouping.summary_logs")
+        static let summaryVolume = String(localized: "grouping.summary_volume")
+        static let exportCardTitle = String(localized: "grouping.export_card_title")
+        static let exportCardSubtitle = String(localized: "grouping.export_card_subtitle")
 
         static func rowSummary(quantity: Int, volume: Double, recordCount: Int) -> String {
             String(
@@ -107,6 +123,27 @@ enum L10n {
                 quantity,
                 DisplayFormatting.volume(volume),
                 recordCount
+            )
+        }
+
+        static func volumeValue(_ volume: Double) -> String {
+            String(
+                format: String(localized: "grouping.volume_value_format"),
+                DisplayFormatting.volume(volume)
+            )
+        }
+
+        static func lengthValue(_ length: Double) -> String {
+            String(
+                format: String(localized: "grouping.length_value_format"),
+                DisplayFormatting.length(length)
+            )
+        }
+
+        static func sectionSummary(diameter: Double) -> String {
+            String(
+                format: String(localized: "grouping.section_summary_format"),
+                DisplayFormatting.diameter(diameter)
             )
         }
     }
@@ -156,6 +193,56 @@ enum L10n {
                 String(localized: "export.optional_field_5_placeholder")
             default:
                 ""
+            }
+        }
+
+        static func reportFieldLabel(_ field: ReportField) -> String {
+            switch field {
+            case .companyName:
+                String(localized: "export.report.company_name_label")
+            case .reportDate:
+                String(localized: "export.report.report_date_label")
+            case .location:
+                String(localized: "export.report.location_label")
+            case .reporter:
+                String(localized: "export.report.reporter_label")
+            case .projectCode:
+                String(localized: "export.report.project_code_label")
+            case .customerName:
+                String(localized: "export.report.customer_name_label")
+            case .batchNumber:
+                String(localized: "export.report.batch_number_label")
+            case .warehouseCode:
+                String(localized: "export.report.warehouse_code_label")
+            case .contactPhone:
+                String(localized: "export.report.contact_phone_label")
+            case .extraNote:
+                String(localized: "export.report.extra_note_label")
+            }
+        }
+
+        static func reportFieldPlaceholder(_ field: ReportField) -> String {
+            switch field {
+            case .companyName:
+                String(localized: "export.report.company_name_placeholder")
+            case .reportDate:
+                String(localized: "export.report.report_date_placeholder")
+            case .location:
+                String(localized: "export.report.location_placeholder")
+            case .reporter:
+                String(localized: "export.report.reporter_placeholder")
+            case .projectCode:
+                String(localized: "export.report.project_code_placeholder")
+            case .customerName:
+                String(localized: "export.report.customer_name_placeholder")
+            case .batchNumber:
+                String(localized: "export.report.batch_number_placeholder")
+            case .warehouseCode:
+                String(localized: "export.report.warehouse_code_placeholder")
+            case .contactPhone:
+                String(localized: "export.report.contact_phone_placeholder")
+            case .extraNote:
+                String(localized: "export.report.extra_note_placeholder")
             }
         }
     }
@@ -221,6 +308,13 @@ enum L10n {
 
     enum Settings {
         static let title = String(localized: "settings.title")
+        static let reportHeaderTitle = String(localized: "settings.report_header_title")
+        static let reportHeaderSubtitle = String(localized: "settings.report_header_subtitle")
+        static let saveReportHeader = String(localized: "settings.save_report_header")
+        static let outputInfoTitle = String(localized: "settings.output_info_title")
+        static let outputInfoBody = String(localized: "settings.output_info_body")
+        static let professionalLookTitle = String(localized: "settings.professional_look_title")
+        static let previewDraftTitle = String(localized: "settings.preview_draft_title")
         static let calculationSection = String(localized: "settings.calculation_section")
         static let defaultFormula = String(localized: "settings.default_formula")
         static let appearanceSection = String(localized: "settings.appearance_section")
@@ -240,5 +334,20 @@ enum L10n {
                 String(localized: "settings.theme_dark")
             }
         }
+    }
+
+    enum Onboarding {
+        static let nextStep = String(localized: "onboarding.next_step")
+        static let skipIntro = String(localized: "onboarding.skip_intro")
+        static let getStarted = String(localized: "onboarding.get_started")
+        static let step1TitleLine1 = String(localized: "onboarding.step1_title_line1")
+        static let step1TitleLine2 = String(localized: "onboarding.step1_title_line2")
+        static let step1Subtitle = String(localized: "onboarding.step1_subtitle")
+        static let step2TitleLine1 = String(localized: "onboarding.step2_title_line1")
+        static let step2TitleLine2 = String(localized: "onboarding.step2_title_line2")
+        static let step2Subtitle = String(localized: "onboarding.step2_subtitle")
+        static let step3TitleLine1 = String(localized: "onboarding.step3_title_line1")
+        static let step3TitleLine2 = String(localized: "onboarding.step3_title_line2")
+        static let step3Subtitle = String(localized: "onboarding.step3_subtitle")
     }
 }

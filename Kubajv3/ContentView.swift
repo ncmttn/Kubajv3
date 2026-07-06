@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var preferences = AppPreferences.shared
+    @Environment(AppPreferences.self) private var preferences
     @State private var selectedTab: AppTab = .home
     @State private var homeViewModel = HomeViewModel()
 
@@ -17,7 +17,7 @@ struct ContentView: View {
                         selectedTab = .groups
                     }
                 case .groups:
-                    GroupingView()
+                    GroupingView(homeViewModel: homeViewModel)
                 case .hollow:
                     HollowCalculationView(isEmbedded: true) { outer, inner, length, quantity in
                         homeViewModel.addHollowEntry(
@@ -39,7 +39,6 @@ struct ContentView: View {
                 .padding(.horizontal, 8)
                 .padding(.bottom, 8)
         }
-        .environment(preferences)
         .preferredColorScheme(preferences.appTheme.colorScheme)
     }
 }

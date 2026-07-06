@@ -19,7 +19,7 @@ struct GroupedExportRow: Identifiable, Sendable {
 struct ExportMetadata: Sendable {
     let optionalLines: [String]
 
-    static let maximumFieldCount = 5
+    static let maximumFieldCount = 10
 
     init(fields: [String]) {
         optionalLines = fields

@@ -25,6 +25,43 @@ final class GroupingViewModel {
         !groups.isEmpty
     }
 
+    var totalVolumeM3: Double {
+        groups.reduce(0) { $0 + $1.totalVolumeM3 }
+    }
+
+    var totalLogsCount: Int {
+        groups.reduce(0) { $0 + $1.totalQuantity }
+    }
+
+    var activeBatchCount: Int {
+        groups.count
+    }
+
+    var averageDiameterCm: Double {
+        let count = totalLogsCount
+        guard count > 0 else { return 0 }
+        let weighted = groups.reduce(0.0) { partial, group in
+            partial + group.diameterCm * Double(group.totalQuantity)
+        }
+        return weighted / Double(count)
+    }
+
+    var diameterSections: [DiameterSection] {
+        let grouped = Dictionary(grouping: groups) { $0.diameterCm }
+        let diameters = grouped.keys.sorted {
+            switch sortOrder {
+            case .ascending:
+                return $0 < $1
+            case .descending:
+                return $0 > $1
+            }
+        }
+        return diameters.map { diameter in
+            let sectionGroups = LogGroupingEngine.sort(grouped[diameter] ?? [], order: sortOrder)
+            return DiameterSection(diameterCm: diameter, groups: sectionGroups)
+        }
+    }
+
     func refreshRecords() {
         guard let selectedFolder else {
             records = []
@@ -75,12 +112,13 @@ final class GroupingViewModel {
         }
 
         let rows = exportRows
+        let exportMetadata = metadata.optionalLines.isEmpty ? ReportHeaderPreferences.metadata : metadata
         pendingExportKind = nil
         isExportSettingsPresented = false
 
         switch kind {
         case .pdf:
-            shareURL = PDFGenerator.temporaryFileURL(rows: rows, metadata: metadata)
+            shareURL = PDFGenerator.temporaryFileURL(rows: rows, metadata: exportMetadata)
         case .csv:
             shareURL = CSVExporter.temporaryFileURL(rows: rows)
         }

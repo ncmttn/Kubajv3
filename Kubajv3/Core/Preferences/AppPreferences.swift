@@ -4,30 +4,32 @@ import SwiftUI
 final class AppPreferences {
     static let shared = AppPreferences()
 
-    @ObservationIgnored
-    @AppStorage(AppPreferenceKey.calculationMethod)
-    private var calculationMethodRawValue = CalculationMethod.huber.rawValue
-
-    @ObservationIgnored
-    @AppStorage(AppPreferenceKey.appTheme)
-    private var appThemeRawValue = AppTheme.system.rawValue
-
     var defaultCalculationMethod: CalculationMethod {
-        get {
-            CalculationMethod(rawValue: calculationMethodRawValue) ?? .huber
-        }
-        set {
-            calculationMethodRawValue = newValue.rawValue
+        didSet {
+            UserDefaults.standard.set(defaultCalculationMethod.rawValue, forKey: AppPreferenceKey.calculationMethod)
         }
     }
 
     var appTheme: AppTheme {
-        get {
-            AppTheme(rawValue: appThemeRawValue) ?? .system
+        didSet {
+            UserDefaults.standard.set(appTheme.rawValue, forKey: AppPreferenceKey.appTheme)
         }
-        set {
-            appThemeRawValue = newValue.rawValue
+    }
+
+    var hasCompletedOnboarding: Bool {
+        didSet {
+            UserDefaults.standard.set(hasCompletedOnboarding, forKey: AppPreferenceKey.hasCompletedOnboarding)
         }
+    }
+
+    private init() {
+        let methodRaw = UserDefaults.standard.string(forKey: AppPreferenceKey.calculationMethod)
+        defaultCalculationMethod = CalculationMethod(rawValue: methodRaw ?? "") ?? .huber
+
+        let themeRaw = UserDefaults.standard.string(forKey: AppPreferenceKey.appTheme)
+        appTheme = AppTheme(rawValue: themeRaw ?? "") ?? .system
+
+        hasCompletedOnboarding = UserDefaults.standard.bool(forKey: AppPreferenceKey.hasCompletedOnboarding)
     }
 
     static var settingsCalculationMethods: [CalculationMethod] {
