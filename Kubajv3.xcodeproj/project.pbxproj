@@ -17,7 +17,24 @@
 		A10000010000000000000009 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000009 /* Localizable.xcstrings */; };
 		B10000010000000000000001 /* ForestryCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000010000000000000001 /* ForestryCalculator.swift */; };
 		T10000010000000000000001 /* ForestryCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T20000010000000000000001 /* ForestryCalculatorTests.swift */; };
+		C10000010000000000000001 /* DraftLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000001 /* DraftLogEntry.swift */; };
+		C10000010000000000000002 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000002 /* HomeViewModel.swift */; };
+		C10000010000000000000003 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000003 /* HomeView.swift */; };
+		C10000010000000000000004 /* HollowCalculationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000004 /* HollowCalculationView.swift */; };
+		C10000010000000000000005 /* FolderSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000005 /* FolderSelectionView.swift */; };
+		C10000010000000000000006 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000006 /* HapticFeedback.swift */; };
+		C10000010000000000000007 /* GlassCardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000007 /* GlassCardModifier.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A90000010000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A70000010000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A50000010000000000000001;
+			remoteInfo = Kubajv3;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A20000010000000000000001 /* Kubajv3App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kubajv3App.swift; sourceTree = "<group>"; };
@@ -32,6 +49,13 @@
 		B20000010000000000000001 /* ForestryCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestryCalculator.swift; sourceTree = "<group>"; };
 		T20000010000000000000001 /* ForestryCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestryCalculatorTests.swift; sourceTree = "<group>"; };
 		T20000010000000000000002 /* Kubajv3Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Kubajv3Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C20000010000000000000001 /* DraftLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftLogEntry.swift; sourceTree = "<group>"; };
+		C20000010000000000000002 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		C20000010000000000000003 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C20000010000000000000004 /* HollowCalculationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HollowCalculationView.swift; sourceTree = "<group>"; };
+		C20000010000000000000005 /* FolderSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSelectionView.swift; sourceTree = "<group>"; };
+		C20000010000000000000006 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
+		C20000010000000000000007 /* GlassCardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCardModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,19 +66,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXFrameworksBuildPhase section */
-
-/* Begin PBXContainerItemProxy section */
-		A90000010000000000000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A70000010000000000000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A50000010000000000000001;
-			remoteInfo = Kubajv3;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXFrameworksBuildPhase section */
 		T30000010000000000000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -82,6 +93,7 @@
 				A40000010000000000000004 /* Models */,
 				A40000010000000000000005 /* Core */,
 				A40000010000000000000009 /* Domain */,
+				A40000010000000000000010 /* Features */,
 				A40000010000000000000006 /* Resources */,
 			);
 			path = Kubajv3;
@@ -110,6 +122,8 @@
 			isa = PBXGroup;
 			children = (
 				A40000010000000000000007 /* Localization */,
+				A40000010000000000000011 /* Haptics */,
+				A40000010000000000000012 /* Design */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -145,6 +159,58 @@
 				B20000010000000000000001 /* ForestryCalculator.swift */,
 			);
 			path = Domain;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000010 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				A40000010000000000000013 /* Home */,
+				A40000010000000000000014 /* Hollow */,
+				A40000010000000000000015 /* FolderSelection */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000011 /* Haptics */ = {
+			isa = PBXGroup;
+			children = (
+				C20000010000000000000006 /* HapticFeedback.swift */,
+			);
+			path = Haptics;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000012 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				C20000010000000000000007 /* GlassCardModifier.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000013 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				C20000010000000000000001 /* DraftLogEntry.swift */,
+				C20000010000000000000002 /* HomeViewModel.swift */,
+				C20000010000000000000003 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000014 /* Hollow */ = {
+			isa = PBXGroup;
+			children = (
+				C20000010000000000000004 /* HollowCalculationView.swift */,
+			);
+			path = Hollow;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000015 /* FolderSelection */ = {
+			isa = PBXGroup;
+			children = (
+				C20000010000000000000005 /* FolderSelectionView.swift */,
+			);
+			path = FolderSelection;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -185,14 +251,6 @@
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
-
-/* Begin PBXTargetDependency section */
-		A90000010000000000000002 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A50000010000000000000001 /* Kubajv3 */;
-			targetProxy = A90000010000000000000001 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		A70000010000000000000001 /* Project object */ = {
@@ -262,6 +320,13 @@
 				A10000010000000000000006 /* CalculationMethod.swift in Sources */,
 				A10000010000000000000007 /* L10n.swift in Sources */,
 				B10000010000000000000001 /* ForestryCalculator.swift in Sources */,
+				C10000010000000000000001 /* DraftLogEntry.swift in Sources */,
+				C10000010000000000000002 /* HomeViewModel.swift in Sources */,
+				C10000010000000000000003 /* HomeView.swift in Sources */,
+				C10000010000000000000004 /* HollowCalculationView.swift in Sources */,
+				C10000010000000000000005 /* FolderSelectionView.swift in Sources */,
+				C10000010000000000000006 /* HapticFeedback.swift in Sources */,
+				C10000010000000000000007 /* GlassCardModifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +339,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A90000010000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A50000010000000000000001 /* Kubajv3 */;
+			targetProxy = A90000010000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A80000010000000000000001 /* Debug */ = {
@@ -475,6 +548,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kubaj.Kubajv3Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
@@ -495,6 +571,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kubaj.Kubajv3Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
