@@ -22,7 +22,7 @@ enum PDFGenerator {
                     cursorY = drawTableHeader(at: cursorY, in: pageRect, context: cgContext)
                 }
 
-                let availableHeight = pageRect.height - PDFLayout.bottomMargin - cursorY
+                let availableHeight = pageRect.height - PDFLayout.bottomMargin - cursorY - PDFLayout.rowHeight
                 let rowsPerPage = max(1, Int(availableHeight / PDFLayout.rowHeight))
                 let endIndex = min(rowIndex + rowsPerPage, rows.count)
 
@@ -40,19 +40,21 @@ enum PDFGenerator {
                 rowIndex = endIndex
                 pageNumber += 1
 
-                if rowIndex >= rows.count && pageNumber > 0 {
+                if rowIndex >= rows.count {
+                    cursorY = drawTotalRow(rows, at: cursorY, in: pageRect, context: cgContext)
                     break
                 }
             }
         }
     }
 
-    static func temporaryFileURL(rows: [GroupedExportRow], metadata: ExportMetadata) -> URL? {
+    static func temporaryFileURL(rows: [GroupedExportRow], metadata: ExportMetadata, fileName: String) -> URL? {
         guard let data = generate(rows: rows, metadata: metadata) else {
             return nil
         }
+        let safeName = ExportFileNaming.sanitized(fileName)
         let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("kubaj-export-\(UUID().uuidString).pdf")
+            .appendingPathComponent("\(safeName).pdf")
         do {
             try data.write(to: url)
             return url
@@ -104,9 +106,9 @@ enum PDFGenerator {
 
     private static func drawTableHeader(at y: CGFloat, in pageRect: CGRect, context: CGContext) -> CGFloat {
         let headers = [
-            L10n.Export.pdfColumnDiameter,
             L10n.Export.pdfColumnLength,
             L10n.Export.pdfColumnQuantity,
+            L10n.Export.pdfColumnDiameter,
             L10n.Export.pdfColumnVolume,
         ]
         let columnWidths = PDFLayout.columnWidths(pageWidth: pageRect.width)
@@ -164,9 +166,9 @@ enum PDFGenerator {
         }
 
         let values = [
-            DisplayFormatting.diameter(row.diameterCm),
             DisplayFormatting.length(row.lengthM),
             String(row.quantity),
+            DisplayFormatting.diameter(row.diameterCm),
             DisplayFormatting.volume(row.totalVolumeM3),
         ]
 
@@ -183,6 +185,51 @@ enum PDFGenerator {
         }
 
         context.setStrokeColor(UIColor.lightGray.cgColor)
+        context.setLineWidth(PDFLayout.borderWidth)
+        context.stroke(rowRect)
+
+        return y + PDFLayout.rowHeight
+    }
+
+    private static func drawTotalRow(
+        _ rows: [GroupedExportRow],
+        at y: CGFloat,
+        in pageRect: CGRect,
+        context: CGContext
+    ) -> CGFloat {
+        let columnWidths = PDFLayout.columnWidths(pageWidth: pageRect.width)
+        let rowRect = CGRect(
+            x: PDFLayout.horizontalMargin,
+            y: y,
+            width: pageRect.width - PDFLayout.horizontalMargin * 2,
+            height: PDFLayout.rowHeight
+        )
+
+        context.setFillColor(UIColor.systemGray4.cgColor)
+        context.fill(rowRect)
+
+        let totalQuantity = rows.reduce(0) { $0 + $1.quantity }
+        let totalVolume = rows.reduce(0.0) { $0 + $1.totalVolumeM3 }
+        let values = [
+            L10n.Export.totalRowLabel,
+            String(totalQuantity),
+            "",
+            DisplayFormatting.volume(totalVolume),
+        ]
+
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.boldSystemFont(ofSize: PDFLayout.tableFontSize),
+            .foregroundColor: UIColor.black,
+        ]
+
+        var x = PDFLayout.horizontalMargin
+        for (index, value) in values.enumerated() {
+            let rect = CGRect(x: x, y: y + PDFLayout.cellPadding, width: columnWidths[index], height: PDFLayout.rowHeight)
+            value.draw(in: rect, withAttributes: attributes)
+            x += columnWidths[index]
+        }
+
+        context.setStrokeColor(UIColor.black.cgColor)
         context.setLineWidth(PDFLayout.borderWidth)
         context.stroke(rowRect)
 
@@ -206,10 +253,10 @@ private enum PDFLayout {
 
     static func columnWidths(pageWidth: CGFloat) -> [CGFloat] {
         let tableWidth = pageWidth - horizontalMargin * 2
-        let diameter = tableWidth * 0.22
         let length = tableWidth * 0.22
         let quantity = tableWidth * 0.18
-        let volume = tableWidth - diameter - length - quantity
-        return [diameter, length, quantity, volume]
+        let diameter = tableWidth * 0.22
+        let volume = tableWidth - length - quantity - diameter
+        return [length, quantity, diameter, volume]
     }
 }

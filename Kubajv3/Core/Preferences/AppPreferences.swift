@@ -16,9 +16,27 @@ final class AppPreferences {
         }
     }
 
+    var appLanguage: AppLanguage {
+        didSet {
+            UserDefaults.standard.set(appLanguage.rawValue, forKey: AppPreferenceKey.appLanguage)
+        }
+    }
+
     var hasCompletedOnboarding: Bool {
         didSet {
             UserDefaults.standard.set(hasCompletedOnboarding, forKey: AppPreferenceKey.hasCompletedOnboarding)
+        }
+    }
+
+    var isHapticEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(isHapticEnabled, forKey: AppPreferenceKey.isHapticEnabled)
+        }
+    }
+
+    var isHighVolumeAlertsEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(isHighVolumeAlertsEnabled, forKey: AppPreferenceKey.isHighVolumeAlertsEnabled)
         }
     }
 
@@ -29,10 +47,21 @@ final class AppPreferences {
         let themeRaw = UserDefaults.standard.string(forKey: AppPreferenceKey.appTheme)
         appTheme = AppTheme(rawValue: themeRaw ?? "") ?? .system
 
+        let languageRaw = UserDefaults.standard.string(forKey: AppPreferenceKey.appLanguage)
+        appLanguage = AppLanguage(rawValue: languageRaw ?? "") ?? .tr
+
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: AppPreferenceKey.hasCompletedOnboarding)
+
+        if UserDefaults.standard.object(forKey: AppPreferenceKey.isHapticEnabled) == nil {
+            isHapticEnabled = true
+        } else {
+            isHapticEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.isHapticEnabled)
+        }
+
+        isHighVolumeAlertsEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.isHighVolumeAlertsEnabled)
     }
 
     static var settingsCalculationMethods: [CalculationMethod] {
-        [.smalian, .huber, .newton]
+        [.smalian, .huber, .newton, .ulker]
     }
 }

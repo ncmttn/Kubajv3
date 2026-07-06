@@ -5,10 +5,11 @@ import SwiftData
 @Observable
 final class GroupingViewModel {
     var selectedFolder: Folder?
-    var sortOrder: DiameterSortOrder = .descending
+    var sortOrder: LogSortOrder = .descending
     var records: [LogRecord] = []
     var isExportSettingsPresented = false
     var pendingExportKind: ExportKind?
+    var exportFileName: String = ""
     var shareURL: URL?
     var isShareSheetPresented = false
 
@@ -67,7 +68,7 @@ final class GroupingViewModel {
             records = []
             return
         }
-        records = FolderRecordCollector.collect(from: selectedFolder)
+        records = selectedFolder.records
     }
 
     func toggleSortOrder() {
@@ -113,14 +114,15 @@ final class GroupingViewModel {
 
         let rows = exportRows
         let exportMetadata = metadata.optionalLines.isEmpty ? ReportHeaderPreferences.metadata : metadata
+        let fileName = exportFileName
         pendingExportKind = nil
         isExportSettingsPresented = false
 
         switch kind {
         case .pdf:
-            shareURL = PDFGenerator.temporaryFileURL(rows: rows, metadata: exportMetadata)
+            shareURL = PDFGenerator.temporaryFileURL(rows: rows, metadata: exportMetadata, fileName: fileName)
         case .csv:
-            shareURL = CSVExporter.temporaryFileURL(rows: rows)
+            shareURL = CSVExporter.temporaryFileURL(rows: rows, fileName: fileName)
         }
 
         if shareURL != nil {
@@ -130,6 +132,15 @@ final class GroupingViewModel {
 
     func dismissExportCancellation() {
         pendingExportKind = nil
+    }
+
+    func deleteFolder(_ folder: Folder, modelContext: ModelContext) {
+        modelContext.delete(folder)
+        try? modelContext.save()
+        if selectedFolder?.persistentModelID == folder.persistentModelID {
+            selectedFolder = nil
+        }
+        records = []
     }
 
     private func persist(_ modelContext: ModelContext) {

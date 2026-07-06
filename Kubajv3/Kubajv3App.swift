@@ -5,24 +5,13 @@ import SwiftData
 struct Kubajv3App: App {
     @State private var preferences = AppPreferences.shared
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Folder.self,
-            LogRecord.self,
-        ])
-        let configuration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false
-        )
+    private static let modelSchema = Schema([
+        Folder.self,
+        LogRecord.self,
+    ])
 
-        do {
-            return try ModelContainer(
-                for: schema,
-                configurations: [configuration]
-            )
-        } catch {
-            fatalError(String(describing: error))
-        }
+    var sharedModelContainer: ModelContainer = {
+        createModelContainer()
     }()
 
     var body: some Scene {
@@ -35,7 +24,46 @@ struct Kubajv3App: App {
                 }
             }
             .environment(preferences)
+            .environment(\.locale, Locale(identifier: preferences.appLanguage.localeIdentifier))
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private static func createModelContainer() -> ModelContainer {
+        let configuration = ModelConfiguration(
+            schema: modelSchema,
+            isStoredInMemoryOnly: false
+        )
+
+        do {
+            return try ModelContainer(
+                for: modelSchema,
+                configurations: [configuration]
+            )
+        } catch {
+            removePersistentStore(at: configuration.url)
+
+            do {
+                return try ModelContainer(
+                    for: modelSchema,
+                    configurations: [configuration]
+                )
+            } catch {
+                fatalError(String(describing: error))
+            }
+        }
+    }
+
+    private static func removePersistentStore(at url: URL) {
+        let fileManager = FileManager.default
+        let relatedURLs = [
+            url,
+            URL(fileURLWithPath: url.path + "-shm"),
+            URL(fileURLWithPath: url.path + "-wal"),
+        ]
+
+        for storeURL in relatedURLs where fileManager.fileExists(atPath: storeURL.path) {
+            try? fileManager.removeItem(at: storeURL)
+        }
     }
 }

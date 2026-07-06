@@ -8,6 +8,11 @@ struct DraftLogEntry: Identifiable, Equatable, Sendable {
     var volumeM3: Double
     var calculationMethod: CalculationMethod
     var isHollow: Bool
+    var isLumber: Bool
+    var topDiameterCm: Double?
+    var midDiameterCm: Double?
+    var buttDiameterCm: Double?
+    var lumberThicknessCm: Double?
     let createdAt: Date
 
     var totalVolumeM3: Double {

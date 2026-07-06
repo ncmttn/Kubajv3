@@ -5,7 +5,12 @@ struct HomeView: View {
     var onViewFullHistory: () -> Void
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(AppPreferences.self) private var preferences
+
+    @State private var isHollowPresented = false
+    @State private var showClearConfirm = false
+    @State private var entryToDelete: UUID?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -14,20 +19,13 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: KubajMetric.sectionSpacing) {
                     inputSection
-                    KubajPrimaryButton(
-                        title: L10n.Home.calculate,
-                        isEnabled: viewModel.canCalculate
-                    ) {
-                        viewModel.addEntryFromInput()
-                        HapticFeedback.light()
-                    }
+                    calculateActions
                     KubajStatsCard(
                         totalVolume: DisplayFormatting.volume(viewModel.totalVolumeM3),
                         logsCount: "\(viewModel.totalLogsCount)",
                         averageDiameter: L10n.Home.diameterValue(viewModel.averageDiameterCm),
                         onReset: {
-                            viewModel.clearAllEntries()
-                            HapticFeedback.medium()
+                            showClearConfirm = true
                         }
                     )
                     recentSection
@@ -37,15 +35,82 @@ struct HomeView: View {
                 .padding(.bottom, 120)
             }
         }
-        .background(KubajColor.background)
+        .background(KubajThemeColors.background(colorScheme))
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button(L10n.Home.keyboardNext) {
+                    advanceFocus()
+                }
+                .fontWeight(.semibold)
+            }
+        }
         .onAppear {
             viewModel.preferences = preferences
+        }
+        .onChange(of: preferences.defaultCalculationMethod) { _, _ in
+            viewModel.focusedInputField = viewModel.primaryDiameterField
+        }
+        .onChange(of: isHollowPresented) { _, presented in
+            if presented {
+                viewModel.focusedInputField = nil
+            }
+        }
+        .onChange(of: viewModel.isFolderSelectionPresented) { _, presented in
+            if presented {
+                viewModel.focusedInputField = nil
+            }
         }
         .sheet(isPresented: $viewModel.isFolderSelectionPresented) {
             FolderSelectionView { folder in
                 viewModel.saveEntries(to: folder, modelContext: modelContext)
                 HapticFeedback.heavy()
             }
+        }
+        .sheet(isPresented: $isHollowPresented) {
+            HollowCalculationView { outer, inner, length, quantity in
+                viewModel.addHollowEntry(
+                    outerDiameterCm: outer,
+                    innerDiameterCm: inner,
+                    lengthM: length,
+                    quantity: quantity
+                )
+                HapticFeedback.medium()
+            }
+        }
+        .confirmationDialog(
+            L10n.Home.confirmClearTitle,
+            isPresented: $showClearConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.Home.confirmClearAction, role: .destructive) {
+                viewModel.clearAllEntries()
+                HapticFeedback.medium()
+            }
+            Button(L10n.Common.cancel, role: .cancel) {}
+        } message: {
+            Text(L10n.Home.confirmClearMessage)
+        }
+        .confirmationDialog(
+            L10n.Home.confirmDeleteTitle,
+            isPresented: Binding(
+                get: { entryToDelete != nil },
+                set: { if !$0 { entryToDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(L10n.Home.confirmDeleteAction, role: .destructive) {
+                if let id = entryToDelete {
+                    viewModel.deleteEntry(id: id)
+                    HapticFeedback.heavy()
+                }
+                entryToDelete = nil
+            }
+            Button(L10n.Common.cancel, role: .cancel) {
+                entryToDelete = nil
+            }
+        } message: {
+            Text(L10n.Home.confirmDeleteMessage)
         }
     }
 
@@ -58,7 +123,7 @@ struct HomeView: View {
 
                 Text(L10n.App.name)
                     .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(KubajColor.textHeading)
+                    .foregroundStyle(KubajThemeColors.textHeading(colorScheme))
                     .tracking(-1)
             }
 
@@ -69,9 +134,9 @@ struct HomeView: View {
             } label: {
                 Image(systemName: "square.and.arrow.down")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(viewModel.canSave ? KubajColor.primary : KubajColor.textMuted)
+                    .foregroundStyle(viewModel.canSave ? KubajColor.primary : KubajThemeColors.textMuted(colorScheme))
                     .frame(width: 32, height: 32)
-                    .background(KubajColor.inputBackground, in: Circle())
+                    .background(KubajThemeColors.inputBackground(colorScheme), in: Circle())
             }
             .disabled(!viewModel.canSave)
         }
@@ -81,13 +146,23 @@ struct HomeView: View {
         .background(.ultraThinMaterial)
         .overlay(alignment: .bottom) {
             Rectangle()
-                .fill(KubajColor.borderSubtle)
+                .fill(KubajThemeColors.borderSubtle(colorScheme))
                 .frame(height: 1)
         }
     }
 
     private var inputSection: some View {
-        HStack(alignment: .top, spacing: 12) {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            ForEach(viewModel.inputFieldsForCurrentFormula, id: \.self) { field in
+                inputField(for: field)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func inputField(for field: HomeInputField) -> some View {
+        switch field {
+        case .diameter:
             KubajInputField(
                 title: L10n.Home.diameterCm,
                 text: $viewModel.diameterInput,
@@ -96,20 +171,119 @@ struct HomeView: View {
                 onTrailingAction: {
                     viewModel.incrementDiameter()
                     HapticFeedback.light()
-                }
+                },
+                isFocused: viewModel.focusedInputField == .diameter,
+                selectAllOnFocus: viewModel.shouldSelectAllOnDiameterFocus && viewModel.focusedInputField == .diameter,
+                returnKeyType: viewModel.nextField(after: .diameter) == nil ? .done : .next,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .diameter
+                    viewModel.shouldSelectAllOnDiameterFocus = false
+                },
+                onSubmit: { advanceFrom(.diameter) }
             )
-
+        case .topDiameter:
+            KubajInputField(
+                title: L10n.Home.topDiameterCm,
+                text: $viewModel.topDiameterInput,
+                isFocused: viewModel.focusedInputField == .topDiameter,
+                selectAllOnFocus: viewModel.shouldSelectAllOnDiameterFocus && viewModel.focusedInputField == .topDiameter,
+                returnKeyType: viewModel.nextField(after: .topDiameter) == nil ? .done : .next,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .topDiameter
+                    viewModel.shouldSelectAllOnDiameterFocus = false
+                },
+                onSubmit: { advanceFrom(.topDiameter) }
+            )
+        case .buttDiameter:
+            KubajInputField(
+                title: L10n.Home.buttDiameterCm,
+                text: $viewModel.buttDiameterInput,
+                isFocused: viewModel.focusedInputField == .buttDiameter,
+                returnKeyType: viewModel.nextField(after: .buttDiameter) == nil ? .done : .next,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .buttDiameter
+                },
+                onSubmit: { advanceFrom(.buttDiameter) }
+            )
+        case .midDiameter:
+            KubajInputField(
+                title: L10n.Home.midDiameterCm,
+                text: $viewModel.midDiameterInput,
+                isFocused: viewModel.focusedInputField == .midDiameter,
+                returnKeyType: viewModel.nextField(after: .midDiameter) == nil ? .done : .next,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .midDiameter
+                },
+                onSubmit: { advanceFrom(.midDiameter) }
+            )
+        case .width:
+            KubajInputField(
+                title: L10n.Lumber.widthCm,
+                text: $viewModel.widthInput,
+                isFocused: viewModel.focusedInputField == .width,
+                selectAllOnFocus: viewModel.shouldSelectAllOnDiameterFocus && viewModel.focusedInputField == .width,
+                returnKeyType: viewModel.nextField(after: .width) == nil ? .done : .next,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .width
+                    viewModel.shouldSelectAllOnDiameterFocus = false
+                },
+                onSubmit: { advanceFrom(.width) }
+            )
+        case .thickness:
+            KubajInputField(
+                title: L10n.Lumber.thicknessCm,
+                text: $viewModel.thicknessInput,
+                isFocused: viewModel.focusedInputField == .thickness,
+                returnKeyType: viewModel.nextField(after: .thickness) == nil ? .done : .next,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .thickness
+                },
+                onSubmit: { advanceFrom(.thickness) }
+            )
+        case .length:
             KubajInputField(
                 title: L10n.Home.lengthM,
                 text: $viewModel.lengthInput,
-                keyboard: .decimalPad
+                isFocused: viewModel.focusedInputField == .length,
+                returnKeyType: viewModel.nextField(after: .length) == nil ? .done : .next,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .length
+                },
+                onSubmit: { advanceFrom(.length) }
             )
-
+        case .quantity:
             KubajInputField(
                 title: L10n.Home.quantity,
                 text: $viewModel.quantityInput,
-                keyboard: .numberPad
+                keyboard: .numberPad,
+                isFocused: viewModel.focusedInputField == .quantity,
+                returnKeyType: .done,
+                onBeginEditing: {
+                    viewModel.focusedInputField = .quantity
+                },
+                onSubmit: {
+                    viewModel.focusedInputField = nil
+                }
             )
+        }
+    }
+
+    private var calculateActions: some View {
+        HStack(spacing: 12) {
+            KubajOutlineCapsuleButton(
+                title: L10n.Home.calculateHollow,
+                systemImage: "circle.dotted"
+            ) {
+                isHollowPresented = true
+            }
+
+            KubajPrimaryButton(
+                title: L10n.Home.calculate,
+                isEnabled: viewModel.canCalculate
+            ) {
+                viewModel.addEntryFromInput()
+                HapticFeedback.light()
+            }
         }
     }
 
@@ -118,31 +292,29 @@ struct HomeView: View {
             HStack {
                 Text(L10n.Home.recentAdditions)
                     .font(KubajFont.sectionTitle())
-                    .foregroundStyle(KubajColor.textHeading)
+                    .foregroundStyle(KubajThemeColors.textHeading(colorScheme))
 
                 Spacer()
-
-                Text(L10n.Home.liveBadge)
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(KubajColor.primary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(KubajColor.liveBadgeBackground, in: Capsule())
             }
 
             if viewModel.sortedEntries.isEmpty {
                 Text(L10n.Home.emptyState)
                     .font(.subheadline)
-                    .foregroundStyle(KubajColor.textMuted)
+                    .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 32)
             } else {
                 VStack(spacing: 0) {
-                    tableHeader
+                    KubajLogTableHeader()
                     ForEach(Array(viewModel.sortedEntries.enumerated()), id: \.element.id) { index, entry in
-                        KubajDraftLogRow(
+                        KubajLogTableRow(
                             rowNumber: viewModel.sortedEntries.count - index,
-                            entry: entry,
+                            lengthM: entry.lengthM,
+                            quantity: entry.quantity,
+                            diameterLabel: LogEntryDisplay.diameterLabel(for: entry),
+                            volumeM3: entry.totalVolumeM3,
+                            showsHollowBadge: LogEntryDisplay.isHollow(entry),
+                            showsLumberBadge: LogEntryDisplay.isLumber(entry),
                             onIncrease: {
                                 viewModel.increaseQuantity(id: entry.id)
                                 HapticFeedback.light()
@@ -152,122 +324,42 @@ struct HomeView: View {
                                 HapticFeedback.medium()
                             },
                             onDelete: {
-                                viewModel.deleteEntry(id: entry.id)
-                                HapticFeedback.heavy()
+                                entryToDelete = entry.id
                             }
                         )
                         if index < viewModel.sortedEntries.count - 1 {
                             Divider()
-                                .overlay(KubajColor.borderSubtle)
+                                .overlay(KubajThemeColors.borderSubtle(colorScheme))
                         }
                     }
                 }
-                .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+                .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
             }
 
             Button(action: onViewFullHistory) {
-                Text(L10n.Home.viewFullHistory)
-                    .font(.system(size: 14, weight: .bold))
+                Text(L10n.Home.openGrouping)
+                    .font(.system(size: 15, weight: .bold))
                     .foregroundStyle(KubajColor.primary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 14)
             }
         }
     }
 
-    private var tableHeader: some View {
-        HStack(spacing: 0) {
-            Text(L10n.Home.tableNo)
-                .frame(width: 36, alignment: .leading)
-            Text(L10n.Home.tableQty)
-                .frame(width: 40, alignment: .leading)
-            Text(L10n.Home.tableDim)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text(L10n.Home.tableVol)
-                .frame(width: 56, alignment: .trailing)
-            Text(L10n.Home.tableActions)
-                .frame(width: 88, alignment: .trailing)
+    private func advanceFocus() {
+        guard let current = viewModel.focusedInputField else {
+            viewModel.focusedInputField = viewModel.inputFieldsForCurrentFormula.first
+            return
         }
-        .font(.system(size: 10, weight: .bold))
-        .foregroundStyle(KubajColor.textSecondary)
-        .textCase(.uppercase)
-        .tracking(1)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(KubajColor.inputBackground.opacity(0.5))
-    }
-}
-
-private struct KubajDraftLogRow: View {
-    let rowNumber: Int
-    let entry: DraftLogEntry
-    let onIncrease: () -> Void
-    let onDecrease: () -> Void
-    let onDelete: () -> Void
-
-    var body: some View {
-        HStack(spacing: 0) {
-            Text("\(rowNumber)")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(KubajColor.textPrimary)
-                .frame(width: 36, alignment: .leading)
-
-            Text("\(entry.quantity)")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(KubajColor.textPrimary)
-                .frame(width: 40, alignment: .leading)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(L10n.Home.dimFormat(
-                    length: entry.lengthM,
-                    diameter: entry.diameterCm
-                ))
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(KubajColor.textPrimary)
-
-                if entry.isHollow {
-                    Text(L10n.Home.hollowBadge)
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(.orange)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Text(DisplayFormatting.volume(entry.totalVolumeM3))
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(KubajColor.primary)
-                .frame(width: 56, alignment: .trailing)
-
-            HStack(spacing: 4) {
-                rowActionButton(systemName: "plus", tint: KubajColor.primary, action: onIncrease)
-                rowActionButton(systemName: "minus", tint: KubajColor.textSecondary, action: onDecrease)
-                rowActionButton(
-                    systemName: "trash",
-                    tint: .red,
-                    background: KubajColor.deleteActionBackground,
-                    action: onDelete
-                )
-            }
-            .frame(width: 88, alignment: .trailing)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        advanceFrom(current)
     }
 
-    private func rowActionButton(
-        systemName: String,
-        tint: Color,
-        background: Color = KubajColor.inputBackground,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(tint)
-                .frame(width: 24, height: 24)
-                .background(background, in: RoundedRectangle(cornerRadius: 6))
+    private func advanceFrom(_ field: HomeInputField) {
+        if let next = viewModel.nextField(after: field) {
+            viewModel.focusedInputField = next
+        } else {
+            viewModel.focusedInputField = nil
         }
-        .buttonStyle(.plain)
     }
 }
 

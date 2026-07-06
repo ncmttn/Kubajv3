@@ -16,19 +16,24 @@
 
 - Silme ve sıfırlama butonlarında confirm işlemi olacak
 
+
+
 ## Gruplandırma
 
-- Bu sayfa figmadaki tasarımla birebir aynı olacak 
-- ikonu personels değil daha uygun bir ikon
 - o sayfada aktif olarak girilen değerlen gruplandırılacak aynı şekilde klsörden daha önce kayıt edilmiş veriye tıklanırsa o da gösterilecek
+
+
 
 ## Tabbar
 
 - Anasayfa, Gruplandır, Klasörler, Ayarlar şeklinde olacak
-- Anasayfaya Kovuk hesaplama butonu eklenecek ve tıklanınca modal açılacak 
+- Anasayfaya Kovuk hesaplama butonu eklenecek ve tıklanınca modal açılacak
+
+
 
 ## Ayarlar
 
+- Rapor üst bilgilerini ayardan kaldır
 - Varsayılan formül değiştirildiğinde anlık seçim gösterimde hata var sayfadan çıkıp tekrar girince değişiyor fixle
 - uygulamanın koyu temasını kodla
 - Dil değişimi için uygulamadan çıkıp ayarlar kısmına gidiyor çıkmadan uygulama içinde kalacak şekilde değişimi sağla

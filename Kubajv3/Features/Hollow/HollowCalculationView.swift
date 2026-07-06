@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct HollowCalculationView: View {
-    var isEmbedded: Bool = false
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var outerDiameterInput = ""
     @State private var innerDiameterInput = ""
@@ -13,58 +13,15 @@ struct HollowCalculationView: View {
     let onAdd: (Double, Double, Double, Int) -> Void
 
     var body: some View {
-        Group {
-            if isEmbedded {
-                embeddedBody
-            } else {
-                NavigationStack {
-                    embeddedBody
-                        .navigationTitle(L10n.Hollow.title)
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button(L10n.Common.cancel) {
-                                    dismiss()
-                                }
-                            }
-                        }
-                }
-            }
-        }
-    }
-
-    private var embeddedBody: some View {
-        VStack(spacing: 0) {
-            if isEmbedded {
-                KubajHeader()
-            }
-
+        NavigationStack {
             ScrollView {
                 VStack(spacing: KubajMetric.sectionSpacing) {
-                    if isEmbedded {
-                        Text(L10n.Hollow.title)
-                            .font(KubajFont.sectionTitle())
-                            .foregroundStyle(KubajColor.textHeading)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                        KubajInputField(title: L10n.Hollow.outerDiameter, text: $outerDiameterInput)
+                        KubajInputField(title: L10n.Hollow.innerDiameter, text: $innerDiameterInput)
+                        KubajInputField(title: L10n.Hollow.length, text: $lengthInput)
+                        KubajInputField(title: L10n.Hollow.quantity, text: $quantityInput, keyboard: .numberPad)
                     }
-
-                    KubajInputField(
-                        title: L10n.Hollow.outerDiameter,
-                        text: $outerDiameterInput
-                    )
-                    KubajInputField(
-                        title: L10n.Hollow.innerDiameter,
-                        text: $innerDiameterInput
-                    )
-                    KubajInputField(
-                        title: L10n.Hollow.length,
-                        text: $lengthInput
-                    )
-                    KubajInputField(
-                        title: L10n.Hollow.quantity,
-                        text: $quantityInput,
-                        keyboard: .numberPad
-                    )
 
                     if let previewResult {
                         resultCard(previewResult)
@@ -79,10 +36,19 @@ struct HollowCalculationView: View {
                 }
                 .padding(.horizontal, KubajMetric.horizontalPadding)
                 .padding(.top, KubajMetric.sectionSpacing)
-                .padding(.bottom, 120)
+                .padding(.bottom, 32)
+            }
+            .background(KubajThemeColors.background(colorScheme))
+            .navigationTitle(L10n.Hollow.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.Common.cancel) {
+                        dismiss()
+                    }
+                }
             }
         }
-        .background(KubajColor.background)
         .onChange(of: outerDiameterInput) { _, _ in updatePreview() }
         .onChange(of: innerDiameterInput) { _, _ in updatePreview() }
         .onChange(of: lengthInput) { _, _ in updatePreview() }
@@ -112,14 +78,14 @@ struct HollowCalculationView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(L10n.Hollow.equivalentDiameter(result.equivalentSolidDiameterCm))
                 .font(.headline)
-                .foregroundStyle(KubajColor.textPrimary)
+                .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
             Text(L10n.Hollow.netVolume(result.netVolumeM3))
                 .font(.subheadline)
-                .foregroundStyle(KubajColor.textSecondary)
+                .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(KubajMetric.horizontalPadding)
-        .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
+        .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
     }
 
     private func updatePreview() {
@@ -139,15 +105,7 @@ struct HollowCalculationView: View {
             return
         }
         onAdd(values.0, values.1, values.2, values.3)
-        if !isEmbedded {
-            dismiss()
-        } else {
-            outerDiameterInput = ""
-            innerDiameterInput = ""
-            lengthInput = ""
-            quantityInput = "1"
-            previewResult = nil
-        }
+        dismiss()
     }
 
     private func parseDouble(_ text: String) -> Double? {

@@ -4,30 +4,29 @@ struct ContentView: View {
     @Environment(AppPreferences.self) private var preferences
     @State private var selectedTab: AppTab = .home
     @State private var homeViewModel = HomeViewModel()
+    @State private var groupingSelectedFolder: Folder?
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            KubajColor.background
+            KubajThemeColors.background(preferences.appTheme.resolvedColorScheme)
                 .ignoresSafeArea()
 
             Group {
                 switch selectedTab {
                 case .home:
                     HomeView(viewModel: homeViewModel) {
+                        groupingSelectedFolder = nil
                         selectedTab = .groups
                     }
                 case .groups:
-                    GroupingView(homeViewModel: homeViewModel)
-                case .hollow:
-                    HollowCalculationView(isEmbedded: true) { outer, inner, length, quantity in
-                        homeViewModel.addHollowEntry(
-                            outerDiameterCm: outer,
-                            innerDiameterCm: inner,
-                            lengthM: length,
-                            quantity: quantity
-                        )
-                        HapticFeedback.medium()
-                        selectedTab = .home
+                    GroupingView(
+                        homeViewModel: homeViewModel,
+                        selectedFolder: $groupingSelectedFolder
+                    )
+                case .folders:
+                    FoldersView { folder in
+                        groupingSelectedFolder = folder
+                        selectedTab = .groups
                     }
                 case .settings:
                     SettingsView()
@@ -37,9 +36,10 @@ struct ContentView: View {
 
             KubajTabBar(selection: $selectedTab)
                 .padding(.horizontal, 8)
-                .padding(.bottom, 8)
+                .padding(.bottom, 0)
         }
         .preferredColorScheme(preferences.appTheme.colorScheme)
+        .environment(\.locale, Locale(identifier: preferences.appLanguage.localeIdentifier))
     }
 }
 

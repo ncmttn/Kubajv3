@@ -4,11 +4,20 @@ import SwiftData
 
 @Observable
 final class HomeViewModel {
-    var diameterInput = ""
+    static let defaultDiameter = "21"
+
+    var diameterInput = defaultDiameter
+    var topDiameterInput = defaultDiameter
+    var buttDiameterInput = defaultDiameter
+    var midDiameterInput = defaultDiameter
+    var widthInput = defaultDiameter
+    var thicknessInput = ""
     var lengthInput = ""
     var quantityInput = "1"
     var draftEntries: [DraftLogEntry] = []
     var isFolderSelectionPresented = false
+    var focusedInputField: HomeInputField? = .diameter
+    var shouldSelectAllOnDiameterFocus = false
 
     var preferences: AppPreferences?
 
@@ -24,18 +33,21 @@ final class HomeViewModel {
         !draftEntries.isEmpty
     }
 
-    var canCalculate: Bool {
-        guard
-            let diameter = InputParser.double(from: diameterInput),
-            let length = InputParser.double(from: lengthInput),
-            let quantity = InputParser.int(from: quantityInput),
-            diameter > 0,
-            length > 0,
-            quantity > 0
-        else {
-            return false
+    var inputFieldsForCurrentFormula: [HomeInputField] {
+        switch activeCalculationMethod {
+        case .huber:
+            [.diameter, .length, .quantity]
+        case .ulker:
+            [.width, .thickness, .length, .quantity]
+        case .smalian:
+            [.topDiameter, .buttDiameter, .length, .quantity]
+        case .newton:
+            [.topDiameter, .buttDiameter, .midDiameter, .length, .quantity]
         }
-        return true
+    }
+
+    var canCalculate: Bool {
+        parsedInputValues() != nil
     }
 
     var totalVolumeM3: Double {
@@ -54,11 +66,8 @@ final class HomeViewModel {
     }
 
     func incrementDiameter() {
-        if let current = InputParser.double(from: diameterInput) {
-            diameterInput = DisplayFormatting.diameter(current + 1)
-        } else {
-            diameterInput = "1"
-        }
+        let base = InputParser.double(from: diameterInput) ?? 21
+        diameterInput = DisplayFormatting.diameter(base + 1)
     }
 
     func clearAllEntries() {
@@ -66,27 +75,24 @@ final class HomeViewModel {
     }
 
     func addEntryFromInput() {
-        guard
-            let diameter = InputParser.double(from: diameterInput),
-            let length = InputParser.double(from: lengthInput),
-            let quantity = InputParser.int(from: quantityInput),
-            diameter > 0,
-            length > 0,
-            quantity > 0
-        else {
+        guard let values = parsedInputValues() else {
             return
         }
 
-        let volume = volumeForStandardEntry(diameterCm: diameter, lengthM: length)
         appendEntry(
-            diameterCm: diameter,
-            lengthM: length,
-            quantity: quantity,
-            volumeM3: volume,
+            diameterCm: values.displayDiameter,
+            lengthM: values.length,
+            quantity: values.quantity,
+            volumeM3: values.volume,
             calculationMethod: activeCalculationMethod,
-            isHollow: false
+            isHollow: false,
+            isLumber: values.isLumber,
+            topDiameterCm: values.topDiameter,
+            midDiameterCm: values.midDiameter,
+            buttDiameterCm: values.buttDiameter,
+            lumberThicknessCm: values.lumberThickness
         )
-        clearInputFields()
+        resetInputFieldsAfterCalculate()
     }
 
     func addHollowEntry(
@@ -116,7 +122,8 @@ final class HomeViewModel {
             quantity: quantity,
             volumeM3: result.netVolumeM3,
             calculationMethod: activeCalculationMethod,
-            isHollow: true
+            isHollow: true,
+            isLumber: false
         )
     }
 
@@ -149,6 +156,11 @@ final class HomeViewModel {
                 volumeM3: entry.volumeM3,
                 calculationMethod: entry.calculationMethod,
                 isHollow: entry.isHollow,
+                isLumber: entry.isLumber,
+                topDiameterCm: entry.topDiameterCm,
+                midDiameterCm: entry.midDiameterCm,
+                buttDiameterCm: entry.buttDiameterCm,
+                lumberThicknessCm: entry.lumberThicknessCm,
                 createdAt: entry.createdAt,
                 folder: folder
             )
@@ -159,18 +171,149 @@ final class HomeViewModel {
         draftEntries.removeAll()
     }
 
-    private func volumeForStandardEntry(diameterCm: Double, lengthM: Double) -> Double {
+    func focusFieldAfterCalculate() {
+        shouldSelectAllOnDiameterFocus = true
+        focusedInputField = primaryDiameterField
+    }
+
+    var primaryDiameterField: HomeInputField {
         switch activeCalculationMethod {
-        case .smalian, .ulker:
-            ForestryCalculator.standardCylinder(diameterCm: diameterCm, lengthM: lengthM)
+        case .smalian, .newton:
+            .topDiameter
         case .huber:
-            ForestryCalculator.huber(midDiameterCm: diameterCm, lengthM: lengthM)
+            .diameter
+        case .ulker:
+            .width
+        }
+    }
+
+    func nextField(after field: HomeInputField) -> HomeInputField? {
+        let fields = inputFieldsForCurrentFormula
+        guard let index = fields.firstIndex(of: field), index + 1 < fields.count else {
+            return nil
+        }
+        return fields[index + 1]
+    }
+
+    private struct ParsedInputValues {
+        let displayDiameter: Double
+        let length: Double
+        let quantity: Int
+        let volume: Double
+        let isLumber: Bool
+        let topDiameter: Double?
+        let midDiameter: Double?
+        let buttDiameter: Double?
+        let lumberThickness: Double?
+    }
+
+    private func parsedInputValues() -> ParsedInputValues? {
+        guard
+            let length = InputParser.double(from: lengthInput),
+            let quantity = InputParser.int(from: quantityInput),
+            length > 0,
+            quantity > 0
+        else {
+            return nil
+        }
+
+        switch activeCalculationMethod {
+        case .huber:
+            guard let diameter = InputParser.double(from: diameterInput), diameter > 0 else {
+                return nil
+            }
+            let volume = ForestryCalculator.huber(midDiameterCm: diameter, lengthM: length)
+            return ParsedInputValues(
+                displayDiameter: diameter,
+                length: length,
+                quantity: quantity,
+                volume: volume,
+                isLumber: false,
+                topDiameter: nil,
+                midDiameter: nil,
+                buttDiameter: nil,
+                lumberThickness: nil
+            )
+
+        case .ulker:
+            guard
+                let width = InputParser.double(from: widthInput),
+                let thickness = InputParser.double(from: thicknessInput),
+                width > 0,
+                thickness > 0
+            else {
+                return nil
+            }
+            let volume = ForestryCalculator.lumber(
+                widthCm: width,
+                thicknessCm: thickness,
+                lengthM: length
+            )
+            return ParsedInputValues(
+                displayDiameter: width,
+                length: length,
+                quantity: quantity,
+                volume: volume,
+                isLumber: true,
+                topDiameter: nil,
+                midDiameter: nil,
+                buttDiameter: nil,
+                lumberThickness: thickness
+            )
+
+        case .smalian:
+            guard
+                let top = InputParser.double(from: topDiameterInput),
+                let butt = InputParser.double(from: buttDiameterInput),
+                top > 0,
+                butt > 0
+            else {
+                return nil
+            }
+            let volume = ForestryCalculator.smalian(
+                topDiameterCm: top,
+                buttDiameterCm: butt,
+                lengthM: length
+            )
+            return ParsedInputValues(
+                displayDiameter: top,
+                length: length,
+                quantity: quantity,
+                volume: volume,
+                isLumber: false,
+                topDiameter: top,
+                midDiameter: nil,
+                buttDiameter: butt,
+                lumberThickness: nil
+            )
+
         case .newton:
-            ForestryCalculator.newton(
-                topDiameterCm: diameterCm,
-                midDiameterCm: diameterCm,
-                buttDiameterCm: diameterCm,
-                lengthM: lengthM
+            guard
+                let top = InputParser.double(from: topDiameterInput),
+                let mid = InputParser.double(from: midDiameterInput),
+                let butt = InputParser.double(from: buttDiameterInput),
+                top > 0,
+                mid > 0,
+                butt > 0
+            else {
+                return nil
+            }
+            let volume = ForestryCalculator.newton(
+                topDiameterCm: top,
+                midDiameterCm: mid,
+                buttDiameterCm: butt,
+                lengthM: length
+            )
+            return ParsedInputValues(
+                displayDiameter: mid,
+                length: length,
+                quantity: quantity,
+                volume: volume,
+                isLumber: false,
+                topDiameter: top,
+                midDiameter: mid,
+                buttDiameter: butt,
+                lumberThickness: nil
             )
         }
     }
@@ -181,7 +324,12 @@ final class HomeViewModel {
         quantity: Int,
         volumeM3: Double,
         calculationMethod: CalculationMethod,
-        isHollow: Bool
+        isHollow: Bool,
+        isLumber: Bool,
+        topDiameterCm: Double? = nil,
+        midDiameterCm: Double? = nil,
+        buttDiameterCm: Double? = nil,
+        lumberThicknessCm: Double? = nil
     ) {
         let entry = DraftLogEntry(
             id: UUID(),
@@ -191,15 +339,19 @@ final class HomeViewModel {
             volumeM3: volumeM3,
             calculationMethod: calculationMethod,
             isHollow: isHollow,
+            isLumber: isLumber,
+            topDiameterCm: topDiameterCm,
+            midDiameterCm: midDiameterCm,
+            buttDiameterCm: buttDiameterCm,
+            lumberThicknessCm: lumberThicknessCm,
             createdAt: Date()
         )
         draftEntries.append(entry)
     }
 
-    private func clearInputFields() {
-        diameterInput = ""
-        lengthInput = ""
+    private func resetInputFieldsAfterCalculate() {
         quantityInput = "1"
+        focusFieldAfterCalculate()
     }
 }
 

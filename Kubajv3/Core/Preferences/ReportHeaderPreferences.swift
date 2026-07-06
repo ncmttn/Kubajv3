@@ -6,11 +6,6 @@ enum ReportField: Int, CaseIterable, Identifiable {
     case location
     case reporter
     case projectCode
-    case customerName
-    case batchNumber
-    case warehouseCode
-    case contactPhone
-    case extraNote
 
     var id: Int { rawValue }
 }

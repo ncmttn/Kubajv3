@@ -19,7 +19,7 @@ struct GroupedExportRow: Identifiable, Sendable {
 struct ExportMetadata: Sendable {
     let optionalLines: [String]
 
-    static let maximumFieldCount = 10
+    static let maximumFieldCount = 5
 
     init(fields: [String]) {
         optionalLines = fields
@@ -33,4 +33,23 @@ struct ExportMetadata: Sendable {
 enum ExportKind: Sendable {
     case pdf
     case csv
+}
+
+enum ExportFileNaming {
+    static let fallback = "kubaj-export"
+
+    static func sanitized(_ name: String) -> String {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return "\(fallback)-\(UUID().uuidString)"
+        }
+        let illegal = CharacterSet(charactersIn: "/\\:?%*|\"<>")
+        let cleaned = trimmed
+            .components(separatedBy: illegal)
+            .joined(separator: "-")
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .joined(separator: "_")
+        return cleaned.isEmpty ? "\(fallback)-\(UUID().uuidString)" : cleaned
+    }
 }

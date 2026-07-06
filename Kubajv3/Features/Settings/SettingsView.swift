@@ -1,237 +1,283 @@
 import SwiftUI
+import StoreKit
+import UIKit
 
 struct SettingsView: View {
     @Environment(AppPreferences.self) private var preferences
-    @State private var reportFields: [String] = Array(repeating: "", count: ExportMetadata.maximumFieldCount)
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.requestReview) private var requestReview
 
     var body: some View {
+        @Bindable var preferences = preferences
+
         VStack(spacing: 0) {
             KubajHeader()
 
             ScrollView {
-                VStack(spacing: 32) {
-                    KubajSectionHeader(
-                        title: L10n.Settings.reportHeaderTitle,
-                        subtitle: L10n.Settings.reportHeaderSubtitle
-                    )
-
-                    reportForm
-
-                    KubajSettingsCard(title: L10n.Settings.calculationSection) {
-                        Picker(L10n.Settings.defaultFormula, selection: formulaBinding) {
-                            ForEach(AppPreferences.settingsCalculationMethods, id: \.rawValue) { method in
-                                Text(L10n.Formula.displayName(for: method))
-                                    .tag(method)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .tint(KubajColor.primary)
-                    }
-
-                    KubajSettingsCard(title: L10n.Settings.appearanceSection) {
-                        Picker(L10n.Settings.theme, selection: themeBinding) {
-                            ForEach(AppTheme.allCases) { theme in
-                                Text(L10n.Settings.themeName(for: theme))
-                                    .tag(theme)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-
-                    KubajSettingsCard(title: L10n.Settings.languageSection) {
-                        Button {
-                            openSystemSettings()
-                        } label: {
-                            HStack {
-                                Label(L10n.Settings.openLanguageSettings, systemImage: "globe")
-                                    .foregroundStyle(KubajColor.textPrimary)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundStyle(KubajColor.textMuted)
-                            }
-                        }
-                    }
-
-                    infoCard
-
-                    professionalCard
-
-                    previewDraft
-
-                    KubajSettingsCard(title: L10n.Settings.aboutSection) {
-                        LabeledContent(L10n.Settings.versionLabel, value: appVersion)
-                    }
+                VStack(spacing: 24) {
+                    generalSettingsSection
+                    enginePreferencesSection
+                    languageSection
+                    supportSection
+                    footerInfo
                 }
                 .padding(.horizontal, KubajMetric.horizontalPadding)
-                .padding(.top, 32)
+                .padding(.top, 24)
                 .padding(.bottom, 120)
             }
         }
-        .background(KubajColor.background)
-        .onAppear {
-            loadReportFields()
-        }
+        .background(KubajThemeColors.background(colorScheme))
     }
 
-    private var reportForm: some View {
-        VStack(spacing: 24) {
-            ForEach(ReportField.allCases) { field in
-                KubajFormField(
-                    label: L10n.Export.reportFieldLabel(field),
-                    placeholder: L10n.Export.reportFieldPlaceholder(field),
-                    text: binding(for: field),
-                    keyboard: field == .contactPhone ? .phonePad : .default
+    private var generalSettingsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            KubajSettingsSectionLabel(title: L10n.Settings.generalSection)
+
+            VStack(spacing: 0) {
+                KubajSettingsToggleRow(
+                    title: L10n.Settings.highVolumeAlerts,
+                    systemImage: "bell.fill",
+                    iconColor: Color(red: 0.95, green: 0.55, blue: 0.2),
+                    isOn: highVolumeAlertsBinding
+                )
+
+                settingsDivider
+
+                KubajSettingsToggleRow(
+                    title: L10n.Settings.darkMode,
+                    systemImage: "moon.fill",
+                    iconColor: Color(red: 0.45, green: 0.35, blue: 0.85),
+                    isOn: darkModeBinding
+                )
+
+                settingsDivider
+
+                KubajSettingsToggleRow(
+                    title: L10n.Settings.hapticFeedback,
+                    systemImage: "iphone.radiowaves.left.and.right",
+                    iconColor: Color(red: 0.95, green: 0.55, blue: 0.2),
+                    isOn: hapticBinding
                 )
             }
-
-            KubajRectPrimaryButton(
-                title: L10n.Settings.saveReportHeader,
-                systemImage: "square.and.arrow.down"
-            ) {
-                saveReportFields()
-                HapticFeedback.medium()
-            }
+            .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.04), radius: 4, y: 2)
         }
-        .padding(32)
-        .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: 32))
     }
 
-    private var infoCard: some View {
-        HStack(alignment: .top, spacing: 16) {
-            Image(systemName: "info.circle.fill")
-                .font(.system(size: 28))
-                .foregroundStyle(KubajColor.primary)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(L10n.Settings.outputInfoTitle)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(KubajColor.textPrimary)
-
-                Text(L10n.Settings.outputInfoBody)
-                    .font(.system(size: 16))
-                    .foregroundStyle(KubajColor.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .padding(32)
-        .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: 24))
-    }
-
-    private var professionalCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Image(systemName: "doc.richtext.fill")
-                .font(.system(size: 30))
-                .foregroundStyle(.white)
-
-            Text(L10n.Settings.professionalLookTitle)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundStyle(.white)
-
-            VStack(spacing: 8) {
-                Capsule()
-                    .fill(Color.white.opacity(0.4))
-                    .frame(height: 8)
-                Capsule()
-                    .fill(Color.white.opacity(0.4))
-                    .frame(width: 180, height: 8)
-            }
-            .padding(12)
-            .background(Color.white.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
-        }
-        .padding(24)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(KubajColor.primaryEnd, in: RoundedRectangle(cornerRadius: 24))
-    }
-
-    private var previewDraft: some View {
-        VStack(spacing: 24) {
-            Text(L10n.Settings.previewDraftTitle)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(KubajColor.textMuted)
-                .textCase(.uppercase)
-                .tracking(1.4)
+    private var enginePreferencesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            KubajSettingsSectionLabel(title: L10n.Settings.enginePreferencesSection)
 
             VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(KubajColor.inputBackground)
-                        .frame(width: 48, height: 48)
+                HStack(spacing: 12) {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(KubajColor.primary.opacity(0.12))
+                        .frame(width: 40, height: 40)
+                        .overlay {
+                            Image(systemName: "function")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(KubajColor.primary)
+                        }
 
-                    VStack(alignment: .trailing, spacing: 4) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(KubajColor.inputBackground)
-                            .frame(width: 128, height: 16)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(KubajColor.surface)
-                            .frame(width: 96, height: 12)
+                    Text(L10n.Settings.calculationMethod)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+
+                HStack(spacing: 12) {
+                    KubajFormulaOptionButton(
+                        title: L10n.Formula.smalian,
+                        subtitle: L10n.Settings.formulaSmalianSubtitle,
+                        isSelected: preferences.defaultCalculationMethod == .smalian
+                    ) {
+                        preferences.defaultCalculationMethod = .smalian
+                        HapticFeedback.light()
                     }
-                    Spacer()
-                }
 
-                ForEach(0..<3, id: \.self) { _ in
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(KubajColor.surface)
-                        .frame(height: 16)
+                    KubajFormulaOptionButton(
+                        title: L10n.Formula.huber,
+                        subtitle: L10n.Settings.formulaHuberSubtitle,
+                        isSelected: preferences.defaultCalculationMethod == .huber
+                    ) {
+                        preferences.defaultCalculationMethod = .huber
+                        HapticFeedback.light()
+                    }
                 }
+                .padding(.horizontal, 16)
 
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(KubajColor.surface)
-                    .frame(width: 200, height: 16)
+                HStack(spacing: 12) {
+                    KubajFormulaOptionButton(
+                        title: L10n.Formula.newton,
+                        subtitle: L10n.Settings.formulaNewtonSubtitle,
+                        isSelected: preferences.defaultCalculationMethod == .newton
+                    ) {
+                        preferences.defaultCalculationMethod = .newton
+                        HapticFeedback.light()
+                    }
+
+                    KubajFormulaOptionButton(
+                        title: L10n.Formula.ulker,
+                        subtitle: L10n.Settings.formulaUlkerSubtitle,
+                        isSelected: preferences.defaultCalculationMethod == .ulker
+                    ) {
+                        preferences.defaultCalculationMethod = .ulker
+                        HapticFeedback.light()
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .padding(33)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 12))
-            .overlay {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(KubajColor.borderSubtle, lineWidth: 1)
-            }
-            .shadow(color: .black.opacity(0.1), radius: 25, y: 12)
-            .scaleEffect(0.95)
+            .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.04), radius: 4, y: 2)
         }
     }
 
-    private var formulaBinding: Binding<CalculationMethod> {
-        Binding(
-            get: { preferences.defaultCalculationMethod },
-            set: { preferences.defaultCalculationMethod = $0 }
-        )
+    private var supportSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            KubajSettingsSectionLabel(title: L10n.Settings.supportSection)
+
+            VStack(spacing: 0) {
+                KubajSettingsLinkRow(
+                    title: L10n.Settings.rateUsTitle,
+                    subtitle: L10n.Settings.rateUsSubtitle,
+                    systemImage: "star.fill",
+                    iconColor: Color(red: 0.95, green: 0.75, blue: 0.2)
+                ) {
+                    requestAppReview()
+                }
+
+                settingsDivider
+
+                KubajSettingsLinkRow(
+                    title: L10n.Settings.contactTitle,
+                    subtitle: L10n.Settings.contactSubtitle,
+                    systemImage: "envelope.fill",
+                    iconColor: KubajColor.primary
+                ) {
+                    openContactEmail()
+                }
+            }
+            .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.04), radius: 4, y: 2)
+        }
     }
 
-    private var themeBinding: Binding<AppTheme> {
-        Binding(
-            get: { preferences.appTheme },
-            set: { preferences.appTheme = $0 }
-        )
+    private var languageSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            KubajSettingsSectionLabel(title: L10n.Settings.languageSection)
+
+            VStack(spacing: 0) {
+                Menu {
+                    ForEach(AppLanguage.allCases) { language in
+                        Button {
+                            preferences.appLanguage = language
+                            HapticFeedback.light()
+                        } label: {
+                            if preferences.appLanguage == language {
+                                Label(language.displayName, systemImage: "checkmark")
+                            } else {
+                                Text(language.displayName)
+                            }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(KubajColor.primary.opacity(0.12))
+                            .frame(width: 40, height: 40)
+                            .overlay {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(KubajColor.primary)
+                            }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L10n.Settings.languagePickerTitle)
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
+                            Text(preferences.appLanguage.displayName)
+                                .font(.system(size: 13))
+                                .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                }
+            }
+            .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.04), radius: 4, y: 2)
+        }
+    }
+
+    private var footerInfo: some View {
+        VStack(spacing: 4) {
+            Text(L10n.Settings.footerVersion(appVersion))
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
+                .textCase(.uppercase)
+                .tracking(1)
+
+            Text(L10n.Settings.footerCompany)
+                .font(.system(size: 12))
+                .foregroundStyle(KubajThemeColors.textMuted(colorScheme).opacity(0.8))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+    }
+
+    private var settingsDivider: some View {
+        Rectangle()
+            .fill(KubajThemeColors.borderSubtle(colorScheme))
+            .frame(height: 1)
+            .padding(.horizontal, 16)
     }
 
     private var appVersion: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
-        return "\(version) (\(build))"
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
 
-    private func binding(for field: ReportField) -> Binding<String> {
+    private var highVolumeAlertsBinding: Binding<Bool> {
         Binding(
-            get: { reportFields[field.rawValue] },
-            set: { reportFields[field.rawValue] = $0 }
+            get: { preferences.isHighVolumeAlertsEnabled },
+            set: { preferences.isHighVolumeAlertsEnabled = $0 }
         )
     }
 
-    private func loadReportFields() {
-        reportFields = ReportField.allCases.map { ReportHeaderPreferences.value(for: $0) }
+    private var darkModeBinding: Binding<Bool> {
+        Binding(
+            get: { preferences.appTheme == .dark },
+            set: { preferences.appTheme = $0 ? .dark : .light }
+        )
     }
 
-    private func saveReportFields() {
-        for field in ReportField.allCases {
-            ReportHeaderPreferences.setValue(reportFields[field.rawValue], for: field)
-        }
+    private var hapticBinding: Binding<Bool> {
+        Binding(
+            get: { preferences.isHapticEnabled },
+            set: { preferences.isHapticEnabled = $0 }
+        )
     }
 
-    private func openSystemSettings() {
-        guard let url = URL(string: UIApplication.openSettingsURLString) else {
+    private func requestAppReview() {
+        requestReview()
+        HapticFeedback.light()
+    }
+
+    private func openContactEmail() {
+        let subject = L10n.Settings.contactEmailSubject
+        let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        guard let url = URL(string: "mailto:\(KubajAppLinks.contactEmail)?subject=\(encodedSubject)") else {
             return
         }
         UIApplication.shared.open(url)
+        HapticFeedback.light()
     }
 }
 

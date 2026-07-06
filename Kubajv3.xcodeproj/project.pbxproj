@@ -40,6 +40,15 @@
 		F10000010000000000000002 /* KubajDesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000010000000000000002 /* KubajDesignComponents.swift */; };
 		G10000010000000000000001 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G20000010000000000000001 /* OnboardingView.swift */; };
 		G10000010000000000000002 /* ReportHeaderPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = G20000010000000000000002 /* ReportHeaderPreferences.swift */; };
+		H10000010000000000000001 /* HomeInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000001 /* HomeInputField.swift */; };
+		H10000010000000000000002 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000002 /* AppLanguage.swift */; };
+		H10000010000000000000003 /* KubajThemeColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000003 /* KubajThemeColors.swift */; };
+		H10000010000000000000004 /* SelectAllTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000004 /* SelectAllTextField.swift */; };
+		H10000010000000000000005 /* LumberCalculationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000005 /* LumberCalculationView.swift */; };
+		H10000010000000000000006 /* FoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000006 /* FoldersView.swift */; };
+		H10000010000000000000008 /* KubajAppLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000008 /* KubajAppLinks.swift */; };
+		H10000010000000000000009 /* LogEntryDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000009 /* LogEntryDisplay.swift */; };
+		H10000010000000000000010 /* KubajLogTableComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000010000000000000010 /* KubajLogTableComponents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +97,15 @@
 		F20000010000000000000002 /* KubajDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajDesignComponents.swift; sourceTree = "<group>"; };
 		G20000010000000000000001 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		G20000010000000000000002 /* ReportHeaderPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportHeaderPreferences.swift; sourceTree = "<group>"; };
+		H20000010000000000000001 /* HomeInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeInputField.swift; sourceTree = "<group>"; };
+		H20000010000000000000002 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		H20000010000000000000003 /* KubajThemeColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajThemeColors.swift; sourceTree = "<group>"; };
+		H20000010000000000000004 /* SelectAllTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectAllTextField.swift; sourceTree = "<group>"; };
+		H20000010000000000000005 /* LumberCalculationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LumberCalculationView.swift; sourceTree = "<group>"; };
+		H20000010000000000000006 /* FoldersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldersView.swift; sourceTree = "<group>"; };
+		H20000010000000000000008 /* KubajAppLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajAppLinks.swift; sourceTree = "<group>"; };
+		H20000010000000000000009 /* LogEntryDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryDisplay.swift; sourceTree = "<group>"; };
+		H20000010000000000000010 /* KubajLogTableComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajLogTableComponents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +174,7 @@
 				A40000010000000000000007 /* Localization */,
 				A40000010000000000000011 /* Haptics */,
 				A40000010000000000000012 /* Design */,
+				A40000010000000000000026 /* Constants */,
 				A40000010000000000000016 /* Sharing */,
 				A40000010000000000000021 /* Preferences */,
 			);
@@ -202,6 +221,8 @@
 			children = (
 				A40000010000000000000013 /* Home */,
 				A40000010000000000000014 /* Hollow */,
+				A40000010000000000000024 /* Lumber */,
+				A40000010000000000000025 /* Folders */,
 				A40000010000000000000015 /* FolderSelection */,
 				A40000010000000000000019 /* Grouping */,
 				A40000010000000000000020 /* Export */,
@@ -224,6 +245,10 @@
 			children = (
 				F20000010000000000000001 /* KubajDesignTokens.swift */,
 				F20000010000000000000002 /* KubajDesignComponents.swift */,
+				H20000010000000000000003 /* KubajThemeColors.swift */,
+				H20000010000000000000004 /* SelectAllTextField.swift */,
+				H20000010000000000000009 /* LogEntryDisplay.swift */,
+				H20000010000000000000010 /* KubajLogTableComponents.swift */,
 				C20000010000000000000007 /* GlassCardModifier.swift */,
 			);
 			path = Design;
@@ -235,6 +260,7 @@
 				C20000010000000000000001 /* DraftLogEntry.swift */,
 				C20000010000000000000002 /* HomeViewModel.swift */,
 				C20000010000000000000003 /* HomeView.swift */,
+				H20000010000000000000001 /* HomeInputField.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -304,6 +330,7 @@
 				E20000010000000000000001 /* AppPreferenceKey.swift */,
 				E20000010000000000000002 /* AppTheme.swift */,
 				E20000010000000000000003 /* AppPreferences.swift */,
+				H20000010000000000000002 /* AppLanguage.swift */,
 				G20000010000000000000002 /* ReportHeaderPreferences.swift */,
 			);
 			path = Preferences;
@@ -323,6 +350,30 @@
 				E20000010000000000000004 /* SettingsView.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000024 /* Lumber */ = {
+			isa = PBXGroup;
+			children = (
+				H20000010000000000000005 /* LumberCalculationView.swift */,
+			);
+			path = Lumber;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000025 /* Folders */ = {
+			isa = PBXGroup;
+			children = (
+				H20000010000000000000006 /* FoldersView.swift */,
+			);
+			path = Folders;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000026 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				H20000010000000000000008 /* KubajAppLinks.swift */,
+			);
+			path = Constants;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -455,6 +506,15 @@
 				F10000010000000000000002 /* KubajDesignComponents.swift in Sources */,
 				G10000010000000000000001 /* OnboardingView.swift in Sources */,
 				G10000010000000000000002 /* ReportHeaderPreferences.swift in Sources */,
+				H10000010000000000000001 /* HomeInputField.swift in Sources */,
+				H10000010000000000000002 /* AppLanguage.swift in Sources */,
+				H10000010000000000000003 /* KubajThemeColors.swift in Sources */,
+				H10000010000000000000004 /* SelectAllTextField.swift in Sources */,
+				H10000010000000000000005 /* LumberCalculationView.swift in Sources */,
+				H10000010000000000000006 /* FoldersView.swift in Sources */,
+				H10000010000000000000008 /* KubajAppLinks.swift in Sources */,
+				H10000010000000000000009 /* LogEntryDisplay.swift in Sources */,
+				H10000010000000000000010 /* KubajLogTableComponents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

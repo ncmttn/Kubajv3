@@ -38,6 +38,11 @@ struct ForestryCalculator: Sendable {
         return roundVolume(volume)
     }
 
+    static func lumber(widthCm: Double, thicknessCm: Double, lengthM: Double) -> Double {
+        let volume = (widthCm / 100) * (thicknessCm / 100) * lengthM
+        return roundVolume(volume)
+    }
+
     static func hollow(
         outerDiameterCm: Double,
         innerDiameterCm: Double,

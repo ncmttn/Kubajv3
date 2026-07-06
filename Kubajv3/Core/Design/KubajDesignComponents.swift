@@ -1,5 +1,35 @@
 import SwiftUI
 
+struct KubajHeaderActionButton: View {
+  let systemImage: String
+  var tint: Color = KubajColor.primary
+  var isDestructive: Bool = false
+  var isEnabled: Bool = true
+  let action: () -> Void
+
+  @Environment(\.colorScheme) private var colorScheme
+
+  var body: some View {
+    Button(action: action) {
+      Image(systemName: systemImage)
+        .font(.system(size: 16, weight: .semibold))
+        .foregroundStyle(foregroundColor)
+        .frame(width: 32, height: 32)
+        .background(KubajThemeColors.inputBackground(colorScheme), in: Circle())
+    }
+    .buttonStyle(.plain)
+    .disabled(!isEnabled)
+    .opacity(isEnabled ? 1 : 0.45)
+  }
+
+  private var foregroundColor: Color {
+    guard isEnabled else {
+      return KubajThemeColors.textMuted(colorScheme)
+    }
+    return isDestructive ? Color(red: 0.9, green: 0.25, blue: 0.25) : tint
+  }
+}
+
 struct KubajHeader: View {
   var body: some View {
     HStack {
@@ -47,25 +77,42 @@ struct KubajInputField: View {
   var keyboard: UIKeyboardType = .decimalPad
   var trailingActionTitle: String?
   var onTrailingAction: (() -> Void)?
+  var isFocused: Bool = false
+  var selectAllOnFocus: Bool = false
+  var returnKeyType: UIReturnKeyType = .next
+  var onBeginEditing: (() -> Void) = {}
+  var onSubmit: (() -> Void) = {}
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       Text(title)
         .font(KubajFont.labelCaps())
-        .foregroundStyle(KubajColor.textSecondary)
+        .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .textCase(.uppercase)
         .tracking(1)
         .padding(.leading, 8)
         .padding(.bottom, 6)
 
       HStack(spacing: 0) {
-        TextField(title, text: $text)
-          .keyboardType(keyboard)
-          .font(KubajFont.inputValue())
-          .foregroundStyle(KubajColor.textPrimary)
-          .padding(.horizontal, 12)
-          .padding(.vertical, 8)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        SelectAllTextField(
+          text: $text,
+          placeholder: title,
+          keyboardType: keyboard,
+          returnKeyType: returnKeyType,
+          isFocused: isFocused,
+          selectAllOnFocus: selectAllOnFocus,
+          onReturn: onSubmit,
+          onBeginEditing: onBeginEditing
+        )
+        .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .onTapGesture {
+          onBeginEditing()
+        }
 
         if let trailingActionTitle, let onTrailingAction {
           Button(action: onTrailingAction) {
@@ -74,13 +121,13 @@ struct KubajInputField: View {
               .foregroundStyle(KubajColor.primary)
               .padding(.horizontal, 12)
               .padding(.vertical, 8)
-              .background(Color.white, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusSmall))
-              .shadow(color: .black.opacity(0.05), radius: 1, y: 1)
+              .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusSmall))
+              .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.05), radius: 1, y: 1)
           }
           .padding(4)
         }
       }
-      .background(KubajColor.inputBackground, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+      .background(KubajThemeColors.inputBackground(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
     }
   }
 }
@@ -108,6 +155,93 @@ struct KubajPrimaryButton: View {
         .shadow(color: KubajColor.primary.opacity(isEnabled ? 0.2 : 0), radius: 8, y: 4)
     }
     .disabled(!isEnabled)
+  }
+}
+
+struct KubajOutlineCapsuleButton: View {
+  let title: String
+  var systemImage: String? = nil
+  let action: () -> Void
+  @Environment(\.colorScheme) private var colorScheme
+
+  var body: some View {
+    Button(action: action) {
+      HStack(spacing: 6) {
+        if let systemImage {
+          Image(systemName: systemImage)
+            .font(.system(size: 14, weight: .semibold))
+        }
+        Text(title)
+          .font(KubajFont.button())
+      }
+      .foregroundStyle(KubajColor.primary)
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 12)
+      .background(KubajThemeColors.card(colorScheme), in: Capsule())
+      .overlay {
+        Capsule()
+          .stroke(KubajColor.primary.opacity(0.35), lineWidth: 1)
+      }
+    }
+    .buttonStyle(.plain)
+  }
+}
+
+struct KubajSettingsLinkRow: View {
+  let title: String
+  let subtitle: String?
+  let systemImage: String
+  let iconColor: Color
+  let action: () -> Void
+  @Environment(\.colorScheme) private var colorScheme
+
+  init(
+    title: String,
+    subtitle: String? = nil,
+    systemImage: String,
+    iconColor: Color,
+    action: @escaping () -> Void
+  ) {
+    self.title = title
+    self.subtitle = subtitle
+    self.systemImage = systemImage
+    self.iconColor = iconColor
+    self.action = action
+  }
+
+  var body: some View {
+    Button(action: action) {
+      HStack(spacing: 12) {
+        RoundedRectangle(cornerRadius: 10)
+          .fill(iconColor.opacity(0.15))
+          .frame(width: 40, height: 40)
+          .overlay {
+            Image(systemName: systemImage)
+              .font(.system(size: 16, weight: .semibold))
+              .foregroundStyle(iconColor)
+          }
+
+        VStack(alignment: .leading, spacing: 2) {
+          Text(title)
+            .font(.system(size: 16, weight: .medium))
+            .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
+          if let subtitle {
+            Text(subtitle)
+              .font(.system(size: 13))
+              .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
+          }
+        }
+
+        Spacer()
+
+        Image(systemName: "chevron.right")
+          .font(.system(size: 12, weight: .semibold))
+          .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
+      }
+      .padding(.horizontal, 16)
+      .padding(.vertical, 12)
+    }
+    .buttonStyle(.plain)
   }
 }
 
@@ -194,7 +328,7 @@ struct KubajTabBar: View {
         } label: {
           VStack(spacing: 4) {
             Image(systemName: tab.iconName)
-              .font(.system(size: tab == .hollow ? 20 : 16, weight: .semibold))
+              .font(.system(size: 16, weight: .semibold))
             Text(tab.title)
               .font(KubajFont.tabLabel())
               .textCase(.uppercase)
@@ -208,8 +342,8 @@ struct KubajTabBar: View {
       }
     }
     .padding(.horizontal, 20)
-    .padding(.top, 8)
-    .padding(.bottom, 20)
+    .padding(.top, 4)
+    .padding(.bottom, 4)
     .background(.ultraThinMaterial)
     .overlay(alignment: .top) {
       Rectangle()
@@ -224,7 +358,7 @@ struct KubajTabBar: View {
 enum AppTab: CaseIterable, Identifiable {
   case home
   case groups
-  case hollow
+  case folders
   case settings
 
   var id: Self { self }
@@ -235,8 +369,8 @@ enum AppTab: CaseIterable, Identifiable {
       L10n.Tab.home
     case .groups:
       L10n.Tab.groups
-    case .hollow:
-      L10n.Tab.hollow
+    case .folders:
+      L10n.Tab.folders
     case .settings:
       L10n.Tab.settings
     }
@@ -248,8 +382,8 @@ enum AppTab: CaseIterable, Identifiable {
       "house.fill"
     case .groups:
       "square.stack.3d.up.fill"
-    case .hollow:
-      "circle.dotted"
+    case .folders:
+      "folder.fill"
     case .settings:
       "gearshape.fill"
     }
@@ -406,6 +540,189 @@ struct KubajSettingsCard<Content: View>: View {
     }
     .padding(KubajMetric.horizontalPadding)
     .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
+  }
+}
+
+struct KubajSettingsSectionLabel: View {
+  let title: String
+
+  var body: some View {
+    Text(title)
+      .font(.system(size: 12, weight: .semibold))
+      .foregroundStyle(KubajColor.textMuted)
+      .textCase(.uppercase)
+      .tracking(1.2)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 16)
+  }
+}
+
+struct KubajSettingsToggleRow: View {
+  let title: String
+  let systemImage: String
+  let iconColor: Color
+  @Binding var isOn: Bool
+
+  var body: some View {
+    HStack(spacing: 12) {
+      RoundedRectangle(cornerRadius: 10)
+        .fill(iconColor.opacity(0.15))
+        .frame(width: 40, height: 40)
+        .overlay {
+          Image(systemName: systemImage)
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundStyle(iconColor)
+        }
+
+      Text(title)
+        .font(.system(size: 16, weight: .medium))
+        .foregroundStyle(KubajColor.textPrimary)
+
+      Spacer()
+
+      Toggle("", isOn: $isOn)
+        .labelsHidden()
+        .tint(KubajColor.primary)
+    }
+    .padding(.horizontal, 16)
+    .padding(.vertical, 12)
+  }
+}
+
+struct KubajFormulaOptionButton: View {
+  let title: String
+  let subtitle: String
+  let isSelected: Bool
+  let action: () -> Void
+  @Environment(\.colorScheme) private var colorScheme
+
+  var body: some View {
+    Button(action: action) {
+      VStack(spacing: 4) {
+        Text(title)
+          .font(.system(size: 16, weight: .bold))
+        Text(subtitle)
+          .font(.system(size: 12, weight: .medium))
+          .multilineTextAlignment(.center)
+      }
+      .foregroundStyle(isSelected ? Color.white : KubajColor.textPrimary)
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 12)
+      .background {
+        RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium)
+          .fill(
+            isSelected
+              ? AnyShapeStyle(LinearGradient(
+                  colors: [KubajColor.primary, KubajColor.primaryEnd],
+                  startPoint: .leading,
+                  endPoint: .trailing
+                ))
+              : AnyShapeStyle(KubajThemeColors.card(colorScheme))
+          )
+      }
+      .overlay {
+        RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium)
+          .stroke(isSelected ? Color.clear : KubajColor.borderSubtle, lineWidth: 1)
+      }
+      .shadow(color: isSelected ? KubajColor.primary.opacity(0.2) : .clear, radius: 8, y: 4)
+    }
+    .buttonStyle(.plain)
+  }
+}
+
+struct KubajIconTitleButton: View {
+  let title: String
+  let systemImage: String
+  let iconColor: Color
+  var isDestructive: Bool = false
+  var isEnabled: Bool = true
+  let action: () -> Void
+
+  @Environment(\.colorScheme) private var colorScheme
+
+  var body: some View {
+    Button(action: action) {
+      VStack(spacing: 10) {
+        RoundedRectangle(cornerRadius: 12)
+          .fill(iconColor.opacity(0.12))
+          .frame(width: 44, height: 44)
+          .overlay {
+            Image(systemName: systemImage)
+              .font(.system(size: 20, weight: .semibold))
+              .foregroundStyle(iconColor)
+          }
+
+        Text(title)
+          .font(.system(size: 13, weight: .semibold))
+          .foregroundStyle(isDestructive ? iconColor : KubajThemeColors.textPrimary(colorScheme))
+          .multilineTextAlignment(.center)
+          .lineLimit(2)
+          .minimumScaleFactor(0.8)
+      }
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 16)
+      .padding(.horizontal, 8)
+      .background(KubajThemeColors.card(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+      .shadow(color: .black.opacity(colorScheme == .dark ? 0.2 : 0.04), radius: 4, y: 2)
+    }
+    .buttonStyle(.plain)
+    .disabled(!isEnabled)
+    .opacity(isEnabled ? 1 : 0.45)
+  }
+}
+
+struct KubajExportManagementCard: View {
+  let title: String
+  let subtitle: String
+  let systemImage: String
+  let iconColor: Color
+  let buttonTitle: String
+  var isEnabled: Bool = true
+  let action: () -> Void
+
+  var body: some View {
+    VStack(spacing: 16) {
+      VStack(spacing: 12) {
+        RoundedRectangle(cornerRadius: 12)
+          .fill(iconColor.opacity(0.12))
+          .frame(width: 48, height: 48)
+          .overlay {
+            Image(systemName: systemImage)
+              .font(.system(size: 22, weight: .semibold))
+              .foregroundStyle(iconColor)
+          }
+
+        VStack(spacing: 4) {
+          Text(title)
+            .font(.system(size: 18, weight: .bold))
+            .foregroundStyle(KubajColor.textPrimary)
+          Text(subtitle)
+            .font(.system(size: 14))
+            .foregroundStyle(KubajColor.textSecondary)
+            .multilineTextAlignment(.center)
+        }
+      }
+      .frame(maxWidth: .infinity)
+
+      Button(action: action) {
+        Text(buttonTitle)
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(KubajColor.textPrimary)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 12)
+          .background(Color.white, in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium))
+          .overlay {
+            RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusMedium)
+              .stroke(KubajColor.borderSubtle, lineWidth: 1)
+          }
+      }
+      .buttonStyle(.plain)
+      .disabled(!isEnabled)
+      .opacity(isEnabled ? 1 : 0.5)
+    }
+    .padding(20)
+    .background(KubajColor.surface, in: RoundedRectangle(cornerRadius: 20))
+    .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
   }
 }
 

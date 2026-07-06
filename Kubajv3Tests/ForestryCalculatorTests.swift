@@ -82,6 +82,12 @@ final class ForestryCalculatorTests: XCTestCase {
         XCTAssertEqual(volume, expected, accuracy: volumeAccuracy)
     }
 
+    func testLumberWithKnownValues() {
+        let volume = ForestryCalculator.lumber(widthCm: 20, thicknessCm: 5, lengthM: 4)
+
+        XCTAssertEqual(volume, 0.040, accuracy: volumeAccuracy)
+    }
+
     func testHollowWithKnownValues() {
         let result = ForestryCalculator.hollow(outerDiameterCm: 40, innerDiameterCm: 20, lengthM: 5)
 

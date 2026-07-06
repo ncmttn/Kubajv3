@@ -29,7 +29,7 @@ struct ExportSettingsView: View {
                                 label: L10n.Export.reportFieldLabel(field),
                                 placeholder: L10n.Export.reportFieldPlaceholder(field),
                                 text: binding(for: field),
-                                keyboard: field == .contactPhone ? .phonePad : .default
+                                keyboard: .default
                             )
                         }
                     }

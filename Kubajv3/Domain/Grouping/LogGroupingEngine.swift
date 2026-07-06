@@ -53,7 +53,7 @@ struct LogGroup: Identifiable, Equatable {
     }
 }
 
-enum DiameterSortOrder: Sendable {
+enum LogSortOrder: Sendable {
     case ascending
     case descending
 }
@@ -69,20 +69,17 @@ struct LogGroupingEngine {
         }
     }
 
-    static func sort(_ groups: [LogGroup], order: DiameterSortOrder) -> [LogGroup] {
+    static func sort(_ groups: [LogGroup], order: LogSortOrder) -> [LogGroup] {
         groups.sorted { lhs, rhs in
-            switch order {
-            case .ascending:
-                if lhs.diameterCm == rhs.diameterCm {
+            if lhs.lengthM != rhs.lengthM {
+                switch order {
+                case .ascending:
                     return lhs.lengthM < rhs.lengthM
-                }
-                return lhs.diameterCm < rhs.diameterCm
-            case .descending:
-                if lhs.diameterCm == rhs.diameterCm {
+                case .descending:
                     return lhs.lengthM > rhs.lengthM
                 }
-                return lhs.diameterCm > rhs.diameterCm
             }
+            return lhs.diameterCm < rhs.diameterCm
         }
     }
 }
@@ -94,5 +91,26 @@ enum FolderRecordCollector {
             result.append(contentsOf: collect(from: subfolder))
         }
         return result
+    }
+
+    static func folderOptions(from roots: [Folder]) -> [(folder: Folder, path: String)] {
+        roots.flatMap { folderPathEntries(from: $0, prefix: "") }
+    }
+
+    private static func folderPathEntries(from folder: Folder, prefix: String) -> [(Folder, String)] {
+        let path = prefix.isEmpty ? folder.name : "\(prefix) / \(folder.name)"
+        var entries: [(Folder, String)] = []
+
+        if !folder.records.isEmpty {
+            entries.append((folder, path))
+        }
+
+        let sortedSubfolders = folder.subFolders.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+        for subfolder in sortedSubfolders {
+            entries.append(contentsOf: folderPathEntries(from: subfolder, prefix: path))
+        }
+        return entries
     }
 }

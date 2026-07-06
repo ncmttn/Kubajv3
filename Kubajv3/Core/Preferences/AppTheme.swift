@@ -17,4 +17,13 @@ enum AppTheme: String, CaseIterable, Identifiable, Sendable {
             .dark
         }
     }
+
+    var resolvedColorScheme: ColorScheme {
+        switch self {
+        case .system, .light:
+            .light
+        case .dark:
+            .dark
+        }
+    }
 }
