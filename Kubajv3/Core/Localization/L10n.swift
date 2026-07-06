@@ -19,6 +19,11 @@ enum L10n {
         static let name = String(localized: "app.name")
     }
 
+    enum Tab {
+        static let home = String(localized: "tab.home")
+        static let grouping = String(localized: "tab.grouping")
+    }
+
     enum Common {
         static let cancel = String(localized: "common.cancel")
     }
@@ -50,6 +55,76 @@ enum L10n {
                 quantity,
                 DisplayFormatting.volume(volume)
             )
+        }
+    }
+
+    enum Grouping {
+        static let title = String(localized: "grouping.title")
+        static let selectFolder = String(localized: "grouping.select_folder")
+        static let noFolderSelected = String(localized: "grouping.no_folder_selected")
+        static let selectFolderPrompt = String(localized: "grouping.select_folder_prompt")
+        static let emptyState = String(localized: "grouping.empty_state")
+        static let sortAscending = String(localized: "grouping.sort_ascending")
+        static let sortDescending = String(localized: "grouping.sort_descending")
+        static let exportPDF = String(localized: "grouping.export_pdf")
+        static let exportCSV = String(localized: "grouping.export_csv")
+
+        static func rowSummary(quantity: Int, volume: Double, recordCount: Int) -> String {
+            String(
+                format: String(localized: "grouping.row_summary_format"),
+                quantity,
+                DisplayFormatting.volume(volume),
+                recordCount
+            )
+        }
+    }
+
+    enum Export {
+        static let settingsTitle = String(localized: "export.settings_title")
+        static let confirmPDF = String(localized: "export.confirm_pdf")
+        static let confirmCSV = String(localized: "export.confirm_csv")
+        static let pdfTitle = String(localized: "export.pdf_title")
+        static let pdfColumnDiameter = String(localized: "export.pdf_column_diameter")
+        static let pdfColumnLength = String(localized: "export.pdf_column_length")
+        static let pdfColumnQuantity = String(localized: "export.pdf_column_quantity")
+        static let pdfColumnVolume = String(localized: "export.pdf_column_volume")
+        static let csvColumnDiameter = String(localized: "export.csv_column_diameter")
+        static let csvColumnLength = String(localized: "export.csv_column_length")
+        static let csvColumnQuantity = String(localized: "export.csv_column_quantity")
+        static let csvColumnVolume = String(localized: "export.csv_column_volume")
+
+        static func optionalFieldLabel(index: Int) -> String {
+            switch index {
+            case 0:
+                String(localized: "export.optional_field_1_label")
+            case 1:
+                String(localized: "export.optional_field_2_label")
+            case 2:
+                String(localized: "export.optional_field_3_label")
+            case 3:
+                String(localized: "export.optional_field_4_label")
+            case 4:
+                String(localized: "export.optional_field_5_label")
+            default:
+                ""
+            }
+        }
+
+        static func optionalFieldPlaceholder(index: Int) -> String {
+            switch index {
+            case 0:
+                String(localized: "export.optional_field_1_placeholder")
+            case 1:
+                String(localized: "export.optional_field_2_placeholder")
+            case 2:
+                String(localized: "export.optional_field_3_placeholder")
+            case 3:
+                String(localized: "export.optional_field_4_placeholder")
+            case 4:
+                String(localized: "export.optional_field_5_placeholder")
+            default:
+                ""
+            }
         }
     }
 

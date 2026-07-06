@@ -24,6 +24,14 @@
 		C10000010000000000000005 /* FolderSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000005 /* FolderSelectionView.swift */; };
 		C10000010000000000000006 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000006 /* HapticFeedback.swift */; };
 		C10000010000000000000007 /* GlassCardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000007 /* GlassCardModifier.swift */; };
+		D10000010000000000000001 /* LogGroupingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000001 /* LogGroupingEngine.swift */; };
+		D10000010000000000000002 /* ExportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000002 /* ExportModels.swift */; };
+		D10000010000000000000003 /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000003 /* CSVExporter.swift */; };
+		D10000010000000000000004 /* PDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000004 /* PDFGenerator.swift */; };
+		D10000010000000000000005 /* GroupingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000005 /* GroupingViewModel.swift */; };
+		D10000010000000000000006 /* GroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000006 /* GroupingView.swift */; };
+		D10000010000000000000007 /* ExportSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000007 /* ExportSettingsView.swift */; };
+		D10000010000000000000008 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000008 /* ShareSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +64,14 @@
 		C20000010000000000000005 /* FolderSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSelectionView.swift; sourceTree = "<group>"; };
 		C20000010000000000000006 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		C20000010000000000000007 /* GlassCardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCardModifier.swift; sourceTree = "<group>"; };
+		D20000010000000000000001 /* LogGroupingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogGroupingEngine.swift; sourceTree = "<group>"; };
+		D20000010000000000000002 /* ExportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportModels.swift; sourceTree = "<group>"; };
+		D20000010000000000000003 /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
+		D20000010000000000000004 /* PDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFGenerator.swift; sourceTree = "<group>"; };
+		D20000010000000000000005 /* GroupingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupingViewModel.swift; sourceTree = "<group>"; };
+		D20000010000000000000006 /* GroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupingView.swift; sourceTree = "<group>"; };
+		D20000010000000000000007 /* ExportSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportSettingsView.swift; sourceTree = "<group>"; };
+		D20000010000000000000008 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +140,7 @@
 				A40000010000000000000007 /* Localization */,
 				A40000010000000000000011 /* Haptics */,
 				A40000010000000000000012 /* Design */,
+				A40000010000000000000016 /* Sharing */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -157,6 +174,8 @@
 			isa = PBXGroup;
 			children = (
 				B20000010000000000000001 /* ForestryCalculator.swift */,
+				A40000010000000000000017 /* Grouping */,
+				A40000010000000000000018 /* Export */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -167,6 +186,8 @@
 				A40000010000000000000013 /* Home */,
 				A40000010000000000000014 /* Hollow */,
 				A40000010000000000000015 /* FolderSelection */,
+				A40000010000000000000019 /* Grouping */,
+				A40000010000000000000020 /* Export */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -211,6 +232,49 @@
 				C20000010000000000000005 /* FolderSelectionView.swift */,
 			);
 			path = FolderSelection;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000016 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				D20000010000000000000008 /* ShareSheet.swift */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000017 /* Grouping */ = {
+			isa = PBXGroup;
+			children = (
+				D20000010000000000000001 /* LogGroupingEngine.swift */,
+			);
+			path = Grouping;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000018 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				D20000010000000000000002 /* ExportModels.swift */,
+				D20000010000000000000003 /* CSVExporter.swift */,
+				D20000010000000000000004 /* PDFGenerator.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000019 /* Grouping */ = {
+			isa = PBXGroup;
+			children = (
+				D20000010000000000000005 /* GroupingViewModel.swift */,
+				D20000010000000000000006 /* GroupingView.swift */,
+			);
+			path = Grouping;
+			sourceTree = "<group>";
+		};
+		A40000010000000000000020 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				D20000010000000000000007 /* ExportSettingsView.swift */,
+			);
+			path = Export;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -327,6 +391,14 @@
 				C10000010000000000000005 /* FolderSelectionView.swift in Sources */,
 				C10000010000000000000006 /* HapticFeedback.swift in Sources */,
 				C10000010000000000000007 /* GlassCardModifier.swift in Sources */,
+				D10000010000000000000001 /* LogGroupingEngine.swift in Sources */,
+				D10000010000000000000002 /* ExportModels.swift in Sources */,
+				D10000010000000000000003 /* CSVExporter.swift in Sources */,
+				D10000010000000000000004 /* PDFGenerator.swift in Sources */,
+				D10000010000000000000005 /* GroupingViewModel.swift in Sources */,
+				D10000010000000000000006 /* GroupingView.swift in Sources */,
+				D10000010000000000000007 /* ExportSettingsView.swift in Sources */,
+				D10000010000000000000008 /* ShareSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,7 +2,17 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        HomeView()
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label(L10n.Tab.home, systemImage: "tree")
+                }
+
+            GroupingView()
+                .tabItem {
+                    Label(L10n.Tab.grouping, systemImage: "square.stack.3d.up")
+                }
+        }
     }
 }
 
