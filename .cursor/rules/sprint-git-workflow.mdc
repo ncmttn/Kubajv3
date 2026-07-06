@@ -1,0 +1,25 @@
+---
+description: Her sprint tamamlandığında otomatik git commit ve push yapılmasını zorunlu kılar
+alwaysApply: true
+---
+
+# Sprint Git Workflow
+
+Her sprint görevi tamamlandığında aşağıdaki adımları kullanıcıya sormadan uygula:
+
+1. `git status`, `git diff` ve `git log` ile değişiklikleri doğrula
+2. `.gitignore` kurallarına aykırı dosyaları (xcuserdata, DerivedData vb.) stage'e alma
+3. İlgili tüm kaynak dosyaları stage'e al
+4. Sprint numarasını ve kapsamını yansıtan commit mesajı ile commit at
+5. `git push origin HEAD` ile GitHub'a gönder
+6. Push başarısız olursa hatayı kullanıcıya bildir ve çözüm öner; commit'i geri alma
+
+Commit mesajı formatı:
+
+```
+feat(sprint-N): kısa özet
+
+Sprint kapsamında yapılan işin 1-2 cümlelik açıklaması.
+```
+
+Sprint kodları veya dokümantasyonu üretildikten sonra commit atılmadan görev tamamlanmış sayılmaz.

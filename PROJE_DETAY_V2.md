@@ -17,10 +17,9 @@ Global ormancılık faaliyetleri baz alınarak; Türkçe, İngilizce, Rusça, Al
 - UI bileşenleri, alert/uyarı mesajları ve PDF/Excel çıktı tablolarının tamamı seçilen dile göre dinamik olarak render edilmelidir.
 
 ## Veri Hiyerarşisi ve Modeller (SwiftData)
-Sistem 3 ana relational modelden oluşur:
-1. **Bolme (Bölme):** Ana klasördür.
-2. **Istif (İstif):** Bölmenin alt klasörüdür. İçinde tomruk ölçümlerini barındırır.
-3. **LogRecord (Tomruk Kaydı):** Bireysel hesaplama satırıdır.
+Sistem esnek ve iç içe geçebilen (nested) 2 ana relational modelden oluşur:
+1. **Folder (Klasör):** Kullanıcının serbestçe isimlendirdiği klasörlerdir. Kendi içinde alt klasörler (subFolders) barındırabilir ve bir üst klasöre (parentFolder) bağlanabilir.
+2. **LogRecord (Tomruk Kaydı):** Bireysel hesaplama satırıdır. Her kayıt bir Folder'a aittir.
    - Özellikler: Çap (cm), Boy (m), Adet, Hacim (m³), Hesaplama Yöntemi (Enum), isHollow (Kovuklu mu? Boolean).
 
 ## Hesaplama Motoru (Forestry Calculator)
