@@ -21,8 +21,10 @@ enum L10n {
 
     enum Tab {
         static let home = String(localized: "tab.home")
-        static let records = String(localized: "tab.records")
+        static let groups = String(localized: "tab.grouping")
+        static let hollow = String(localized: "tab.hollow")
         static let settings = String(localized: "tab.settings")
+        static let records = String(localized: "tab.records")
     }
 
     enum Common {
@@ -34,6 +36,7 @@ enum L10n {
         static let lengthM = String(localized: "home.length_m")
         static let quantity = String(localized: "home.quantity")
         static let addEntry = String(localized: "home.add_entry")
+        static let calculate = String(localized: "home.calculate")
         static let calculateHollow = String(localized: "home.calculate_hollow")
         static let save = String(localized: "home.save")
         static let emptyState = String(localized: "home.empty_state")
@@ -41,12 +44,40 @@ enum L10n {
         static let swipeDecrease = String(localized: "home.swipe_decrease")
         static let swipeIncrease = String(localized: "home.swipe_increase")
         static let hollowBadge = String(localized: "home.hollow_badge")
+        static let totalVolume = String(localized: "home.total_volume")
+        static let logsCount = String(localized: "home.logs_count")
+        static let avgDiameter = String(localized: "home.avg_diameter")
+        static let cubicMeterUnit = String(localized: "home.cubic_meter_unit")
+        static let recentAdditions = String(localized: "home.recent_additions")
+        static let liveBadge = String(localized: "home.live_badge")
+        static let viewFullHistory = String(localized: "home.view_full_history")
+        static let diameterIncrement = String(localized: "home.diameter_increment")
+        static let tableNo = String(localized: "home.table_no")
+        static let tableQty = String(localized: "home.table_qty")
+        static let tableDim = String(localized: "home.table_dim")
+        static let tableVol = String(localized: "home.table_vol")
+        static let tableActions = String(localized: "home.table_actions")
 
         static func dimensions(diameter: Double, length: Double) -> String {
             String(
                 format: String(localized: "home.dimensions_format"),
                 DisplayFormatting.diameter(diameter),
                 DisplayFormatting.length(length)
+            )
+        }
+
+        static func dimFormat(length: Double, diameter: Double) -> String {
+            String(
+                format: String(localized: "home.dim_format"),
+                DisplayFormatting.length(length),
+                DisplayFormatting.diameter(diameter)
+            )
+        }
+
+        static func diameterValue(_ value: Double) -> String {
+            String(
+                format: String(localized: "home.diameter_value_format"),
+                DisplayFormatting.diameter(value)
             )
         }
 

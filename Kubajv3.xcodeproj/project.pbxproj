@@ -36,6 +36,8 @@
 		E10000010000000000000002 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000002 /* AppTheme.swift */; };
 		E10000010000000000000003 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000003 /* AppPreferences.swift */; };
 		E10000010000000000000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000010000000000000004 /* SettingsView.swift */; };
+		F10000010000000000000001 /* KubajDesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000010000000000000001 /* KubajDesignTokens.swift */; };
+		F10000010000000000000002 /* KubajDesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000010000000000000002 /* KubajDesignComponents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +82,8 @@
 		E20000010000000000000002 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		E20000010000000000000003 /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
 		E20000010000000000000004 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F20000010000000000000001 /* KubajDesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajDesignTokens.swift; sourceTree = "<group>"; };
+		F20000010000000000000002 /* KubajDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajDesignComponents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +217,8 @@
 		A40000010000000000000012 /* Design */ = {
 			isa = PBXGroup;
 			children = (
+				F20000010000000000000001 /* KubajDesignTokens.swift */,
+				F20000010000000000000002 /* KubajDesignComponents.swift */,
 				C20000010000000000000007 /* GlassCardModifier.swift */,
 			);
 			path = Design;
@@ -431,6 +437,8 @@
 				E10000010000000000000002 /* AppTheme.swift in Sources */,
 				E10000010000000000000003 /* AppPreferences.swift in Sources */,
 				E10000010000000000000004 /* SettingsView.swift in Sources */,
+				F10000010000000000000001 /* KubajDesignTokens.swift in Sources */,
+				F10000010000000000000002 /* KubajDesignComponents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

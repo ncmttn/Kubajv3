@@ -12,17 +12,8 @@ struct GroupingView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                LinearGradient(
-                    colors: [
-                        Color.green.opacity(0.2),
-                        Color.accentColor.opacity(0.1),
-                        Color.clear,
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+            VStack(spacing: 0) {
+                KubajHeader()
 
                 VStack(spacing: 16) {
                     folderPicker
@@ -30,8 +21,9 @@ struct GroupingView: View {
                     groupList
                 }
                 .padding()
+                .frame(maxHeight: .infinity)
             }
-            .navigationTitle(L10n.Grouping.title)
+            .background(KubajColor.background)
             .onChange(of: viewModel.selectedFolder?.persistentModelID) { _, _ in
                 viewModel.refreshRecords()
             }

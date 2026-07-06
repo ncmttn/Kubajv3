@@ -8,7 +8,6 @@ final class HomeViewModel {
     var lengthInput = ""
     var quantityInput = "1"
     var draftEntries: [DraftLogEntry] = []
-    var isHollowSheetPresented = false
     var isFolderSelectionPresented = false
 
     var preferences: AppPreferences?
@@ -23,6 +22,47 @@ final class HomeViewModel {
 
     var canSave: Bool {
         !draftEntries.isEmpty
+    }
+
+    var canCalculate: Bool {
+        guard
+            let diameter = InputParser.double(from: diameterInput),
+            let length = InputParser.double(from: lengthInput),
+            let quantity = InputParser.int(from: quantityInput),
+            diameter > 0,
+            length > 0,
+            quantity > 0
+        else {
+            return false
+        }
+        return true
+    }
+
+    var totalVolumeM3: Double {
+        draftEntries.reduce(0) { $0 + $1.totalVolumeM3 }
+    }
+
+    var totalLogsCount: Int {
+        draftEntries.reduce(0) { $0 + $1.quantity }
+    }
+
+    var averageDiameterCm: Double {
+        let count = totalLogsCount
+        guard count > 0 else { return 0 }
+        let weighted = draftEntries.reduce(0.0) { $0 + $1.diameterCm * Double($1.quantity) }
+        return weighted / Double(count)
+    }
+
+    func incrementDiameter() {
+        if let current = InputParser.double(from: diameterInput) {
+            diameterInput = DisplayFormatting.diameter(current + 1)
+        } else {
+            diameterInput = "1"
+        }
+    }
+
+    func clearAllEntries() {
+        draftEntries.removeAll()
     }
 
     func addEntryFromInput() {

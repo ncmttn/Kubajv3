@@ -5,17 +5,8 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                LinearGradient(
-                    colors: [
-                        Color.purple.opacity(0.15),
-                        Color.accentColor.opacity(0.1),
-                        Color.clear,
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+            VStack(spacing: 0) {
+                KubajHeader()
 
                 Form {
                     Section(L10n.Settings.calculationSection) {
@@ -51,7 +42,7 @@ struct SettingsView: View {
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle(L10n.Settings.title)
+            .background(KubajColor.background)
         }
     }
 
