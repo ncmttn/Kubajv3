@@ -16,3 +16,8 @@ build/
 *.ipa
 *.dSYM.zip
 *.dSYM
+.gradle/
+.idea/
+local.properties
+*.apk
+*.aab
