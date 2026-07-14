@@ -146,7 +146,7 @@ struct GroupingView: View {
                     tint: Color(red: 0.15, green: 0.65, blue: 0.35),
                     isEnabled: viewModel.canExport
                 ) {
-                    requestExport(.csv)
+                    requestExport(.xlsx)
                 }
 
                 KubajHeaderActionButton(
@@ -203,20 +203,23 @@ struct GroupingView: View {
                     .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
                     .padding(.vertical, 32)
             } else {
-                ForEach(Array(viewModel.groups.enumerated()), id: \.element.id) { index, group in
+                let groups = viewModel.groups
+                let lengthBands = LengthBandIndices.compute(for: groups.map(\.lengthM))
+                ForEach(Array(groups.enumerated()), id: \.element.id) { index, group in
                     KubajLogTableRow(
                         rowNumber: index + 1,
                         lengthM: group.lengthM,
                         quantity: group.totalQuantity,
                         diameterLabel: LogEntryDisplay.diameterLabel(for: group),
                         volumeM3: group.totalVolumeM3,
+                        lengthBandIndex: lengthBands[index],
                         showsHollowBadge: LogEntryDisplay.isHollow(group),
                         showsLumberBadge: LogEntryDisplay.isLumber(group),
                         onIncrease: { handleIncrease(for: group) },
                         onDecrease: { handleDecrease(for: group) },
                         onDelete: { groupToDelete = group }
                     )
-                    if index < viewModel.groups.count - 1 {
+                    if index < groups.count - 1 {
                         Divider()
                             .overlay(KubajThemeColors.borderSubtle(colorScheme))
                     }

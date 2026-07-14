@@ -129,7 +129,7 @@ enum L10n {
     enum Export {
         static var settingsTitle: String { L10n.tr("export.settings_title") }
         static var confirmPDF: String { L10n.tr("export.confirm_pdf") }
-        static var confirmCSV: String { L10n.tr("export.confirm_csv") }
+        static var confirmXLSX: String { L10n.tr("export.confirm_xlsx") }
         static var pdfTitle: String { L10n.tr("export.pdf_title") }
         static var pdfColumnDiameter: String { L10n.tr("export.pdf_column_diameter") }
         static var pdfColumnLength: String { L10n.tr("export.pdf_column_length") }

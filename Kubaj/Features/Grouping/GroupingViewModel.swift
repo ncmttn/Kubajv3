@@ -121,8 +121,8 @@ final class GroupingViewModel {
         switch kind {
         case .pdf:
             shareURL = PDFGenerator.temporaryFileURL(rows: rows, metadata: exportMetadata, fileName: fileName)
-        case .csv:
-            shareURL = CSVExporter.temporaryFileURL(rows: rows, fileName: fileName)
+        case .xlsx:
+            shareURL = XLSXExporter.temporaryFileURL(rows: rows, fileName: fileName)
         }
 
         if shareURL != nil {

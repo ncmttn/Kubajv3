@@ -319,15 +319,18 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 32)
             } else {
+                let entries = viewModel.sortedEntries
+                let lengthBands = LengthBandIndices.compute(for: entries.map(\.lengthM))
                 VStack(spacing: 0) {
                     KubajLogTableHeader()
-                    ForEach(Array(viewModel.sortedEntries.enumerated()), id: \.element.id) { index, entry in
+                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                         KubajLogTableRow(
-                            rowNumber: viewModel.sortedEntries.count - index,
+                            rowNumber: entries.count - index,
                             lengthM: entry.lengthM,
                             quantity: entry.quantity,
                             diameterLabel: LogEntryDisplay.diameterLabel(for: entry),
                             volumeM3: entry.totalVolumeM3,
+                            lengthBandIndex: lengthBands[index],
                             showsHollowBadge: LogEntryDisplay.isHollow(entry),
                             showsLumberBadge: LogEntryDisplay.isLumber(entry),
                             onIncrease: {
@@ -342,7 +345,7 @@ struct HomeView: View {
                                 entryToDelete = entry.id
                             }
                         )
-                        if index < viewModel.sortedEntries.count - 1 {
+                        if index < entries.count - 1 {
                             Divider()
                                 .overlay(KubajThemeColors.borderSubtle(colorScheme))
                         }

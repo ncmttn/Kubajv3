@@ -26,7 +26,7 @@
 		C10000010000000000000007 /* GlassCardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000010000000000000007 /* GlassCardModifier.swift */; };
 		D10000010000000000000001 /* LogGroupingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000001 /* LogGroupingEngine.swift */; };
 		D10000010000000000000002 /* ExportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000002 /* ExportModels.swift */; };
-		D10000010000000000000003 /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000003 /* CSVExporter.swift */; };
+		D10000010000000000000003 /* XLSXExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000003 /* XLSXExporter.swift */; };
 		D10000010000000000000004 /* PDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000004 /* PDFGenerator.swift */; };
 		D10000010000000000000005 /* GroupingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000005 /* GroupingViewModel.swift */; };
 		D10000010000000000000006 /* GroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000010000000000000006 /* GroupingView.swift */; };
@@ -71,7 +71,7 @@
 		A20000010000000000000007 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		A20000010000000000000008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20000010000000000000009 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		A20000010000000000000010 /* Kubajv3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kubajv3.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000010000000000000010 /* Kubaj.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kubaj.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200000100000000000000F1 /* LocalizationBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationBundle.swift; sourceTree = "<group>"; };
 		B20000010000000000000001 /* ForestryCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestryCalculator.swift; sourceTree = "<group>"; };
 		C20000010000000000000001 /* DraftLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftLogEntry.swift; sourceTree = "<group>"; };
@@ -83,7 +83,7 @@
 		C20000010000000000000007 /* GlassCardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCardModifier.swift; sourceTree = "<group>"; };
 		D20000010000000000000001 /* LogGroupingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogGroupingEngine.swift; sourceTree = "<group>"; };
 		D20000010000000000000002 /* ExportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportModels.swift; sourceTree = "<group>"; };
-		D20000010000000000000003 /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
+		D20000010000000000000003 /* XLSXExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XLSXExporter.swift; sourceTree = "<group>"; };
 		D20000010000000000000004 /* PDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFGenerator.swift; sourceTree = "<group>"; };
 		D20000010000000000000005 /* GroupingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupingViewModel.swift; sourceTree = "<group>"; };
 		D20000010000000000000006 /* GroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupingView.swift; sourceTree = "<group>"; };
@@ -107,7 +107,7 @@
 		H20000010000000000000010 /* KubajLogTableComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KubajLogTableComponents.swift; sourceTree = "<group>"; };
 		H20000010000000000000011 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		T20000010000000000000001 /* ForestryCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestryCalculatorTests.swift; sourceTree = "<group>"; };
-		T20000010000000000000002 /* Kubajv3Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Kubajv3Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		T20000010000000000000002 /* KubajTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KubajTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,13 +131,13 @@
 		A40000010000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				A40000010000000000000002 /* Kubajv3 */,
+				A40000010000000000000002 /* Kubaj */,
 				A40000010000000000000008 /* Kubajv3Tests */,
 				A40000010000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A40000010000000000000002 /* Kubajv3 */ = {
+		A40000010000000000000002 /* Kubaj */ = {
 			isa = PBXGroup;
 			children = (
 				A20000010000000000000001 /* Kubajv3App.swift */,
@@ -148,14 +148,14 @@
 				A40000010000000000000010 /* Features */,
 				A40000010000000000000006 /* Resources */,
 			);
-			path = Kubajv3;
+			path = Kubaj;
 			sourceTree = "<group>";
 		};
 		A40000010000000000000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A20000010000000000000010 /* Kubajv3.app */,
-				T20000010000000000000002 /* Kubajv3Tests.xctest */,
+				A20000010000000000000010 /* Kubaj.app */,
+				T20000010000000000000002 /* KubajTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -304,7 +304,7 @@
 			isa = PBXGroup;
 			children = (
 				D20000010000000000000002 /* ExportModels.swift */,
-				D20000010000000000000003 /* CSVExporter.swift */,
+				D20000010000000000000003 /* XLSXExporter.swift */,
 				D20000010000000000000004 /* PDFGenerator.swift */,
 			);
 			path = Export;
@@ -382,9 +382,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A50000010000000000000001 /* Kubajv3 */ = {
+		A50000010000000000000001 /* Kubaj */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A60000010000000000000003 /* Build configuration list for PBXNativeTarget "Kubajv3" */;
+			buildConfigurationList = A60000010000000000000003 /* Build configuration list for PBXNativeTarget "Kubaj" */;
 			buildPhases = (
 				A50000010000000000000002 /* Sources */,
 				A30000010000000000000001 /* Frameworks */,
@@ -394,14 +394,14 @@
 			);
 			dependencies = (
 			);
-			name = Kubajv3;
+			name = Kubaj;
 			productName = Kubajv3;
-			productReference = A20000010000000000000010 /* Kubajv3.app */;
+			productReference = A20000010000000000000010 /* Kubaj.app */;
 			productType = "com.apple.product-type.application";
 		};
-		T50000010000000000000001 /* Kubajv3Tests */ = {
+		T50000010000000000000001 /* KubajTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A60000010000000000000004 /* Build configuration list for PBXNativeTarget "Kubajv3Tests" */;
+			buildConfigurationList = A60000010000000000000004 /* Build configuration list for PBXNativeTarget "KubajTests" */;
 			buildPhases = (
 				T50000010000000000000002 /* Sources */,
 				T30000010000000000000001 /* Frameworks */,
@@ -411,9 +411,9 @@
 			dependencies = (
 				A90000010000000000000002 /* PBXTargetDependency */,
 			);
-			name = Kubajv3Tests;
+			name = KubajTests;
 			productName = Kubajv3Tests;
-			productReference = T20000010000000000000002 /* Kubajv3Tests.xctest */;
+			productReference = T20000010000000000000002 /* KubajTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -435,7 +435,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A60000010000000000000001 /* Build configuration list for PBXProject "Kubajv3" */;
+			buildConfigurationList = A60000010000000000000001 /* Build configuration list for PBXProject "Kubaj" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = tr;
 			hasScannedForEncodings = 0;
@@ -456,8 +456,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A50000010000000000000001 /* Kubajv3 */,
-				T50000010000000000000001 /* Kubajv3Tests */,
+				A50000010000000000000001 /* Kubaj */,
+				T50000010000000000000001 /* KubajTests */,
 			);
 		};
 /* End PBXProject section */
@@ -496,7 +496,7 @@
 				C10000010000000000000007 /* GlassCardModifier.swift in Sources */,
 				D10000010000000000000001 /* LogGroupingEngine.swift in Sources */,
 				D10000010000000000000002 /* ExportModels.swift in Sources */,
-				D10000010000000000000003 /* CSVExporter.swift in Sources */,
+				D10000010000000000000003 /* XLSXExporter.swift in Sources */,
 				D10000010000000000000004 /* PDFGenerator.swift in Sources */,
 				D10000010000000000000005 /* GroupingViewModel.swift in Sources */,
 				D10000010000000000000006 /* GroupingView.swift in Sources */,
@@ -535,7 +535,7 @@
 /* Begin PBXTargetDependency section */
 		A90000010000000000000002 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A50000010000000000000001 /* Kubajv3 */;
+			target = A50000010000000000000001 /* Kubaj */;
 			targetProxy = A90000010000000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -669,13 +669,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = J3X7H9FXWB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Kubaj;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kübaj";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -708,13 +708,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = J3X7H9FXWB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Kubaj;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kübaj";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -759,7 +759,7 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kubajv3.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Kubajv3";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kubaj.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Kubaj";
 			};
 			name = Debug;
 		};
@@ -782,14 +782,14 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kubajv3.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Kubajv3";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kubaj.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Kubaj";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A60000010000000000000001 /* Build configuration list for PBXProject "Kubajv3" */ = {
+		A60000010000000000000001 /* Build configuration list for PBXProject "Kubaj" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A80000010000000000000001 /* Debug */,
@@ -798,7 +798,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A60000010000000000000003 /* Build configuration list for PBXNativeTarget "Kubajv3" */ = {
+		A60000010000000000000003 /* Build configuration list for PBXNativeTarget "Kubaj" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A80000010000000000000003 /* Debug */,
@@ -807,7 +807,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A60000010000000000000004 /* Build configuration list for PBXNativeTarget "Kubajv3Tests" */ = {
+		A60000010000000000000004 /* Build configuration list for PBXNativeTarget "KubajTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A80000010000000000000005 /* Debug */,

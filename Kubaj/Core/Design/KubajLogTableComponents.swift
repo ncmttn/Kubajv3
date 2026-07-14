@@ -1,5 +1,23 @@
 import SwiftUI
 
+enum LengthBandIndices {
+    /// Toggles band index (0/1) whenever consecutive rows have a different length.
+    static func compute(for lengths: [Double]) -> [Int] {
+        guard !lengths.isEmpty else { return [] }
+        var bands: [Int] = []
+        var band = 0
+        var previousLength: Double?
+        for length in lengths {
+            if let previousLength, abs(length - previousLength) > 0.000_1 {
+                band = 1 - band
+            }
+            bands.append(band)
+            previousLength = length
+        }
+        return bands
+    }
+}
+
 struct KubajLogTableHeader: View {
     var sortOrder: LogSortOrder?
     var onSortLength: (() -> Void)?
@@ -54,6 +72,7 @@ struct KubajLogTableRow: View {
     let quantity: Int
     let diameterLabel: String
     let volumeM3: Double
+    var lengthBandIndex: Int = 0
     let showsHollowBadge: Bool
     let showsLumberBadge: Bool
     let onIncrease: () -> Void
@@ -113,6 +132,7 @@ struct KubajLogTableRow: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
+        .background(KubajThemeColors.lengthBandBackground(colorScheme, bandIndex: lengthBandIndex))
     }
 
     private func rowActionButton(

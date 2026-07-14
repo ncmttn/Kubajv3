@@ -54,4 +54,14 @@ enum KubajThemeColors {
             ? Color.white.opacity(0.08)
             : KubajColor.borderSubtle
     }
+
+    /// Subtle alternating row tint when the length (boy) value changes between consecutive rows.
+    static func lengthBandBackground(_ scheme: ColorScheme, bandIndex: Int) -> Color {
+        guard bandIndex % 2 == 1 else {
+            return .clear
+        }
+        return scheme == .dark
+            ? Color.white.opacity(0.045)
+            : KubajColor.primary.opacity(0.05)
+    }
 }

@@ -63,8 +63,8 @@ struct ExportSettingsView: View {
         switch exportKind {
         case .pdf:
             L10n.Export.confirmPDF
-        case .csv:
-            L10n.Export.confirmCSV
+        case .xlsx:
+            L10n.Export.confirmXLSX
         }
     }
 

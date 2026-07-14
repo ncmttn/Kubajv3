@@ -32,7 +32,7 @@ struct ExportMetadata: Sendable {
 
 enum ExportKind: Sendable {
     case pdf
-    case csv
+    case xlsx
 }
 
 enum ExportFileNaming {

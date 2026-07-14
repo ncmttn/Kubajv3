@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A50000010000000000000001"
-               BuildableName = "Kubajv3.app"
-               BlueprintName = "Kubajv3"
-               ReferencedContainer = "container:Kubajv3.xcodeproj">
+               BuildableName = "Kubaj.app"
+               BlueprintName = "Kubaj"
+               ReferencedContainer = "container:Kubaj.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,9 +35,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "T50000010000000000000001"
-               BuildableName = "Kubajv3Tests.xctest"
-               BlueprintName = "Kubajv3Tests"
-               ReferencedContainer = "container:Kubajv3.xcodeproj">
+               BuildableName = "KubajTests.xctest"
+               BlueprintName = "KubajTests"
+               ReferencedContainer = "container:Kubaj.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -57,9 +57,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A50000010000000000000001"
-            BuildableName = "Kubajv3.app"
-            BlueprintName = "Kubajv3"
-            ReferencedContainer = "container:Kubajv3.xcodeproj">
+            BuildableName = "Kubaj.app"
+            BlueprintName = "Kubaj"
+            ReferencedContainer = "container:Kubaj.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -74,9 +74,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A50000010000000000000001"
-            BuildableName = "Kubajv3.app"
-            BlueprintName = "Kubajv3"
-            ReferencedContainer = "container:Kubajv3.xcodeproj">
+            BuildableName = "Kubaj.app"
+            BlueprintName = "Kubaj"
+            ReferencedContainer = "container:Kubaj.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
