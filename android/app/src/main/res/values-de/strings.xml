@@ -71,5 +71,6 @@
     <string name="onboarding_title_3">Professionelle</string>
     <string name="onboarding_body_3">Erstellen und teilen Sie detaillierte PDF- und Excel-Berichte.</string>
     <string name="next">Nächster Schritt</string>
+    <string name="skip_intro">Einführung überspringen</string>
     <string name="get_started">Loslegen</string>
 </resources>

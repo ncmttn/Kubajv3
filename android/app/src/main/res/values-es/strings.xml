@@ -71,5 +71,6 @@
     <string name="onboarding_title_3">Informes</string>
     <string name="onboarding_body_3">Cree y comparta informes detallados en PDF y Excel.</string>
     <string name="next">Siguiente paso</string>
+    <string name="skip_intro">Omitir introducción</string>
     <string name="get_started">Comenzar</string>
 </resources>

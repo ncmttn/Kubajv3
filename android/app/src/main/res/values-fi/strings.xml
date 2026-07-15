@@ -71,5 +71,6 @@
     <string name="onboarding_title_3">Ammattimaiset</string>
     <string name="onboarding_body_3">Luo ja jaa yksityiskohtaisia PDF- ja Excel-raportteja.</string>
     <string name="next">Seuraava vaihe</string>
+    <string name="skip_intro">Ohita esittely</string>
     <string name="get_started">Aloita</string>
 </resources>

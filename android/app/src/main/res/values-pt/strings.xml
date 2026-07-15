@@ -71,5 +71,6 @@
     <string name="onboarding_title_3">Relatórios</string>
     <string name="onboarding_body_3">Crie e compartilhe relatórios detalhados em PDF e Excel.</string>
     <string name="next">Próximo passo</string>
+    <string name="skip_intro">Pular introdução</string>
     <string name="get_started">Começar</string>
 </resources>

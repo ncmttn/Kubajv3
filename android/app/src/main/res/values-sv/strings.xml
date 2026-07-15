@@ -71,5 +71,6 @@
     <string name="onboarding_title_3">Professionella</string>
     <string name="onboarding_body_3">Skapa och dela detaljerade rapporter i PDF och Excel.</string>
     <string name="next">Nästa steg</string>
+    <string name="skip_intro">Hoppa över introduktionen</string>
     <string name="get_started">Kom igång</string>
 </resources>

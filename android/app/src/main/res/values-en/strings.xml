@@ -70,5 +70,6 @@
     <string name="onboarding_title_3">Share easily</string>
     <string name="onboarding_body_3">Create and share PDF and Excel reports.</string>
     <string name="next">Next</string>
+    <string name="skip_intro">Skip intro</string>
     <string name="get_started">Get started</string>
 </resources>

@@ -95,7 +95,7 @@ import kotlinx.coroutines.delay
 private enum class MainTab(val label: Int, val icon: ImageVector) {
     HOME(R.string.tab_home, Icons.Default.Home),
     GROUPING(R.string.tab_grouping, Icons.Default.Inventory2),
-    HOLLOW(R.string.calculate_hollow, Icons.Default.DonutLarge),
+    FOLDERS(R.string.tab_folders, Icons.Default.Folder),
     SETTINGS(R.string.tab_settings, Icons.Default.Settings)
 }
 
@@ -175,33 +175,36 @@ private fun OnboardingScreen(onComplete: () -> Unit) {
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .height(330.dp)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                KubajPrimary.copy(alpha = 0.16f),
-                                KubajPrimaryEnd.copy(alpha = 0.04f)
-                            )
-                        ),
-                        RoundedCornerShape(32.dp)
-                    ),
+                    .aspectRatio(4f / 5f)
+                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(40.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Box(
+                Icon(
+                    when (page) {
+                        0 -> Icons.Default.Calculate
+                        1 -> Icons.Default.Inventory2
+                        else -> Icons.Default.Description
+                    },
+                    null,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                    modifier = Modifier.size(80.dp)
+                )
+                Row(
                     Modifier
-                        .size(150.dp)
-                        .background(Color.White.copy(alpha = 0.9f), CircleShape),
-                    contentAlignment = Alignment.Center
+                        .align(Alignment.TopStart)
+                        .padding(24.dp)
+                        .background(KubajPrimary.copy(alpha = 0.82f), RoundedCornerShape(20.dp))
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        when (page) {
-                            0 -> Icons.Default.Calculate
-                            1 -> Icons.Default.Inventory2
-                            else -> Icons.Default.Description
-                        },
-                        null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(76.dp)
+                    Icon(Icons.Default.Park, null, tint = Color.White, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        stringResource(R.string.app_name).uppercase(),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
                     )
                 }
             }
@@ -249,6 +252,12 @@ private fun OnboardingScreen(onComplete: () -> Unit) {
                     fontWeight = FontWeight.Bold
                 )
             }
+            if (page < 2) {
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = onComplete, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.skip_intro))
+                }
+            }
         }
     }
 }
@@ -262,9 +271,10 @@ private fun MainScreen(state: AppUiState, viewModel: AppViewModel) {
             Row(
                 Modifier
                     .navigationBarsPadding()
-                    .height(64.dp)
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.96f), RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp)
+                    .height(62.dp)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.96f), RoundedCornerShape(32.dp))
+                    .padding(horizontal = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 MainTab.entries.forEach { tab ->
@@ -284,9 +294,9 @@ private fun MainScreen(state: AppUiState, viewModel: AppViewModel) {
                             modifier = Modifier.size(18.dp)
                         )
                         Text(
-                            stringResource(tab.label),
+                            stringResource(tab.label).uppercase(),
                             maxLines = 1,
-                            fontSize = 9.sp,
+                            fontSize = 10.sp,
                             color = if (active) MaterialTheme.colorScheme.primary else KubajTabInactive
                         )
                     }
@@ -295,9 +305,16 @@ private fun MainScreen(state: AppUiState, viewModel: AppViewModel) {
         }
     ) { padding ->
         when (selected) {
-            MainTab.HOME -> HomeScreen(state, viewModel, Modifier.padding(padding))
+            MainTab.HOME -> HomeScreen(
+                state,
+                viewModel,
+                Modifier.padding(padding)
+            ) { selected = MainTab.GROUPING }
             MainTab.GROUPING -> GroupingScreen(state, viewModel, Modifier.padding(padding))
-            MainTab.HOLLOW -> HollowScreen(viewModel, Modifier.padding(padding))
+            MainTab.FOLDERS -> FoldersScreen(state, Modifier.padding(padding)) { folderId ->
+                viewModel.selectFolder(folderId)
+                selected = MainTab.GROUPING
+            }
             MainTab.SETTINGS -> SettingsScreen(state, viewModel, Modifier.padding(padding))
         }
     }
@@ -308,26 +325,32 @@ private fun ScreenHeader(title: String, actions: @Composable () -> Unit = {}) {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 20.dp, vertical = 18.dp),
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(Icons.Default.Park, null, tint = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.width(10.dp))
-        Text(title, fontSize = 21.sp, fontWeight = FontWeight.Bold)
+        Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold, letterSpacing = (-1).sp)
         Spacer(Modifier.weight(1f))
         actions()
     }
 }
 
 @Composable
-private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Modifier) {
+private fun HomeScreen(
+    state: AppUiState,
+    viewModel: AppViewModel,
+    modifier: Modifier,
+    onViewFullHistory: () -> Unit
+) {
     var diameter by rememberSaveable { mutableStateOf("21") }
     var top by rememberSaveable { mutableStateOf("21") }
     var mid by rememberSaveable { mutableStateOf("21") }
     var butt by rememberSaveable { mutableStateOf("21") }
     var length by rememberSaveable { mutableStateOf("") }
     var quantity by rememberSaveable { mutableStateOf("1") }
+    var showHollow by rememberSaveable { mutableStateOf(false) }
     var showSave by rememberSaveable { mutableStateOf(false) }
     var clearConfirm by rememberSaveable { mutableStateOf(false) }
     val primaryFocusRequester = remember { FocusRequester() }
@@ -335,8 +358,14 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name)) {
-            IconButton(enabled = state.drafts.isNotEmpty(), onClick = { showSave = true }) {
-                Icon(Icons.Default.Save, null)
+            IconButton(
+                enabled = state.drafts.isNotEmpty(),
+                onClick = { showSave = true },
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            ) {
+                Icon(Icons.Default.Save, null, modifier = Modifier.size(17.dp))
             }
         }
         LazyColumn(
@@ -357,7 +386,7 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
                                 selectAllTrigger = primarySelectAllTrigger
                             ) {
                                 TextButton(onClick = {
-                                    diameter = ((diameter.toDoubleOrNull() ?: 21.0) + 1).toInt().toString()
+                                    diameter = ((diameter.toLocalizedDoubleOrNull() ?: 21.0) + 1).toInt().toString()
                                 }) { Text("+1") }
                             }
                             NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
@@ -406,15 +435,23 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Spacer(Modifier.weight(1f))
+                    FilledTonalButton(
+                        onClick = { showHollow = true },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(24.dp)
+                    ) {
+                        Icon(Icons.Default.DonutLarge, null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.calculate_hollow), maxLines = 1)
+                    }
                     Button(
                         onClick = {
                             val added = viewModel.addStandard(
-                                diameter.toDoubleOrNull(),
-                                top.toDoubleOrNull(),
-                                mid.toDoubleOrNull(),
-                                butt.toDoubleOrNull(),
-                                length.toDoubleOrNull(),
+                                diameter.toLocalizedDoubleOrNull(),
+                                top.toLocalizedDoubleOrNull(),
+                                mid.toLocalizedDoubleOrNull(),
+                                butt.toLocalizedDoubleOrNull(),
+                                length.toLocalizedDoubleOrNull(),
                                 quantity.toIntOrNull()
                             )
                             if (added) {
@@ -423,7 +460,8 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
                                 primaryFocusRequester.requestFocus()
                             }
                         },
-                        modifier = Modifier.weight(2f)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(24.dp)
                     ) {
                         Text(stringResource(R.string.calculate))
                     }
@@ -433,7 +471,7 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
                 val count = state.drafts.sumOf { it.quantity }
                 val total = state.drafts.sumOf { it.totalVolumeM3 }
                 val average = if (count == 0) 0.0 else state.drafts.sumOf { it.diameterCm * it.quantity } / count
-                SummaryCards(total, count, average)
+                HomeStatsCard(total, count, average) { clearConfirm = true }
             }
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -449,9 +487,19 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
             } else {
                 item { DraftTable(state.drafts, viewModel) }
             }
+            item {
+                TextButton(onClick = onViewFullHistory, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        stringResource(R.string.tab_grouping),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
     }
 
+    if (showHollow) HollowSheet(viewModel) { showHollow = false }
     if (showSave) SaveDialog(state.folders, viewModel, onDismiss = { showSave = false })
     if (clearConfirm) ConfirmDialog(
         onDismiss = { clearConfirm = false },
@@ -479,7 +527,7 @@ private fun DraftTable(entries: List<DraftEntry>, viewModel: AppViewModel) {
             Text(stringResource(R.string.table_length), Modifier.width(48.dp), fontSize = 9.sp)
             Text(stringResource(R.string.table_diameter), Modifier.weight(1f), fontSize = 9.sp)
             Text(stringResource(R.string.table_volume), Modifier.width(58.dp), fontSize = 9.sp)
-            Spacer(Modifier.width(70.dp))
+            Spacer(Modifier.width(90.dp))
         }
         entries.forEachIndexed { index, entry ->
             Row(
@@ -502,118 +550,98 @@ private fun DraftTable(entries: List<DraftEntry>, viewModel: AppViewModel) {
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
-                Row(Modifier.width(70.dp)) {
+                Row(Modifier.width(90.dp)) {
                     IconButton(
                         onClick = { viewModel.increaseDraft(entry.id) },
-                        modifier = Modifier.size(34.dp)
+                        modifier = Modifier.size(30.dp)
                     ) { Icon(Icons.Default.Add, null, modifier = Modifier.size(17.dp)) }
                     IconButton(
                         onClick = { viewModel.decreaseDraft(entry.id) },
-                        modifier = Modifier.size(34.dp)
+                        modifier = Modifier.size(30.dp)
                     ) { Icon(Icons.Default.Remove, null, modifier = Modifier.size(17.dp)) }
+                    IconButton(
+                        onClick = { viewModel.deleteDraft(entry.id) },
+                        modifier = Modifier.size(30.dp)
+                    ) { Icon(Icons.Default.Delete, null, tint = KubajDanger, modifier = Modifier.size(17.dp)) }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HollowScreen(viewModel: AppViewModel, modifier: Modifier) {
-    var outer by rememberSaveable { mutableStateOf("45") }
-    var inner by rememberSaveable { mutableStateOf("12") }
-    var length by rememberSaveable { mutableStateOf("4.0") }
+private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
+    var outer by rememberSaveable { mutableStateOf("") }
+    var inner by rememberSaveable { mutableStateOf("") }
+    var length by rememberSaveable { mutableStateOf("") }
     var quantity by rememberSaveable { mutableStateOf("1") }
-    val values = listOf(outer.toDoubleOrNull(), inner.toDoubleOrNull(), length.toDoubleOrNull())
-    val valid = values.all { it != null && it > 0 } && (values[0] ?: 0.0) > (values[1] ?: 0.0)
+    val values = listOf(
+        outer.toLocalizedDoubleOrNull(),
+        inner.toLocalizedDoubleOrNull(),
+        length.toLocalizedDoubleOrNull()
+    )
+    val parsedQuantity = quantity.toIntOrNull()
+    val valid = values.all { it != null && it > 0 } &&
+        (values[0] ?: 0.0) > (values[1] ?: 0.0) &&
+        parsedQuantity != null && parsedQuantity > 0
     val result = if (valid) viewModel.calculateHollow(values[0]!!, values[1]!!, values[2]!!) else null
 
-    Column(modifier.fillMaxSize()) {
-        ScreenHeader(stringResource(R.string.app_name))
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.linearGradient(listOf(KubajPrimary, KubajPrimaryEnd)),
-                            RoundedCornerShape(24.dp)
-                        )
-                        .padding(28.dp)
-                ) {
-                    Text(
-                        stringResource(R.string.net_volume).substringBefore(":").uppercase(),
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        "${volumeFormat.format(result?.netVolumeM3 ?: 0.0)} m³",
-                        color = Color.White,
-                        fontSize = 38.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        stringResource(
-                            R.string.equivalent_diameter,
-                            result?.equivalentDiameterCm ?: 0
-                        ),
-                        color = Color.White.copy(alpha = 0.86f),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(Modifier.fillMaxWidth()) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.calculate_hollow), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
             }
-            item {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(184.dp)
-                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        Modifier
-                            .size(126.dp)
-                            .border(12.dp, Color(0xFFADC6FF), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Box(
-                            Modifier
-                                .size(52.dp)
-                                .border(2.dp, KubajPrimary, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.DonutLarge, null, tint = KubajPrimary)
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        InputPair {
+                            NumberField(stringResource(R.string.outer_diameter), outer, { outer = it }, Modifier.weight(1f))
+                            NumberField(stringResource(R.string.inner_diameter), inner, { inner = it }, Modifier.weight(1f))
+                        }
+                        InputPair {
+                            NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
+                            NumberField(
+                                stringResource(R.string.quantity),
+                                quantity,
+                                { quantity = it },
+                                Modifier.weight(1f),
+                                integer = true
+                            )
                         }
                     }
                 }
-            }
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    NumberField(stringResource(R.string.outer_diameter), outer, { outer = it })
-                    NumberField(stringResource(R.string.length_m), length, { length = it })
-                    NumberField(stringResource(R.string.inner_diameter), inner, { inner = it })
-                    NumberField(stringResource(R.string.quantity), quantity, { quantity = it }, integer = true)
+                result?.let { preview ->
+                    item {
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp))
+                                .padding(24.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                stringResource(R.string.equivalent_diameter, preview.equivalentDiameterCm),
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                stringResource(R.string.net_volume, preview.netVolumeM3),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
-            }
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    FilledTonalButton(
-                        enabled = result != null,
-                        onClick = {
-                            result?.let {
-                                viewModel.addEquivalentDiameter(
-                                    it.equivalentDiameterCm - 1,
-                                    values[2]!!,
-                                    quantity.toIntOrNull() ?: 1
-                                )
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("-1 DIA", fontSize = 11.sp) }
+                item {
                     Button(
                         enabled = valid,
                         onClick = {
@@ -621,58 +649,135 @@ private fun HollowScreen(viewModel: AppViewModel, modifier: Modifier) {
                                 values[0]!!,
                                 values[1]!!,
                                 values[2]!!,
-                                quantity.toIntOrNull() ?: 1
+                                parsedQuantity!!
                             )
+                            onDismiss()
                         },
-                        modifier = Modifier.weight(1f)
-                    ) { Text(stringResource(R.string.add_to_list), fontSize = 11.sp, maxLines = 1) }
-                    FilledTonalButton(
-                        enabled = result != null,
-                        onClick = {
-                            result?.let {
-                                viewModel.addEquivalentDiameter(
-                                    it.equivalentDiameterCm + 1,
-                                    values[2]!!,
-                                    quantity.toIntOrNull() ?: 1
-                                )
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(24.dp)
+                    ) { Text(stringResource(R.string.add_to_list), fontWeight = FontWeight.Bold) }
+                }
+                result?.let { preview ->
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Text(
+                                stringResource(R.string.equivalent_diameter, preview.equivalentDiameterCm).uppercase(),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                FilledTonalButton(
+                                    enabled = preview.equivalentDiameterCm > 1,
+                                    onClick = {
+                                        viewModel.addEquivalentDiameter(
+                                            preview.equivalentDiameterCm - 1,
+                                            values[2]!!,
+                                            parsedQuantity!!
+                                        )
+                                        onDismiss()
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(24.dp)
+                                ) { Text(stringResource(R.string.add_diameter, preview.equivalentDiameterCm - 1)) }
+                                FilledTonalButton(
+                                    onClick = {
+                                        viewModel.addEquivalentDiameter(
+                                            preview.equivalentDiameterCm + 1,
+                                            values[2]!!,
+                                            parsedQuantity!!
+                                        )
+                                        onDismiss()
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(24.dp)
+                                ) { Text(stringResource(R.string.add_diameter, preview.equivalentDiameterCm + 1)) }
                             }
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("+1 DIA", fontSize = 11.sp) }
+                        }
+                    }
                 }
             }
-        }
+    }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SaveDialog(folders: List<FolderEntity>, viewModel: AppViewModel, onDismiss: () -> Unit) {
     var name by rememberSaveable { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_file)) },
-        text = {
-            Column {
+    var selectedFolderId by rememberSaveable { mutableStateOf<Long?>(null) }
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.select_file), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            }
+            if (folders.isEmpty()) {
+                EmptyState(stringResource(R.string.folders_empty))
+            } else {
                 folders.forEach { folder ->
-                    Text(
-                        folderPath(folder, folders),
+                    Row(
                         Modifier
                             .fillMaxWidth()
-                            .clickable { viewModel.saveDrafts(folder.id); onDismiss() }
-                            .padding(12.dp)
-                    )
+                            .background(
+                                if (selectedFolderId == folder.id) KubajPrimary.copy(alpha = 0.10f)
+                                else MaterialTheme.colorScheme.surfaceContainerLowest,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable { selectedFolderId = folder.id }
+                            .padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Folder,
+                            null,
+                            tint = if (selectedFolderId == folder.id) KubajPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(folderPath(folder, folders), Modifier.weight(1f))
+                        RadioButton(selectedFolderId == folder.id, onClick = { selectedFolderId = folder.id })
+                    }
                 }
-                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.file_name)) })
             }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                viewModel.createFolder(name) { viewModel.saveDrafts(it) }
-                onDismiss()
-            }) { Text(stringResource(R.string.create_file)) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
-    )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    name,
+                    { name = it },
+                    label = { Text(stringResource(R.string.file_name)) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
+                )
+                IconButton(
+                    enabled = name.isNotBlank(),
+                    onClick = {
+                        viewModel.createFolder(name) { selectedFolderId = it }
+                        name = ""
+                    }
+                ) { Icon(Icons.Default.Add, null) }
+            }
+            Button(
+                enabled = selectedFolderId != null,
+                onClick = {
+                    selectedFolderId?.let(viewModel::saveDrafts)
+                    onDismiss()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
+        }
+    }
 }
 
 @Composable
@@ -699,54 +804,79 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name)) {
-            IconButton(enabled = groups.isNotEmpty(), onClick = { exportType = "pdf" }) {
-                Icon(Icons.Default.Description, null)
+            IconButton(
+                enabled = groups.isNotEmpty(),
+                onClick = { exportType = "pdf" },
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            ) {
+                Icon(Icons.Default.Description, null, modifier = Modifier.size(17.dp), tint = KubajDanger)
             }
-            IconButton(enabled = groups.isNotEmpty(), onClick = { exportType = "xlsx" }) {
-                Icon(Icons.Default.TableView, null)
+            Spacer(Modifier.width(8.dp))
+            IconButton(
+                enabled = groups.isNotEmpty(),
+                onClick = { exportType = "xlsx" },
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            ) {
+                Icon(Icons.Default.TableView, null, modifier = Modifier.size(17.dp), tint = KubajGreen)
             }
-            IconButton(enabled = state.selectedFolder != null, onClick = { deleteConfirm = true }) {
-                Icon(Icons.Default.Delete, null, tint = KubajDanger)
+            Spacer(Modifier.width(8.dp))
+            IconButton(
+                enabled = state.selectedFolder != null,
+                onClick = { deleteConfirm = true },
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            ) {
+                Icon(Icons.Default.Delete, null, tint = KubajDanger, modifier = Modifier.size(17.dp))
             }
         }
         LazyColumn(
             contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        stringResource(R.string.tab_grouping).uppercase(),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        stringResource(R.string.calculations),
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                    Text(
-                        stringResource(R.string.grouping_empty),
+                        stringResource(R.string.select_file).uppercase(),
+                        modifier = Modifier.padding(start = 8.dp),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
-            }
-            item {
-                Box {
-                    FilledTonalButton(onClick = { folderMenu = true }, modifier = Modifier.fillMaxWidth()) {
-                        Text(state.selectedFolder?.name ?: stringResource(R.string.active_session))
-                    }
-                    DropdownMenu(folderMenu, { folderMenu = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.active_session)) },
-                            onClick = { viewModel.selectFolder(null); folderMenu = false }
-                        )
-                        state.folders.forEach {
-                            DropdownMenuItem(
-                                text = { Text(folderPath(it, state.folders)) },
-                                onClick = { viewModel.selectFolder(it.id); folderMenu = false }
+                    Box {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+                                .clickable { folderMenu = true }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                state.selectedFolder?.let { folderPath(it, state.folders) }
+                                    ?: stringResource(R.string.active_session),
+                                Modifier.weight(1f),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
                             )
+                            Text("⌄", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        DropdownMenu(folderMenu, { folderMenu = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.active_session)) },
+                                onClick = { viewModel.selectFolder(null); folderMenu = false }
+                            )
+                            state.folders.forEach {
+                                DropdownMenuItem(
+                                    text = { Text(folderPath(it, state.folders)) },
+                                    onClick = { viewModel.selectFolder(it.id); folderMenu = false }
+                                )
+                            }
                         }
                     }
                 }
@@ -755,23 +885,16 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                 val count = groups.sumOf { it.totalQuantity }
                 GroupOverview(
                     totalVolume = groups.sumOf { it.totalVolumeM3 },
-                    groupCount = groups.size,
-                    averageDiameter = groups.takeIf { it.isNotEmpty() && count > 0 }
-                        ?.let { values ->
-                            values.sumOf { it.diameterCm * it.totalQuantity } / count
-                        } ?: 0.0,
                     productCount = count
                 )
-            }
-            item {
-                TextButton(onClick = viewModel::toggleSort) {
-                    Text("${stringResource(R.string.table_length)} ${if (state.sortAscending) "↑" else "↓"}")
-                }
             }
             if (groups.isEmpty()) item { EmptyState(stringResource(R.string.grouping_empty)) }
             else item {
                 GroupTable(
                     groups,
+                    sortAscending = state.sortAscending,
+                    onToggleSort = viewModel::toggleSort,
+                    hapticsEnabled = state.preferences.hapticsEnabled,
                     onIncrease = {
                         if (state.selectedFolderId == null) viewModel.increaseDraftGroup(it)
                         else viewModel.increaseGroup(it)
@@ -814,6 +937,7 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExportDialog(
     type: String,
@@ -827,125 +951,140 @@ private fun ExportDialog(
     var location by rememberSaveable { mutableStateOf("") }
     var reporter by rememberSaveable { mutableStateOf("") }
     var code by rememberSaveable { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(if (type == "pdf") stringResource(R.string.export_pdf) else stringResource(R.string.export_excel)) },
-        text = {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                item { OutlinedTextField(fileName, { fileName = it }, label = { Text(stringResource(R.string.export_file_name)) }) }
-                item { OutlinedTextField(company, { company = it }, label = { Text(stringResource(R.string.company_name)) }) }
-                item { OutlinedTextField(date, { date = it }, label = { Text(stringResource(R.string.report_date)) }) }
-                item { OutlinedTextField(location, { location = it }, label = { Text(stringResource(R.string.location)) }) }
-                item { OutlinedTextField(reporter, { reporter = it }, label = { Text(stringResource(R.string.reporter)) }) }
-                item { OutlinedTextField(code, { code = it }, label = { Text(stringResource(R.string.project_code)) }) }
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(Modifier.fillMaxWidth()) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.export_settings), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
             }
-        },
-        confirmButton = {
-            TextButton(
-                enabled = groups.isNotEmpty(),
-                onClick = { onExport(fileName, ExportMetadata(listOf(company, date, location, reporter, code))) }
-            ) { Text(if (type == "pdf") stringResource(R.string.export_pdf) else stringResource(R.string.export_excel)) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
-    )
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            stringResource(R.string.export_settings),
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            if (type == "pdf") stringResource(R.string.export_pdf)
+                            else stringResource(R.string.export_excel),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                item {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(32.dp))
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        OutlinedTextField(fileName, { fileName = it }, label = { Text(stringResource(R.string.export_file_name)) })
+                        OutlinedTextField(company, { company = it }, label = { Text(stringResource(R.string.company_name)) })
+                        OutlinedTextField(date, { date = it }, label = { Text(stringResource(R.string.report_date)) })
+                        OutlinedTextField(location, { location = it }, label = { Text(stringResource(R.string.location)) })
+                        OutlinedTextField(reporter, { reporter = it }, label = { Text(stringResource(R.string.reporter)) })
+                        OutlinedTextField(code, { code = it }, label = { Text(stringResource(R.string.project_code)) })
+                    }
+                }
+                item {
+                    Button(
+                        enabled = groups.isNotEmpty(),
+                        onClick = {
+                            onExport(
+                                fileName,
+                                ExportMetadata(listOf(company, date, location, reporter, code))
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Icon(
+                            if (type == "pdf") Icons.Default.Description else Icons.Default.TableView,
+                            null
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            if (type == "pdf") stringResource(R.string.export_pdf)
+                            else stringResource(R.string.export_excel)
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
-private fun FoldersScreen(state: AppUiState, viewModel: AppViewModel, modifier: Modifier) {
-    var name by rememberSaveable { mutableStateOf("") }
-    var parentForNew by remember { mutableStateOf<FolderEntity?>(null) }
+private fun FoldersScreen(
+    state: AppUiState,
+    modifier: Modifier,
+    onFolderSelected: (Long) -> Unit
+) {
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name))
         LazyColumn(
-            contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedTextField(
-                        name,
-                        { name = it },
-                        label = { Text(stringResource(R.string.file_name)) },
-                        modifier = Modifier.weight(1f)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        stringResource(R.string.tab_folders),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Black
                     )
-                    IconButton(onClick = { viewModel.createFolder(name); name = "" }) {
-                        Icon(Icons.Default.Add, null)
-                    }
+                    Text(
+                        stringResource(R.string.select_file),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
             val usedFolderIds = state.records.map { it.folderId }.toSet()
             val visible = state.folders.filter { it.id in usedFolderIds }
             if (visible.isEmpty()) item { EmptyState(stringResource(R.string.folders_empty)) }
             items(visible, key = { it.id }) { folder ->
-                Card(
+                Row(
                     Modifier
                         .fillMaxWidth()
-                        .clickable { viewModel.selectFolder(folder.id) }
+                        .background(MaterialTheme.colorScheme.surfaceContainerLowest, RoundedCornerShape(12.dp))
+                        .clickable { onFolderSelected(folder.id) }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Folder, null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(folderPath(folder, state.folders), fontWeight = FontWeight.Bold)
-                            Text("${state.records.count { it.folderId == folder.id }} ${stringResource(R.string.product_count)}")
-                        }
-                        IconButton(onClick = { parentForNew = folder }) {
-                            Icon(Icons.Default.Add, null)
-                        }
-                        IconButton(onClick = { viewModel.deleteFolder(folder) }) {
-                            Icon(Icons.Default.Delete, null, tint = KubajDanger)
-                        }
+                    Icon(Icons.Default.Folder, null, tint = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(folderPath(folder, state.folders), fontWeight = FontWeight.SemiBold)
+                        Text(
+                            "${state.records.count { it.folderId == folder.id }} ${stringResource(R.string.product_count)}",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
+                    Text("›", fontSize = 22.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
-    }
-    parentForNew?.let { parent ->
-        var childName by rememberSaveable(parent.id) { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { parentForNew = null },
-            title = { Text("${parent.name} / ${stringResource(R.string.create_file)}") },
-            text = {
-                OutlinedTextField(
-                    childName,
-                    { childName = it },
-                    label = { Text(stringResource(R.string.file_name)) }
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.createFolder(childName, parent.id)
-                    parentForNew = null
-                }) { Text(stringResource(R.string.confirm)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { parentForNew = null }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
     }
 }
 
 @Composable
 private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier: Modifier) {
-    val context = LocalContext.current
-    var exportType by remember { mutableStateOf<String?>(null) }
-    val groups = if (state.selectedFolderId == null) {
-        LogGrouping.sort(
-            state.drafts.groupBy { it.lengthM to it.diameterCm }.map { (key, drafts) ->
-                com.kubaj.android.domain.LogGroup(
-                    "${key.first}-${key.second}",
-                    key.second,
-                    key.first,
-                    drafts.sumOf { it.quantity },
-                    drafts.sumOf { it.totalVolumeM3 },
-                    emptyList()
-                )
-            },
-            state.sortAscending
-        )
-    } else state.groups
+    var languageMenu by remember { mutableStateOf(false) }
+    val languages = listOf("", "tr", "en", "de", "es", "pt", "fr", "sv", "fi", "ru")
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name))
@@ -955,108 +1094,174 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
         ) {
             item {
                 SettingsSection(stringResource(R.string.tab_settings)) {
-                    Row(
-                        Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.Settings, null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(12.dp))
-                        Text(stringResource(R.string.settings_haptics), Modifier.weight(1f))
-                        Switch(state.preferences.hapticsEnabled, viewModel::setHaptics)
+                    Column {
+                        Row(
+                            Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                Modifier
+                                    .size(40.dp)
+                                    .background(KubajPrimary.copy(alpha = 0.12f), RoundedCornerShape(10.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.Settings, null, tint = MaterialTheme.colorScheme.primary)
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Text(stringResource(R.string.settings_haptics), Modifier.weight(1f))
+                            Switch(state.preferences.hapticsEnabled, viewModel::setHaptics)
+                        }
+                        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                        Column(Modifier.padding(12.dp)) {
+                            AppTheme.entries.forEach { theme ->
+                                SettingChoice(
+                                    text = stringResource(
+                                        when (theme) {
+                                            AppTheme.SYSTEM -> R.string.theme_system
+                                            AppTheme.LIGHT -> R.string.theme_light
+                                            AppTheme.DARK -> R.string.theme_dark
+                                        }
+                                    ),
+                                    selected = state.preferences.theme == theme,
+                                    onClick = { viewModel.setTheme(theme) }
+                                )
+                            }
+                        }
                     }
                 }
             }
             item {
                 SettingsSection(stringResource(R.string.settings_calculation_methods)) {
-                    CalculationMethod.entries.forEach { method ->
-                        SettingChoice(
-                            text = when (method) {
-                                CalculationMethod.HUBER -> stringResource(R.string.formula_huber)
-                                CalculationMethod.SMALIAN -> stringResource(R.string.formula_smalian)
-                                CalculationMethod.NEWTON -> stringResource(R.string.formula_newton)
-                            },
-                            selected = state.preferences.calculationMethod == method,
-                            onClick = { viewModel.setMethod(method) }
-                        )
-                    }
-                }
-            }
-            item {
-                SettingsSection(stringResource(R.string.settings_theme)) {
-                    AppTheme.entries.forEach { theme ->
-                        SettingChoice(
-                            text = stringResource(
-                                when (theme) {
-                                    AppTheme.SYSTEM -> R.string.theme_system
-                                    AppTheme.LIGHT -> R.string.theme_light
-                                    AppTheme.DARK -> R.string.theme_dark
-                                }
-                            ),
-                            selected = state.preferences.theme == theme,
-                            onClick = { viewModel.setTheme(theme) }
-                        )
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                Modifier
+                                    .size(40.dp)
+                                    .background(KubajPrimary.copy(alpha = 0.12f), RoundedCornerShape(10.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.Calculate, null, tint = KubajPrimary)
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Text(stringResource(R.string.settings_calculation_methods), fontWeight = FontWeight.SemiBold)
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            FormulaOption(
+                                stringResource(R.string.formula_smalian),
+                                state.preferences.calculationMethod == CalculationMethod.SMALIAN,
+                                Modifier.weight(1f)
+                            ) { viewModel.setMethod(CalculationMethod.SMALIAN) }
+                            FormulaOption(
+                                stringResource(R.string.formula_huber),
+                                state.preferences.calculationMethod == CalculationMethod.HUBER,
+                                Modifier.weight(1f)
+                            ) { viewModel.setMethod(CalculationMethod.HUBER) }
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            FormulaOption(
+                                stringResource(R.string.formula_newton),
+                                state.preferences.calculationMethod == CalculationMethod.NEWTON,
+                                Modifier.weight(1f)
+                            ) { viewModel.setMethod(CalculationMethod.NEWTON) }
+                            Spacer(Modifier.weight(1f))
+                        }
                     }
                 }
             }
             item {
                 SettingsSection(stringResource(R.string.settings_language)) {
-                    listOf("", "tr", "en", "de", "es", "pt", "fr", "sv", "fi", "ru").forEach { language ->
-                        SettingChoice(
-                            text = if (language.isEmpty()) stringResource(R.string.theme_system) else language.uppercase(),
-                            selected = state.preferences.language == language,
-                            onClick = { viewModel.setLanguage(language) }
-                        )
+                    Box {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceContainerLowest, RoundedCornerShape(20.dp))
+                                .clickable { languageMenu = true }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                Modifier
+                                    .size(40.dp)
+                                    .background(KubajPrimary.copy(alpha = 0.12f), RoundedCornerShape(10.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("◎", color = KubajPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(stringResource(R.string.settings_language), fontWeight = FontWeight.Medium)
+                                Text(
+                                    if (state.preferences.language.isBlank()) stringResource(R.string.theme_system)
+                                    else state.preferences.language.uppercase(),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 13.sp
+                                )
+                            }
+                            Text("⌄", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        DropdownMenu(languageMenu, { languageMenu = false }) {
+                            languages.forEach { language ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            if (language.isEmpty()) stringResource(R.string.theme_system)
+                                            else language.uppercase()
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.setLanguage(language)
+                                        languageMenu = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
-            item {
-                SettingsSection(stringResource(R.string.export_settings)) {
-                    Column(
-                        Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        DataExportCard(
-                            icon = Icons.Default.Description,
-                            title = stringResource(R.string.export_pdf),
-                            enabled = groups.isNotEmpty()
-                        ) { exportType = "pdf" }
-                        DataExportCard(
-                            icon = Icons.Default.TableView,
-                            title = stringResource(R.string.export_excel),
-                            enabled = groups.isNotEmpty()
-                        ) { exportType = "xlsx" }
-                    }
-                }
-            }
-            item { FolderSettings(state, viewModel) }
             item {
                 Text(
                     "WOODLOG V${com.kubaj.android.BuildConfig.VERSION_NAME}",
                     Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
                     textAlign = TextAlign.Center
                 )
             }
         }
     }
+}
 
-    exportType?.let { type ->
-        ExportDialog(type, groups, onDismiss = { exportType = null }) { fileName, metadata ->
-            val file = if (type == "pdf") {
-                Exporters.createPdf(context, fileName, groups, metadata)
-            } else {
-                Exporters.createXlsx(context, fileName, groups)
-            }
-            Exporters.share(
-                context,
-                file,
-                if (type == "pdf") "application/pdf"
-                else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+@Composable
+private fun FormulaOption(
+    title: String,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier
+            .background(
+                if (selected) Brush.linearGradient(listOf(KubajPrimary, KubajPrimaryEnd))
+                else Brush.linearGradient(
+                    listOf(
+                        MaterialTheme.colorScheme.surfaceContainerLowest,
+                        MaterialTheme.colorScheme.surfaceContainerLowest
+                    )
+                ),
+                RoundedCornerShape(12.dp)
             )
-            exportType = null
-        }
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 14.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            title,
+            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1
+        )
     }
 }
 
@@ -1076,9 +1281,8 @@ private fun SettingsSection(title: String, content: @Composable () -> Unit) {
             Modifier
                 .fillMaxWidth()
                 .background(
-                    if (MaterialTheme.colorScheme.background == Color(0xFFF9F9F9)) Color(0xFFF3F3F3)
-                    else MaterialTheme.colorScheme.surface,
-                    RoundedCornerShape(24.dp)
+                    MaterialTheme.colorScheme.surfaceContainerLowest,
+                    RoundedCornerShape(20.dp)
                 )
                 .padding(4.dp)
         ) {
@@ -1095,7 +1299,7 @@ private fun SettingChoice(text: String, selected: Boolean, onClick: () -> Unit) 
             .clickable(onClick = onClick)
             .background(
                 if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
-                else MaterialTheme.colorScheme.surface,
+                else MaterialTheme.colorScheme.surfaceContainerLowest,
                 RoundedCornerShape(18.dp)
             )
             .padding(horizontal = 14.dp, vertical = 8.dp),
@@ -1103,75 +1307,6 @@ private fun SettingChoice(text: String, selected: Boolean, onClick: () -> Unit) 
     ) {
         RadioButton(selected, onClick)
         Text(text, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
-    }
-}
-
-@Composable
-private fun DataExportCard(
-    icon: ImageVector,
-    title: String,
-    enabled: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(20.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Box(
-            Modifier
-                .size(44.dp)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f), RoundedCornerShape(14.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
-        }
-        Text(title, fontWeight = FontWeight.Bold)
-        FilledTonalButton(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
-            Text(title)
-        }
-    }
-}
-
-@Composable
-private fun FolderSettings(state: AppUiState, viewModel: AppViewModel) {
-    var name by rememberSaveable { mutableStateOf("") }
-    SettingsSection(stringResource(R.string.tab_folders)) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    name,
-                    { name = it },
-                    label = { Text(stringResource(R.string.file_name)) },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true
-                )
-                IconButton(
-                    enabled = name.isNotBlank(),
-                    onClick = { viewModel.createFolder(name); name = "" }
-                ) { Icon(Icons.Default.Add, null) }
-            }
-            state.folders.forEach { folder ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
-                        .clickable { viewModel.selectFolder(folder.id) }
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Folder, null, tint = MaterialTheme.colorScheme.primary)
-                    Spacer(Modifier.width(10.dp))
-                    Text(folderPath(folder, state.folders), Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
-                    IconButton(onClick = { viewModel.deleteFolder(folder) }) {
-                        Icon(Icons.Default.Delete, null, tint = KubajDanger)
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -1194,3 +1329,6 @@ private fun folderPath(folder: FolderEntity, folders: List<FolderEntity>): Strin
     }
     return names.joinToString(" / ")
 }
+
+private fun String.toLocalizedDoubleOrNull(): Double? =
+    trim().replace(',', '.').toDoubleOrNull()

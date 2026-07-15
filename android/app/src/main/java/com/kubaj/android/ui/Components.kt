@@ -1,6 +1,7 @@
 package com.kubaj.android.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +12,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -159,34 +163,56 @@ fun SummaryCards(totalVolume: Double, count: Int, averageDiameter: Double) {
 }
 
 @Composable
-fun GroupOverview(
+fun HomeStatsCard(
     totalVolume: Double,
-    groupCount: Int,
+    count: Int,
     averageDiameter: Double,
-    productCount: Int
+    onReset: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            SummaryCard(
-                stringResource(R.string.total_volume),
-                "${volumeFormat.format(totalVolume)} m³",
-                Modifier.weight(1f)
-            )
-            SummaryCard(
-                stringResource(R.string.tab_grouping),
-                groupCount.toString(),
-                Modifier.weight(1f)
-            )
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp))
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(verticalAlignment = Alignment.Top) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.total_volume).uppercase(),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.sp
+                )
+                Text(
+                    "${volumeFormat.format(totalVolume)} m³",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1
+                )
+            }
+            IconButton(
+                onClick = onReset,
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            ) {
+                Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
+            }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            SummaryCard(
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(MaterialTheme.colorScheme.outlineVariant)
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+            HomeStatBlock(stringResource(R.string.product_count), count.toString(), Modifier.weight(1f))
+            HomeStatBlock(
                 stringResource(R.string.average_diameter),
                 "${diameterFormat.format(averageDiameter)} cm",
-                Modifier.weight(1f)
-            )
-            SummaryCard(
-                stringResource(R.string.product_count),
-                productCount.toString(),
                 Modifier.weight(1f)
             )
         }
@@ -194,10 +220,43 @@ fun GroupOverview(
 }
 
 @Composable
+private fun HomeStatBlock(title: String, value: String, modifier: Modifier) {
+    Column(modifier) {
+        Text(
+            title.uppercase(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
+        )
+        Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+    }
+}
+
+@Composable
+fun GroupOverview(
+    totalVolume: Double,
+    productCount: Int
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        SummaryCard(
+            stringResource(R.string.total_volume),
+            "${volumeFormat.format(totalVolume)} m³",
+            Modifier.weight(1f)
+        )
+        SummaryCard(
+            stringResource(R.string.product_count),
+            productCount.toString(),
+            Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
 private fun SummaryCard(title: String, value: String, modifier: Modifier) {
     Column(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(18.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest, RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp, vertical = 18.dp)
     ) {
         Text(
@@ -223,6 +282,9 @@ private fun SummaryCard(title: String, value: String, modifier: Modifier) {
 @Composable
 fun GroupTable(
     groups: List<LogGroup>,
+    sortAscending: Boolean,
+    onToggleSort: () -> Unit,
+    hapticsEnabled: Boolean,
     onIncrease: (LogGroup) -> Unit,
     onDecrease: (LogGroup) -> Unit,
     onDelete: (LogGroup) -> Unit
@@ -233,7 +295,7 @@ fun GroupTable(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
     ) {
-        TableHeader()
+        TableHeader(sortAscending, onToggleSort)
         groups.forEachIndexed { index, group ->
             val tint = if (bands[index] == 1) {
                 MaterialTheme.colorScheme.primary.copy(alpha = 0.055f)
@@ -258,9 +320,9 @@ fun GroupTable(
                     fontWeight = FontWeight.Bold
                 )
                 Row(Modifier.width(84.dp)) {
-                    SmallAction(Icons.Default.Add) { onIncrease(group) }
-                    SmallAction(Icons.Default.Remove) { onDecrease(group) }
-                    SmallAction(Icons.Default.Delete, KubajDanger) { onDelete(group) }
+                    SmallAction(Icons.Default.Add, hapticsEnabled = hapticsEnabled) { onIncrease(group) }
+                    SmallAction(Icons.Default.Remove, hapticsEnabled = hapticsEnabled) { onDecrease(group) }
+                    SmallAction(Icons.Default.Delete, KubajDanger, hapticsEnabled) { onDelete(group) }
                 }
             }
         }
@@ -268,7 +330,7 @@ fun GroupTable(
 }
 
 @Composable
-private fun TableHeader() {
+private fun TableHeader(sortAscending: Boolean, onToggleSort: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -276,7 +338,14 @@ private fun TableHeader() {
             .padding(horizontal = 10.dp, vertical = 11.dp)
     ) {
         Text(stringResource(R.string.table_no), Modifier.width(28.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.table_length), Modifier.width(44.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(
+            "${stringResource(R.string.table_length)} ${if (sortAscending) "↑" else "↓"}",
+            Modifier
+                .width(44.dp)
+                .clickable(onClick = onToggleSort),
+            fontSize = 9.sp,
+            textAlign = TextAlign.Center
+        )
         Text(stringResource(R.string.table_quantity), Modifier.width(36.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
         Text(stringResource(R.string.table_diameter), Modifier.width(42.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
         Text(stringResource(R.string.table_volume), Modifier.width(56.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
@@ -288,12 +357,15 @@ private fun TableHeader() {
 private fun SmallAction(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     tint: Color = MaterialTheme.colorScheme.primary,
+    hapticsEnabled: Boolean,
     action: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
     IconButton(
         onClick = {
-            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            if (hapticsEnabled) {
+                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            }
             action()
         },
         modifier = Modifier.width(28.dp)

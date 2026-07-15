@@ -71,5 +71,6 @@
     <string name="onboarding_title_3">Профессиональные</string>
     <string name="onboarding_body_3">Создавайте и делитесь подробными отчётами в PDF и Excel.</string>
     <string name="next">Следующий шаг</string>
+    <string name="skip_intro">Пропустить введение</string>
     <string name="get_started">Начать</string>
 </resources>
