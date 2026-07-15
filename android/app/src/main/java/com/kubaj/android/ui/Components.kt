@@ -159,11 +159,46 @@ fun SummaryCards(totalVolume: Double, count: Int, averageDiameter: Double) {
 }
 
 @Composable
+fun GroupOverview(
+    totalVolume: Double,
+    groupCount: Int,
+    averageDiameter: Double,
+    productCount: Int
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            SummaryCard(
+                stringResource(R.string.total_volume),
+                "${volumeFormat.format(totalVolume)} m³",
+                Modifier.weight(1f)
+            )
+            SummaryCard(
+                stringResource(R.string.tab_grouping),
+                groupCount.toString(),
+                Modifier.weight(1f)
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            SummaryCard(
+                stringResource(R.string.average_diameter),
+                "${diameterFormat.format(averageDiameter)} cm",
+                Modifier.weight(1f)
+            )
+            SummaryCard(
+                stringResource(R.string.product_count),
+                productCount.toString(),
+                Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
 private fun SummaryCard(title: String, value: String, modifier: Modifier) {
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(18.dp))
-            .padding(horizontal = 10.dp, vertical = 14.dp)
+            .padding(horizontal = 16.dp, vertical = 18.dp)
     ) {
         Text(
             title.uppercase(),
@@ -173,7 +208,15 @@ private fun SummaryCard(title: String, value: String, modifier: Modifier) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        Text(value, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            value,
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -205,16 +248,16 @@ fun GroupTable(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text((index + 1).toString(), Modifier.width(28.dp), fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                Text(lengthFormat.format(group.lengthM), Modifier.width(52.dp), textAlign = TextAlign.Center)
-                Text(group.totalQuantity.toString(), Modifier.width(42.dp), textAlign = TextAlign.Center)
-                Text(diameterFormat.format(group.diameterCm), Modifier.weight(1f), textAlign = TextAlign.Center)
+                Text(lengthFormat.format(group.lengthM), Modifier.width(44.dp), textAlign = TextAlign.Center)
+                Text(group.totalQuantity.toString(), Modifier.width(36.dp), textAlign = TextAlign.Center)
+                Text(diameterFormat.format(group.diameterCm), Modifier.width(42.dp), textAlign = TextAlign.Center)
                 Text(
                     volumeFormat.format(group.totalVolumeM3),
-                    Modifier.width(68.dp),
+                    Modifier.width(56.dp),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
-                Row(Modifier.width(96.dp)) {
+                Row(Modifier.width(84.dp)) {
                     SmallAction(Icons.Default.Add) { onIncrease(group) }
                     SmallAction(Icons.Default.Remove) { onDecrease(group) }
                     SmallAction(Icons.Default.Delete, KubajDanger) { onDelete(group) }
@@ -233,11 +276,11 @@ private fun TableHeader() {
             .padding(horizontal = 10.dp, vertical = 11.dp)
     ) {
         Text(stringResource(R.string.table_no), Modifier.width(28.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.table_length), Modifier.width(52.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.table_quantity), Modifier.width(42.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.table_diameter), Modifier.weight(1f), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.table_volume), Modifier.width(68.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Spacer(Modifier.width(96.dp))
+        Text(stringResource(R.string.table_length), Modifier.width(44.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.table_quantity), Modifier.width(36.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.table_diameter), Modifier.width(42.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.table_volume), Modifier.width(56.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Spacer(Modifier.width(84.dp))
     }
 }
 
@@ -253,7 +296,7 @@ private fun SmallAction(
             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
             action()
         },
-        modifier = Modifier.width(32.dp)
+        modifier = Modifier.width(28.dp)
     ) {
         Icon(icon, null, tint = tint)
     }

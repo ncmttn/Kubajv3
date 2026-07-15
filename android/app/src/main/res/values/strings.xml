@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Kübaj</string>
+    <string name="launcher_name" translatable="false">Woodlog - Kübaj, Hacim Hesapla</string>
     <string name="splash_tagline">Odun hacmi hesaplama</string>
     <string name="tab_home">Ana Sayfa</string>
     <string name="tab_grouping">Gruplandır</string>

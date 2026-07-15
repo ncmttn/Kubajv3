@@ -10,11 +10,11 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.kubaj.android"
+        applicationId = "com.woodlog"
         minSdk = 26
         targetSdk = 36
-        versionCode = 31
-        versionName = "3.0.1"
+        versionCode = 59
+        versionName = "3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
