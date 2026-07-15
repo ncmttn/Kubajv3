@@ -16,9 +16,4 @@ class ForestryCalculatorTest {
         assertEquals(35, result.equivalentDiameterCm)
         assertEquals(0.283, result.netVolumeM3, 0.0001)
     }
-
-    @Test
-    fun lumberUsesMetricConversion() {
-        assertEquals(0.06, ForestryCalculator.lumber(20.0, 10.0, 3.0), 0.0001)
-    }
 }

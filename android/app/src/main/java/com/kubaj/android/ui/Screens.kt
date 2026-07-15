@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Park
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Settings
@@ -46,8 +48,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -64,6 +64,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -79,6 +81,7 @@ import com.kubaj.android.AppViewModel
 import com.kubaj.android.R
 import com.kubaj.android.data.AppTheme
 import com.kubaj.android.data.FolderEntity
+import com.kubaj.android.data.LANGUAGE_LOADING
 import com.kubaj.android.domain.CalculationMethod
 import com.kubaj.android.domain.DraftEntry
 import com.kubaj.android.domain.LogGrouping
@@ -99,9 +102,12 @@ fun KubajRoot(viewModel: AppViewModel) {
     var splash by rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(state.preferences.language) {
-        AppCompatDelegate.setApplicationLocales(
-            LocaleListCompat.forLanguageTags(state.preferences.language)
-        )
+        if (state.preferences.language != LANGUAGE_LOADING) {
+            val locales = LocaleListCompat.forLanguageTags(state.preferences.language)
+            if (AppCompatDelegate.getApplicationLocales() != locales) {
+                AppCompatDelegate.setApplicationLocales(locales)
+            }
+        }
     }
     LaunchedEffect(Unit) {
         delay(1_600)
@@ -122,7 +128,7 @@ private fun SplashScreen() {
     Box(
         Modifier
             .fillMaxSize()
-            .background(KubajPrimary),
+            .background(Brush.linearGradient(listOf(KubajPrimary, KubajPrimaryEnd))),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -132,7 +138,7 @@ private fun SplashScreen() {
                     .background(Color.White, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Calculate, null, tint = KubajPrimary, modifier = Modifier.size(56.dp))
+                Icon(Icons.Default.Park, null, tint = KubajPrimary, modifier = Modifier.size(56.dp))
             }
             Spacer(Modifier.height(24.dp))
             Text(stringResource(R.string.app_name), color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Black)
@@ -178,15 +184,40 @@ private fun OnboardingScreen(onComplete: () -> Unit) {
 private fun MainScreen(state: AppUiState, viewModel: AppViewModel) {
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            NavigationBar {
+            Row(
+                Modifier
+                    .navigationBarsPadding()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .height(54.dp)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.96f), RoundedCornerShape(28.dp))
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 MainTab.entries.forEach { tab ->
-                    NavigationBarItem(
-                        selected = selected == tab,
-                        onClick = { selected = tab },
-                        icon = { Icon(tab.icon, null) },
-                        label = { Text(stringResource(tab.label), maxLines = 1, fontSize = 10.sp) }
-                    )
+                    val active = selected == tab
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .clickable { selected = tab }
+                            .padding(vertical = 5.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Icon(
+                            tab.icon,
+                            null,
+                            tint = if (active) MaterialTheme.colorScheme.primary else KubajTabInactive,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            stringResource(tab.label).uppercase(),
+                            maxLines = 1,
+                            fontSize = 9.sp,
+                            color = if (active) MaterialTheme.colorScheme.primary else KubajTabInactive
+                        )
+                    }
                 }
             }
         }
@@ -209,7 +240,7 @@ private fun ScreenHeader(title: String, actions: @Composable () -> Unit = {}) {
             .padding(horizontal = 20.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(Icons.Default.Inventory2, null, tint = MaterialTheme.colorScheme.primary)
+        Icon(Icons.Default.Park, null, tint = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.width(10.dp))
         Text(title, fontSize = 21.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.weight(1f))
@@ -223,13 +254,13 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
     var top by rememberSaveable { mutableStateOf("21") }
     var mid by rememberSaveable { mutableStateOf("21") }
     var butt by rememberSaveable { mutableStateOf("21") }
-    var width by rememberSaveable { mutableStateOf("21") }
-    var thickness by rememberSaveable { mutableStateOf("") }
     var length by rememberSaveable { mutableStateOf("") }
     var quantity by rememberSaveable { mutableStateOf("1") }
     var showHollow by rememberSaveable { mutableStateOf(false) }
     var showSave by rememberSaveable { mutableStateOf(false) }
     var clearConfirm by rememberSaveable { mutableStateOf(false) }
+    val primaryFocusRequester = remember { FocusRequester() }
+    var primarySelectAllTrigger by rememberSaveable { mutableIntStateOf(0) }
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name)) {
@@ -246,7 +277,14 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     when (method) {
                         CalculationMethod.HUBER -> InputPair {
-                            NumberField(stringResource(R.string.diameter_cm), diameter, { diameter = it }, Modifier.weight(1f)) {
+                            NumberField(
+                                stringResource(R.string.diameter_cm),
+                                diameter,
+                                { diameter = it },
+                                Modifier.weight(1f),
+                                focusRequester = primaryFocusRequester,
+                                selectAllTrigger = primarySelectAllTrigger
+                            ) {
                                 TextButton(onClick = {
                                     diameter = ((diameter.toDoubleOrNull() ?: 21.0) + 1).toInt().toString()
                                 }) { Text("+1") }
@@ -255,7 +293,14 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
                         }
                         CalculationMethod.SMALIAN -> {
                             InputPair {
-                                NumberField(stringResource(R.string.top_diameter_cm), top, { top = it }, Modifier.weight(1f))
+                                NumberField(
+                                    stringResource(R.string.top_diameter_cm),
+                                    top,
+                                    { top = it },
+                                    Modifier.weight(1f),
+                                    focusRequester = primaryFocusRequester,
+                                    selectAllTrigger = primarySelectAllTrigger
+                                )
                                 NumberField(stringResource(R.string.butt_diameter_cm), butt, { butt = it }, Modifier.weight(1f))
                             }
                             InputPair {
@@ -265,22 +310,19 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
                         }
                         CalculationMethod.NEWTON -> {
                             InputPair {
-                                NumberField(stringResource(R.string.top_diameter_cm), top, { top = it }, Modifier.weight(1f))
+                                NumberField(
+                                    stringResource(R.string.top_diameter_cm),
+                                    top,
+                                    { top = it },
+                                    Modifier.weight(1f),
+                                    focusRequester = primaryFocusRequester,
+                                    selectAllTrigger = primarySelectAllTrigger
+                                )
                                 NumberField(stringResource(R.string.butt_diameter_cm), butt, { butt = it }, Modifier.weight(1f))
                             }
                             InputPair {
                                 NumberField(stringResource(R.string.mid_diameter_cm), mid, { mid = it }, Modifier.weight(1f))
                                 NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
-                            }
-                        }
-                        CalculationMethod.ULKER -> {
-                            InputPair {
-                                NumberField(stringResource(R.string.width_cm), width, { width = it }, Modifier.weight(1f))
-                                NumberField(stringResource(R.string.thickness_cm), thickness, { thickness = it }, Modifier.weight(1f))
-                            }
-                            InputPair {
-                                NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
-                                NumberField(stringResource(R.string.quantity), quantity, { quantity = it }, Modifier.weight(1f), true)
                             }
                         }
                     }
@@ -298,16 +340,19 @@ private fun HomeScreen(state: AppUiState, viewModel: AppViewModel, modifier: Mod
                     }
                     Button(
                         onClick = {
-                            viewModel.addStandard(
+                            val added = viewModel.addStandard(
                                 diameter.toDoubleOrNull(),
                                 top.toDoubleOrNull(),
                                 mid.toDoubleOrNull(),
                                 butt.toDoubleOrNull(),
-                                width.toDoubleOrNull(),
-                                thickness.toDoubleOrNull(),
                                 length.toDoubleOrNull(),
                                 quantity.toIntOrNull()
                             )
+                            if (added) {
+                                quantity = "1"
+                                primarySelectAllTrigger++
+                                primaryFocusRequester.requestFocus()
+                            }
                         },
                         modifier = Modifier.weight(1f)
                     ) {
@@ -490,7 +535,7 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
     } else state.groups
 
     Column(modifier.fillMaxSize()) {
-        ScreenHeader(stringResource(R.string.tab_grouping)) {
+        ScreenHeader(stringResource(R.string.app_name)) {
             IconButton(enabled = groups.isNotEmpty(), onClick = { exportType = "pdf" }) {
                 Icon(Icons.Default.Description, null)
             }
@@ -543,9 +588,18 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
             else item {
                 GroupTable(
                     groups,
-                    onIncrease = { if (it.records.isNotEmpty()) viewModel.increaseGroup(it) },
-                    onDecrease = { if (it.records.isNotEmpty()) viewModel.decreaseGroup(it) },
-                    onDelete = { if (it.records.isNotEmpty()) viewModel.deleteGroup(it) }
+                    onIncrease = {
+                        if (state.selectedFolderId == null) viewModel.increaseDraftGroup(it)
+                        else viewModel.increaseGroup(it)
+                    },
+                    onDecrease = {
+                        if (state.selectedFolderId == null) viewModel.decreaseDraftGroup(it)
+                        else viewModel.decreaseGroup(it)
+                    },
+                    onDelete = {
+                        if (state.selectedFolderId == null) viewModel.deleteDraftGroup(it)
+                        else viewModel.deleteGroup(it)
+                    }
                 )
             }
         }
@@ -617,7 +671,7 @@ private fun FoldersScreen(state: AppUiState, viewModel: AppViewModel, modifier: 
     var name by rememberSaveable { mutableStateOf("") }
     var parentForNew by remember { mutableStateOf<FolderEntity?>(null) }
     Column(modifier.fillMaxSize()) {
-        ScreenHeader(stringResource(R.string.tab_folders))
+        ScreenHeader(stringResource(R.string.app_name))
         LazyColumn(
             contentPadding = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -692,7 +746,7 @@ private fun FoldersScreen(state: AppUiState, viewModel: AppViewModel, modifier: 
 @Composable
 private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier: Modifier) {
     Column(modifier.fillMaxSize()) {
-        ScreenHeader(stringResource(R.string.tab_settings))
+        ScreenHeader(stringResource(R.string.app_name))
         LazyColumn(
             contentPadding = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
@@ -705,7 +759,6 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                                 CalculationMethod.HUBER -> stringResource(R.string.formula_huber)
                                 CalculationMethod.SMALIAN -> stringResource(R.string.formula_smalian)
                                 CalculationMethod.NEWTON -> stringResource(R.string.formula_newton)
-                                CalculationMethod.ULKER -> stringResource(R.string.formula_ulker)
                             },
                             selected = state.preferences.calculationMethod == method,
                             onClick = { viewModel.setMethod(method) }
@@ -732,9 +785,9 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
             }
             item {
                 SettingsSection(stringResource(R.string.settings_language)) {
-                    listOf("tr", "en", "de", "es", "pt", "fr", "sv", "fi", "ru").forEach { language ->
+                    listOf("", "tr", "en", "de", "es", "pt", "fr", "sv", "fi", "ru").forEach { language ->
                         SettingChoice(
-                            text = language.uppercase(),
+                            text = if (language.isEmpty()) stringResource(R.string.theme_system) else language.uppercase(),
                             selected = state.preferences.language == language,
                             onClick = { viewModel.setLanguage(language) }
                         )

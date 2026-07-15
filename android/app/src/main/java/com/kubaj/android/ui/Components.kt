@@ -1,6 +1,8 @@
 package com.kubaj.android.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,15 +22,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +50,8 @@ import com.kubaj.android.R
 import com.kubaj.android.domain.LogGroup
 import com.kubaj.android.domain.LogGrouping
 import java.text.DecimalFormat
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 
 val volumeFormat = DecimalFormat("0.000")
 val lengthFormat = DecimalFormat("0.0")
@@ -48,33 +64,82 @@ fun NumberField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     integer: Boolean = false,
+    focusRequester: FocusRequester? = null,
+    selectAllTrigger: Int = 0,
     trailing: @Composable (() -> Unit)? = null
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                text = label.uppercase(),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
+    var fieldValue by remember { mutableStateOf(TextFieldValue(value)) }
+    var wasFocused by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    LaunchedEffect(value) {
+        if (fieldValue.text != value) {
+            fieldValue = TextFieldValue(value, TextRange(value.length))
+        }
+    }
+    LaunchedEffect(selectAllTrigger) {
+        if (selectAllTrigger > 0) {
+            fieldValue = fieldValue.copy(selection = TextRange(0, fieldValue.text.length))
+        }
+    }
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Release) {
+                delay(30)
+                fieldValue = fieldValue.copy(selection = TextRange(0, fieldValue.text.length))
+            }
+        }
+    }
+
+    Column(modifier) {
+        Text(
+            text = label.uppercase(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 8.dp, bottom = 6.dp)
+        )
+        OutlinedTextField(
+            value = fieldValue,
+            onValueChange = {
+                fieldValue = it
+                onValueChange(it.text)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
+                .onFocusChanged { state ->
+                    if (state.isFocused && !wasFocused) {
+                        fieldValue = fieldValue.copy(selection = TextRange(0, fieldValue.text.length))
+                    }
+                    wasFocused = state.isFocused
+                },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = if (integer) KeyboardType.Number else KeyboardType.Decimal
+            ),
+            trailingIcon = trailing,
+            interactionSource = interactionSource,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent
             )
-        },
-        modifier = modifier,
-        singleLine = true,
-        shape = RoundedCornerShape(14.dp),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = if (integer) KeyboardType.Number else KeyboardType.Decimal
-        ),
-        trailingIcon = trailing
-    )
+        )
+    }
 }
 
 @Composable
 fun SummaryCards(totalVolume: Double, count: Int, averageDiameter: Double) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         SummaryCard(
             stringResource(R.string.total_volume),
             "${volumeFormat.format(totalVolume)} m³",
@@ -85,13 +150,12 @@ fun SummaryCards(totalVolume: Double, count: Int, averageDiameter: Double) {
             count.toString(),
             Modifier.weight(1f)
         )
+        SummaryCard(
+            stringResource(R.string.average_diameter),
+            "${diameterFormat.format(averageDiameter)} cm",
+            Modifier.weight(1f)
+        )
     }
-    Spacer(Modifier.height(12.dp))
-    SummaryCard(
-        stringResource(R.string.average_diameter),
-        "${diameterFormat.format(averageDiameter)} cm",
-        Modifier.fillMaxWidth()
-    )
 }
 
 @Composable
@@ -99,15 +163,17 @@ private fun SummaryCard(title: String, value: String, modifier: Modifier) {
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(18.dp))
-            .padding(18.dp)
+            .padding(horizontal = 10.dp, vertical = 14.dp)
     ) {
         Text(
             title.uppercase(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
-        Text(value, fontSize = 23.sp, fontWeight = FontWeight.Bold)
+        Text(value, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1)
     }
 }
 
@@ -138,10 +204,10 @@ fun GroupTable(
                     .padding(horizontal = 10.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text((index + 1).toString(), Modifier.width(28.dp), fontWeight = FontWeight.SemiBold)
-                Text(lengthFormat.format(group.lengthM), Modifier.width(52.dp))
-                Text(group.totalQuantity.toString(), Modifier.width(42.dp))
-                Text(diameterFormat.format(group.diameterCm), Modifier.weight(1f))
+                Text((index + 1).toString(), Modifier.width(28.dp), fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                Text(lengthFormat.format(group.lengthM), Modifier.width(52.dp), textAlign = TextAlign.Center)
+                Text(group.totalQuantity.toString(), Modifier.width(42.dp), textAlign = TextAlign.Center)
+                Text(diameterFormat.format(group.diameterCm), Modifier.weight(1f), textAlign = TextAlign.Center)
                 Text(
                     volumeFormat.format(group.totalVolumeM3),
                     Modifier.width(68.dp),
@@ -166,11 +232,11 @@ private fun TableHeader() {
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f))
             .padding(horizontal = 10.dp, vertical = 11.dp)
     ) {
-        Text(stringResource(R.string.table_no), Modifier.width(28.dp))
-        Text(stringResource(R.string.table_length), Modifier.width(52.dp))
-        Text(stringResource(R.string.table_quantity), Modifier.width(42.dp))
-        Text(stringResource(R.string.table_diameter), Modifier.weight(1f))
-        Text(stringResource(R.string.table_volume), Modifier.width(68.dp))
+        Text(stringResource(R.string.table_no), Modifier.width(28.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.table_length), Modifier.width(52.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.table_quantity), Modifier.width(42.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.table_diameter), Modifier.weight(1f), fontSize = 9.sp, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.table_volume), Modifier.width(68.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.width(96.dp))
     }
 }

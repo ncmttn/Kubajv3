@@ -78,8 +78,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         top: Double?,
         mid: Double?,
         butt: Double?,
-        width: Double?,
-        thickness: Double?,
         length: Double?,
         quantity: Int?
     ): Boolean {
@@ -127,20 +125,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     topDiameterCm = first,
                     midDiameterCm = middle,
                     buttDiameterCm = second
-                )
-            }
-            CalculationMethod.ULKER -> {
-                val safeWidth = width?.takeIf { it > 0 } ?: return false
-                val safeThickness = thickness?.takeIf { it > 0 } ?: return false
-                DraftEntry(
-                    UUID.randomUUID().toString(),
-                    safeWidth,
-                    safeLength,
-                    safeQuantity,
-                    ForestryCalculator.lumber(safeWidth, safeThickness, safeLength),
-                    method,
-                    isLumber = true,
-                    lumberThicknessCm = safeThickness
                 )
             }
         }
@@ -199,6 +183,27 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     fun deleteDraft(id: String) = drafts.update { values -> values.filterNot { it.id == id } }
+    fun increaseDraftGroup(group: LogGroup) {
+        val target = matchingDraft(group) ?: return
+        increaseDraft(target.id)
+    }
+
+    fun decreaseDraftGroup(group: LogGroup) {
+        val target = matchingDraft(group) ?: return
+        decreaseDraft(target.id)
+    }
+
+    fun deleteDraftGroup(group: LogGroup) {
+        drafts.update { values ->
+            values.filterNot { it.diameterCm == group.diameterCm && it.lengthM == group.lengthM }
+        }
+    }
+
+    private fun matchingDraft(group: LogGroup): DraftEntry? =
+        drafts.value
+            .filter { it.diameterCm == group.diameterCm && it.lengthM == group.lengthM }
+            .maxByOrNull { it.createdAt }
+
     fun clearDrafts() = drafts.update { emptyList() }
     fun selectFolder(id: Long?) = selectedFolderId.update { id }
     fun toggleSort() = sortAscending.update { !it }

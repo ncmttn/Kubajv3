@@ -17,10 +17,12 @@ enum class AppTheme {
     DARK
 }
 
+const val LANGUAGE_LOADING = "__loading__"
+
 data class PreferenceState(
     val calculationMethod: CalculationMethod = CalculationMethod.HUBER,
     val theme: AppTheme = AppTheme.SYSTEM,
-    val language: String = "tr",
+    val language: String = LANGUAGE_LOADING,
     val hapticsEnabled: Boolean = true,
     val onboardingCompleted: Boolean = false
 )
@@ -42,7 +44,7 @@ class AppPreferences(private val context: Context) {
             theme = values[Keys.theme]
                 ?.let { runCatching { AppTheme.valueOf(it) }.getOrNull() }
                 ?: AppTheme.SYSTEM,
-            language = values[Keys.language] ?: "tr",
+            language = values[Keys.language].orEmpty(),
             hapticsEnabled = values[Keys.haptics] ?: true,
             onboardingCompleted = values[Keys.onboarding] ?: false
         )

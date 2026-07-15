@@ -7,8 +7,7 @@ import kotlin.math.sqrt
 enum class CalculationMethod {
     HUBER,
     SMALIAN,
-    NEWTON,
-    ULKER
+    NEWTON
 }
 
 data class HollowResult(
@@ -65,9 +64,6 @@ object ForestryCalculator {
             buttDiameterCm * buttDiameterCm
         return roundVolume(PI * lengthM * sum / 240_000.0)
     }
-
-    fun lumber(widthCm: Double, thicknessCm: Double, lengthM: Double): Double =
-        roundVolume(widthCm / 100 * thicknessCm / 100 * lengthM)
 
     fun hollow(outerDiameterCm: Double, innerDiameterCm: Double, lengthM: Double): HollowResult {
         val outer = PI * (outerDiameterCm / 200).let { it * it } * lengthM
