@@ -37,6 +37,8 @@
     <string name="export_excel">Luo Excel</string>
     <string name="export_file_name">Vientitiedoston nimi</string>
     <string name="export_settings">Vientiasetukset</string>
+    <string name="export_saved">Tiedosto tallennettu</string>
+    <string name="export_failed">Tiedostoa ei voitu tallentaa</string>
     <string name="company_name">Yrityksen nimi</string>
     <string name="report_date">Raportin päivä</string>
     <string name="location">Sijainti / Alue</string>

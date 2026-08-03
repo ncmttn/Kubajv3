@@ -37,6 +37,8 @@
     <string name="export_excel">Создать Excel</string>
     <string name="export_file_name">Имя экспортируемого файла</string>
     <string name="export_settings">Настройки экспорта</string>
+    <string name="export_saved">Файл сохранён</string>
+    <string name="export_failed">Не удалось сохранить файл</string>
     <string name="company_name">Название компании</string>
     <string name="report_date">Дата отчёта</string>
     <string name="location">Местоположение</string>

@@ -16,23 +16,32 @@ struct HomeView: View {
         VStack(spacing: 0) {
             homeHeader
 
-            ScrollView {
-                VStack(spacing: KubajMetric.sectionSpacing) {
-                    inputSection
-                    calculateActions
-                    KubajStatsCard(
-                        totalVolume: DisplayFormatting.volume(viewModel.totalVolumeM3),
-                        logsCount: "\(viewModel.totalLogsCount)",
-                        averageDiameter: L10n.Home.diameterValue(viewModel.averageDiameterCm),
-                        onReset: {
-                            showClearConfirm = true
-                        }
-                    )
-                    recentSection
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: KubajMetric.sectionSpacing) {
+                        inputSection
+                        calculateActions
+                        KubajStatsCard(
+                            totalVolume: DisplayFormatting.volume(viewModel.totalVolumeM3),
+                            logsCount: "\(viewModel.totalLogsCount)",
+                            onReset: {
+                                showClearConfirm = true
+                            }
+                        )
+                        .id("statsCard")
+                        recentSection
+                    }
+                    .padding(.horizontal, KubajMetric.horizontalPadding)
+                    .padding(.top, KubajMetric.sectionSpacing)
+                    .padding(.bottom, 120)
                 }
-                .padding(.horizontal, KubajMetric.horizontalPadding)
-                .padding(.top, KubajMetric.sectionSpacing)
-                .padding(.bottom, 120)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: viewModel.sortedEntries.first?.id) { _, newId in
+                    guard let newId else { return }
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        proxy.scrollTo(newId, anchor: .bottom)
+                    }
+                }
             }
         }
         .background(KubajThemeColors.background(colorScheme))
@@ -345,6 +354,7 @@ struct HomeView: View {
                                 entryToDelete = entry.id
                             }
                         )
+                        .id(entry.id)
                         if index < entries.count - 1 {
                             Divider()
                                 .overlay(KubajThemeColors.borderSubtle(colorScheme))

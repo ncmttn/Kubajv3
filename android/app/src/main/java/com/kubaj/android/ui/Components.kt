@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,7 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kubaj.android.R
+import com.kubaj.android.domain.LogEntryDisplay
 import com.kubaj.android.domain.LogGroup
 import com.kubaj.android.domain.LogGrouping
 import java.text.DecimalFormat
@@ -139,88 +141,48 @@ fun NumberField(
 }
 
 @Composable
-fun SummaryCards(totalVolume: Double, count: Int, averageDiameter: Double) {
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        SummaryCard(
-            stringResource(R.string.total_volume),
-            "${volumeFormat.format(totalVolume)} m³",
-            Modifier.weight(1f)
-        )
-        SummaryCard(
-            stringResource(R.string.product_count),
-            count.toString(),
-            Modifier.weight(1f)
-        )
-        SummaryCard(
-            stringResource(R.string.average_diameter),
-            "${diameterFormat.format(averageDiameter)} cm",
-            Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
 fun HomeStatsCard(
     totalVolume: Double,
     count: Int,
-    averageDiameter: Double,
     onReset: () -> Unit
 ) {
-    Column(
+    Row(
         Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp))
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(verticalAlignment = Alignment.Top) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    stringResource(R.string.total_volume).uppercase(),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp
-                )
-                Text(
-                    "${volumeFormat.format(totalVolume)} m³",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Black,
-                    maxLines = 1
-                )
-            }
-            IconButton(
-                onClick = onReset,
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-            ) {
-                Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
-            }
-        }
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(MaterialTheme.colorScheme.outlineVariant)
+        HomeStatBlock(
+            stringResource(R.string.total_volume),
+            "${volumeFormat.format(totalVolume)} m³",
+            Modifier.weight(1.7f),
+            valueColor = MaterialTheme.colorScheme.primary
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-            HomeStatBlock(stringResource(R.string.product_count), count.toString(), Modifier.weight(1f))
-            HomeStatBlock(
-                stringResource(R.string.average_diameter),
-                "${diameterFormat.format(averageDiameter)} cm",
-                Modifier.weight(1f)
-            )
+        HomeStatBlock(
+            stringResource(R.string.product_count),
+            count.toString(),
+            Modifier.weight(0.8f)
+        )
+        IconButton(
+            onClick = onReset,
+            modifier = Modifier
+                .size(40.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+        ) {
+            Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
         }
     }
 }
 
 @Composable
-private fun HomeStatBlock(title: String, value: String, modifier: Modifier) {
+private fun HomeStatBlock(
+    title: String,
+    value: String,
+    modifier: Modifier,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
+) {
     Column(modifier) {
         Text(
             title.uppercase(),
@@ -229,7 +191,14 @@ private fun HomeStatBlock(title: String, value: String, modifier: Modifier) {
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp
         )
-        Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(
+            value,
+            color = valueColor,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -295,7 +264,7 @@ fun GroupTable(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
     ) {
-        TableHeader(sortAscending, onToggleSort)
+        GroupTableHeader(sortAscending, onToggleSort)
         groups.forEachIndexed { index, group ->
             val tint = if (bands[index] == 1) {
                 MaterialTheme.colorScheme.primary.copy(alpha = 0.055f)
@@ -309,15 +278,18 @@ fun GroupTable(
                     .padding(horizontal = 10.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text((index + 1).toString(), Modifier.width(28.dp), fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                Text(lengthFormat.format(group.lengthM), Modifier.width(44.dp), textAlign = TextAlign.Center)
-                Text(group.totalQuantity.toString(), Modifier.width(36.dp), textAlign = TextAlign.Center)
-                Text(diameterFormat.format(group.diameterCm), Modifier.width(42.dp), textAlign = TextAlign.Center)
+                TableValue((index + 1).toString(), Modifier.weight(0.45f))
+                TableValue(lengthFormat.format(group.lengthM), Modifier.weight(0.7f))
+                TableValue(group.totalQuantity.toString(), Modifier.weight(0.6f))
+                TableValue(LogEntryDisplay.diameterLabel(group), Modifier.weight(0.85f))
                 Text(
                     volumeFormat.format(group.totalVolumeM3),
-                    Modifier.width(56.dp),
+                    Modifier.weight(0.9f),
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
                 Row(Modifier.width(84.dp)) {
                     SmallAction(Icons.Default.Add, hapticsEnabled = hapticsEnabled) { onIncrease(group) }
@@ -330,27 +302,56 @@ fun GroupTable(
 }
 
 @Composable
-private fun TableHeader(sortAscending: Boolean, onToggleSort: () -> Unit) {
+fun GroupTableHeader(sortAscending: Boolean, onToggleSort: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f))
-            .padding(horizontal = 10.dp, vertical = 11.dp)
+            .padding(horizontal = 10.dp, vertical = 12.dp)
     ) {
-        Text(stringResource(R.string.table_no), Modifier.width(28.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(
+        TableTitle(stringResource(R.string.table_no), Modifier.weight(0.45f))
+        TableTitle(
             "${stringResource(R.string.table_length)} ${if (sortAscending) "↑" else "↓"}",
             Modifier
-                .width(44.dp)
-                .clickable(onClick = onToggleSort),
-            fontSize = 9.sp,
-            textAlign = TextAlign.Center
+                .weight(0.7f)
+                .clickable(onClick = onToggleSort)
         )
-        Text(stringResource(R.string.table_quantity), Modifier.width(36.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.table_diameter), Modifier.width(42.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
-        Text(stringResource(R.string.table_volume), Modifier.width(56.dp), fontSize = 9.sp, textAlign = TextAlign.Center)
+        TableTitle(stringResource(R.string.table_quantity), Modifier.weight(0.6f))
+        TableTitle(stringResource(R.string.table_diameter), Modifier.weight(0.85f))
+        TableTitle(stringResource(R.string.table_volume), Modifier.weight(0.9f))
         Spacer(Modifier.width(84.dp))
     }
+}
+
+@Composable
+fun RowScope.TableTitle(text: String, modifier: Modifier) {
+    Text(
+        text.uppercase(),
+        modifier,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+fun RowScope.TableValue(text: String, modifier: Modifier) {
+    Text(
+        text,
+        modifier,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Medium,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+private fun TableHeader(sortAscending: Boolean, onToggleSort: () -> Unit) {
+    GroupTableHeader(sortAscending, onToggleSort)
 }
 
 @Composable
@@ -360,11 +361,11 @@ private fun SmallAction(
     hapticsEnabled: Boolean,
     action: () -> Unit
 ) {
-    val haptic = LocalHapticFeedback.current
+    val context = LocalContext.current
     IconButton(
         onClick = {
             if (hapticsEnabled) {
-                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                performAppHaptic(context)
             }
             action()
         },

@@ -58,13 +58,6 @@ final class HomeViewModel {
         draftEntries.reduce(0) { $0 + $1.quantity }
     }
 
-    var averageDiameterCm: Double {
-        let count = totalLogsCount
-        guard count > 0 else { return 0 }
-        let weighted = draftEntries.reduce(0.0) { $0 + $1.diameterCm * Double($1.quantity) }
-        return weighted / Double(count)
-    }
-
     func incrementDiameter() {
         let base = InputParser.double(from: diameterInput) ?? 21
         diameterInput = DisplayFormatting.diameter(base + 1)

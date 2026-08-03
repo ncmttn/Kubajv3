@@ -7,6 +7,7 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.FileProvider
 import com.kubaj.android.R
+import com.kubaj.android.domain.LogEntryDisplay
 import com.kubaj.android.domain.LogGroup
 import com.kubaj.android.ui.diameterFormat
 import com.kubaj.android.ui.lengthFormat
@@ -78,7 +79,7 @@ object Exporters {
             }
             canvas.drawText(lengthFormat.format(group.lengthM), margin, y, paint)
             canvas.drawText(group.totalQuantity.toString(), 150f, y, paint)
-            canvas.drawText(diameterFormat.format(group.diameterCm), 250f, y, paint)
+            canvas.drawText(LogEntryDisplay.diameterLabel(group), 250f, y, paint)
             canvas.drawText(volumeFormat.format(group.totalVolumeM3), 370f, y, paint)
             y += 20
         }
@@ -108,18 +109,26 @@ object Exporters {
         return file
     }
 
+    fun copyToUri(context: Context, source: File, destination: android.net.Uri) {
+        context.contentResolver.openOutputStream(destination)?.use { output ->
+            source.inputStream().use { input -> input.copyTo(output) }
+        } ?: error("Unable to open destination")
+    }
+
     fun share(context: Context, file: File, mimeType: String) {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        context.startActivity(
-            Intent.createChooser(
-                Intent(Intent.ACTION_SEND).apply {
-                    type = mimeType
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                },
-                file.name
-            )
+        val intent = Intent.createChooser(
+            Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            },
+            file.name
         )
+        if (context !is android.app.Activity) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
     }
 
     private fun sheet(context: Context, groups: List<LogGroup>): String {
@@ -134,7 +143,7 @@ object Exporters {
             listOf(
                 lengthFormat.format(it.lengthM),
                 it.totalQuantity.toString(),
-                diameterFormat.format(it.diameterCm),
+                LogEntryDisplay.diameterLabel(it),
                 volumeFormat.format(it.totalVolumeM3)
             )
         }

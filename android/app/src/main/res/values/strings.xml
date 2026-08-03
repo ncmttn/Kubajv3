@@ -37,6 +37,8 @@
     <string name="export_excel">Excel oluştur</string>
     <string name="export_file_name">Dışa aktarılacak dosyanın adı</string>
     <string name="export_settings">Rapor üst bilgileri</string>
+    <string name="export_saved">Dosya kaydedildi</string>
+    <string name="export_failed">Dosya kaydedilemedi</string>
     <string name="company_name">Firma adı</string>
     <string name="report_date">Rapor tarihi</string>
     <string name="location">Konum</string>
@@ -52,7 +54,7 @@
     <string name="formula_huber">Huber</string>
     <string name="formula_smalian">Smalian</string>
     <string name="formula_newton">Newton</string>
-    <string name="formula_ulker">Ülker</string>
+    <string name="formula_ulker">Kereste</string>
     <string name="outer_diameter">Dış çap (cm)</string>
     <string name="inner_diameter">İç çap (cm)</string>
     <string name="equivalent_diameter">Eşdeğer çap: %1$d cm</string>

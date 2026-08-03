@@ -37,6 +37,8 @@
     <string name="export_excel">Gerar Excel</string>
     <string name="export_file_name">Nome do arquivo exportado</string>
     <string name="export_settings">Configurações de exportação</string>
+    <string name="export_saved">Arquivo salvo</string>
+    <string name="export_failed">Não foi possível salvar o arquivo</string>
     <string name="company_name">Nome da empresa</string>
     <string name="report_date">Data do relatório</string>
     <string name="location">Local / Região</string>

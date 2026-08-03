@@ -37,6 +37,8 @@
     <string name="export_excel">Generar Excel</string>
     <string name="export_file_name">Nombre del archivo exportado</string>
     <string name="export_settings">Ajustes de exportación</string>
+    <string name="export_saved">Archivo guardado</string>
+    <string name="export_failed">No se pudo guardar el archivo</string>
     <string name="company_name">Nombre de empresa</string>
     <string name="report_date">Fecha del informe</string>
     <string name="location">Ubicación / Región</string>

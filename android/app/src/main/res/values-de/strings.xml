@@ -37,6 +37,8 @@
     <string name="export_excel">Excel erstellen</string>
     <string name="export_file_name">Name der Exportdatei</string>
     <string name="export_settings">Exporteinstellungen</string>
+    <string name="export_saved">Datei gespeichert</string>
+    <string name="export_failed">Datei konnte nicht gespeichert werden</string>
     <string name="company_name">Firmenname</string>
     <string name="report_date">Berichtsdatum</string>
     <string name="location">Standort / Region</string>

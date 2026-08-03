@@ -5,10 +5,10 @@
     <application
         android:name=".KubajApplication"
         android:allowBackup="true"
-        android:icon="@drawable/kubaj_app_icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/launcher_name"
         android:localeConfig="@xml/locales_config"
-        android:roundIcon="@drawable/kubaj_app_icon"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Kubaj">
         <activity

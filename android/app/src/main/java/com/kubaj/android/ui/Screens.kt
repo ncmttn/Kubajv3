@@ -1,6 +1,13 @@
 package com.kubaj.android.ui
 
+import android.content.Context
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -87,6 +94,7 @@ import com.kubaj.android.data.FolderEntity
 import com.kubaj.android.data.LANGUAGE_LOADING
 import com.kubaj.android.domain.CalculationMethod
 import com.kubaj.android.domain.DraftEntry
+import com.kubaj.android.domain.LogEntryDisplay
 import com.kubaj.android.domain.LogGrouping
 import com.kubaj.android.export.ExportMetadata
 import com.kubaj.android.export.Exporters
@@ -120,7 +128,10 @@ fun KubajRoot(viewModel: AppViewModel) {
     KubajTheme(state.preferences.theme) {
         when {
             splash -> SplashScreen()
-            !state.preferences.onboardingCompleted -> OnboardingScreen(viewModel::completeOnboarding)
+            !state.preferences.onboardingCompleted -> OnboardingScreen(
+                state.preferences.hapticsEnabled,
+                viewModel::completeOnboarding
+            )
             else -> MainScreen(state, viewModel)
         }
     }
@@ -151,8 +162,9 @@ private fun SplashScreen() {
 }
 
 @Composable
-private fun OnboardingScreen(onComplete: () -> Unit) {
+private fun OnboardingScreen(hapticsEnabled: Boolean, onComplete: () -> Unit) {
     var page by rememberSaveable { mutableIntStateOf(0) }
+    val haptic = hapticAction(hapticsEnabled)
     val titles = listOf(
         R.string.onboarding_title_1,
         R.string.onboarding_title_2,
@@ -240,7 +252,10 @@ private fun OnboardingScreen(onComplete: () -> Unit) {
             }
             Spacer(Modifier.height(28.dp))
             Button(
-                onClick = { if (page == 2) onComplete() else page++ },
+                onClick = {
+                    haptic()
+                    if (page == 2) onComplete() else page++
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp),
@@ -254,7 +269,7 @@ private fun OnboardingScreen(onComplete: () -> Unit) {
             }
             if (page < 2) {
                 Spacer(Modifier.height(8.dp))
-                TextButton(onClick = onComplete, modifier = Modifier.fillMaxWidth()) {
+                TextButton(onClick = { haptic(); onComplete() }, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.skip_intro))
                 }
             }
@@ -265,6 +280,7 @@ private fun OnboardingScreen(onComplete: () -> Unit) {
 @Composable
 private fun MainScreen(state: AppUiState, viewModel: AppViewModel) {
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
+    val haptic = hapticAction(state.preferences.hapticsEnabled)
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -282,7 +298,10 @@ private fun MainScreen(state: AppUiState, viewModel: AppViewModel) {
                     Column(
                         Modifier
                             .weight(1f)
-                            .clickable { selected = tab }
+                            .clickable {
+                                haptic()
+                                selected = tab
+                            }
                             .padding(vertical = 7.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -348,19 +367,23 @@ private fun HomeScreen(
     var top by rememberSaveable { mutableStateOf("21") }
     var mid by rememberSaveable { mutableStateOf("21") }
     var butt by rememberSaveable { mutableStateOf("21") }
+    var width by rememberSaveable { mutableStateOf("21") }
+    var thickness by rememberSaveable { mutableStateOf("") }
     var length by rememberSaveable { mutableStateOf("") }
     var quantity by rememberSaveable { mutableStateOf("1") }
     var showHollow by rememberSaveable { mutableStateOf(false) }
     var showSave by rememberSaveable { mutableStateOf(false) }
     var clearConfirm by rememberSaveable { mutableStateOf(false) }
+    var deleteEntryId by rememberSaveable { mutableStateOf<String?>(null) }
     val primaryFocusRequester = remember { FocusRequester() }
     var primarySelectAllTrigger by rememberSaveable { mutableIntStateOf(0) }
+    val haptic = hapticAction(state.preferences.hapticsEnabled)
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name)) {
             IconButton(
                 enabled = state.drafts.isNotEmpty(),
-                onClick = { showSave = true },
+                onClick = { haptic(); showSave = true },
                 modifier = Modifier
                     .size(32.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
@@ -386,8 +409,9 @@ private fun HomeScreen(
                                 selectAllTrigger = primarySelectAllTrigger
                             ) {
                                 TextButton(onClick = {
+                                    haptic()
                                     diameter = ((diameter.toLocalizedDoubleOrNull() ?: 21.0) + 1).toInt().toString()
-                                }) { Text("+1") }
+                                }) { Text("+1", fontSize = 21.sp, fontWeight = FontWeight.Black) }
                             }
                             NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
                         }
@@ -425,6 +449,28 @@ private fun HomeScreen(
                                 NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
                             }
                         }
+                        CalculationMethod.LUMBER -> {
+                            InputPair {
+                                NumberField(
+                                    stringResource(R.string.width_cm),
+                                    width,
+                                    { width = it },
+                                    Modifier.weight(1f),
+                                    focusRequester = primaryFocusRequester,
+                                    selectAllTrigger = primarySelectAllTrigger
+                                )
+                                NumberField(
+                                    stringResource(R.string.thickness_cm),
+                                    thickness,
+                                    { thickness = it },
+                                    Modifier.weight(1f)
+                                )
+                            }
+                            InputPair {
+                                NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
+                                NumberField(stringResource(R.string.quantity), quantity, { quantity = it }, Modifier.weight(1f), true)
+                            }
+                        }
                     }
                     if (method == CalculationMethod.HUBER) {
                         NumberField(stringResource(R.string.quantity), quantity, { quantity = it }, Modifier.fillMaxWidth(0.5f), true)
@@ -436,7 +482,7 @@ private fun HomeScreen(
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     FilledTonalButton(
-                        onClick = { showHollow = true },
+                        onClick = { haptic(); showHollow = true },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(24.dp)
                     ) {
@@ -446,11 +492,14 @@ private fun HomeScreen(
                     }
                     Button(
                         onClick = {
+                            haptic()
                             val added = viewModel.addStandard(
                                 diameter.toLocalizedDoubleOrNull(),
                                 top.toLocalizedDoubleOrNull(),
                                 mid.toLocalizedDoubleOrNull(),
                                 butt.toLocalizedDoubleOrNull(),
+                                width.toLocalizedDoubleOrNull(),
+                                thickness.toLocalizedDoubleOrNull(),
                                 length.toLocalizedDoubleOrNull(),
                                 quantity.toIntOrNull()
                             )
@@ -470,25 +519,31 @@ private fun HomeScreen(
             item {
                 val count = state.drafts.sumOf { it.quantity }
                 val total = state.drafts.sumOf { it.totalVolumeM3 }
-                val average = if (count == 0) 0.0 else state.drafts.sumOf { it.diameterCm * it.quantity } / count
-                HomeStatsCard(total, count, average) { clearConfirm = true }
+                HomeStatsCard(total, count) { haptic(); clearConfirm = true }
             }
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.calculations), fontSize = 21.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.calculations), fontSize = 25.sp, fontWeight = FontWeight.Black)
                     Spacer(Modifier.weight(1f))
                     if (state.drafts.isNotEmpty()) {
-                        IconButton(onClick = { clearConfirm = true }) { Icon(Icons.Default.Delete, null) }
+                        IconButton(onClick = { haptic(); clearConfirm = true }) { Icon(Icons.Default.Delete, null) }
                     }
                 }
             }
             if (state.drafts.isEmpty()) {
                 item { EmptyState(stringResource(R.string.empty_calculations)) }
             } else {
-                item { DraftTable(state.drafts, viewModel) }
+                item {
+                    DraftTable(
+                        entries = state.drafts,
+                        onIncrease = { haptic(); viewModel.increaseDraft(it) },
+                        onDecrease = { haptic(); viewModel.decreaseDraft(it) },
+                        onDelete = { haptic(); deleteEntryId = it }
+                    )
+                }
             }
             item {
-                TextButton(onClick = onViewFullHistory, modifier = Modifier.fillMaxWidth()) {
+                TextButton(onClick = { haptic(); onViewFullHistory() }, modifier = Modifier.fillMaxWidth()) {
                     Text(
                         stringResource(R.string.tab_grouping),
                         color = MaterialTheme.colorScheme.primary,
@@ -499,11 +554,27 @@ private fun HomeScreen(
         }
     }
 
-    if (showHollow) HollowSheet(viewModel) { showHollow = false }
-    if (showSave) SaveDialog(state.folders, viewModel, onDismiss = { showSave = false })
+    if (showHollow) HollowSheet(
+        viewModel,
+        state.preferences.hapticsEnabled
+    ) { showHollow = false }
+    if (showSave) SaveDialog(
+        state.folders,
+        viewModel,
+        state.preferences.hapticsEnabled,
+        onDismiss = { showSave = false }
+    )
     if (clearConfirm) ConfirmDialog(
         onDismiss = { clearConfirm = false },
-        onConfirm = { viewModel.clearDrafts(); clearConfirm = false }
+        onConfirm = { haptic(); viewModel.clearDrafts(); clearConfirm = false }
+    )
+    if (deleteEntryId != null) ConfirmDialog(
+        onDismiss = { deleteEntryId = null },
+        onConfirm = {
+            haptic()
+            deleteEntryId?.let(viewModel::deleteDraft)
+            deleteEntryId = null
+        }
     )
 }
 
@@ -513,7 +584,12 @@ private fun InputPair(content: @Composable RowScope.() -> Unit) {
 }
 
 @Composable
-private fun DraftTable(entries: List<DraftEntry>, viewModel: AppViewModel) {
+private fun DraftTable(
+    entries: List<DraftEntry>,
+    onIncrease: (String) -> Unit,
+    onDecrease: (String) -> Unit,
+    onDelete: (String) -> Unit
+) {
     val bands = LogGrouping.lengthBands(entries.map { it.lengthM })
     Column(Modifier.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))) {
         Row(
@@ -522,12 +598,12 @@ private fun DraftTable(entries: List<DraftEntry>, viewModel: AppViewModel) {
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
                 .padding(horizontal = 10.dp, vertical = 12.dp)
         ) {
-            Text(stringResource(R.string.table_no), Modifier.width(28.dp), fontSize = 9.sp)
-            Text(stringResource(R.string.table_quantity), Modifier.width(38.dp), fontSize = 9.sp)
-            Text(stringResource(R.string.table_length), Modifier.width(48.dp), fontSize = 9.sp)
-            Text(stringResource(R.string.table_diameter), Modifier.weight(1f), fontSize = 9.sp)
-            Text(stringResource(R.string.table_volume), Modifier.width(58.dp), fontSize = 9.sp)
-            Spacer(Modifier.width(90.dp))
+            TableTitle(stringResource(R.string.table_no), Modifier.weight(0.45f))
+            TableTitle(stringResource(R.string.table_length), Modifier.weight(0.7f))
+            TableTitle(stringResource(R.string.table_quantity), Modifier.weight(0.6f))
+            TableTitle(stringResource(R.string.table_diameter), Modifier.weight(0.85f))
+            TableTitle(stringResource(R.string.table_volume), Modifier.weight(0.9f))
+            Spacer(Modifier.width(84.dp))
         }
         entries.forEachIndexed { index, entry ->
             Row(
@@ -540,28 +616,31 @@ private fun DraftTable(entries: List<DraftEntry>, viewModel: AppViewModel) {
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text((index + 1).toString(), Modifier.width(28.dp))
-                Text(entry.quantity.toString(), Modifier.width(38.dp))
-                Text(lengthFormat.format(entry.lengthM), Modifier.width(48.dp))
-                Text("Ø ${diameterFormat.format(entry.diameterCm)}", Modifier.weight(1f))
+                TableValue((index + 1).toString(), Modifier.weight(0.45f))
+                TableValue(lengthFormat.format(entry.lengthM), Modifier.weight(0.7f))
+                TableValue(entry.quantity.toString(), Modifier.weight(0.6f))
+                TableValue(LogEntryDisplay.diameterLabel(entry), Modifier.weight(0.85f))
                 Text(
                     volumeFormat.format(entry.totalVolumeM3),
-                    Modifier.width(58.dp),
+                    Modifier.weight(0.9f),
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
-                Row(Modifier.width(90.dp)) {
+                Row(Modifier.width(84.dp)) {
                     IconButton(
-                        onClick = { viewModel.increaseDraft(entry.id) },
-                        modifier = Modifier.size(30.dp)
+                        onClick = { onIncrease(entry.id) },
+                        modifier = Modifier.size(28.dp)
                     ) { Icon(Icons.Default.Add, null, modifier = Modifier.size(17.dp)) }
                     IconButton(
-                        onClick = { viewModel.decreaseDraft(entry.id) },
-                        modifier = Modifier.size(30.dp)
+                        onClick = { onDecrease(entry.id) },
+                        modifier = Modifier.size(28.dp)
                     ) { Icon(Icons.Default.Remove, null, modifier = Modifier.size(17.dp)) }
                     IconButton(
-                        onClick = { viewModel.deleteDraft(entry.id) },
-                        modifier = Modifier.size(30.dp)
+                        onClick = { onDelete(entry.id) },
+                        modifier = Modifier.size(28.dp)
                     ) { Icon(Icons.Default.Delete, null, tint = KubajDanger, modifier = Modifier.size(17.dp)) }
                 }
             }
@@ -571,21 +650,23 @@ private fun DraftTable(entries: List<DraftEntry>, viewModel: AppViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
+private fun HollowSheet(
+    viewModel: AppViewModel,
+    hapticsEnabled: Boolean,
+    onDismiss: () -> Unit
+) {
     var outer by rememberSaveable { mutableStateOf("") }
     var inner by rememberSaveable { mutableStateOf("") }
     var length by rememberSaveable { mutableStateOf("") }
-    var quantity by rememberSaveable { mutableStateOf("1") }
     val values = listOf(
         outer.toLocalizedDoubleOrNull(),
         inner.toLocalizedDoubleOrNull(),
         length.toLocalizedDoubleOrNull()
     )
-    val parsedQuantity = quantity.toIntOrNull()
     val valid = values.all { it != null && it > 0 } &&
-        (values[0] ?: 0.0) > (values[1] ?: 0.0) &&
-        parsedQuantity != null && parsedQuantity > 0
+        (values[0] ?: 0.0) > (values[1] ?: 0.0)
     val result = if (valid) viewModel.calculateHollow(values[0]!!, values[1]!!, values[2]!!) else null
+    val haptic = hapticAction(hapticsEnabled)
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth()) {
@@ -597,7 +678,7 @@ private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
             ) {
                 Text(stringResource(R.string.calculate_hollow), fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { haptic(); onDismiss() }) { Text(stringResource(R.string.cancel)) }
             }
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
@@ -609,16 +690,7 @@ private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
                             NumberField(stringResource(R.string.outer_diameter), outer, { outer = it }, Modifier.weight(1f))
                             NumberField(stringResource(R.string.inner_diameter), inner, { inner = it }, Modifier.weight(1f))
                         }
-                        InputPair {
-                            NumberField(stringResource(R.string.length_m), length, { length = it }, Modifier.weight(1f))
-                            NumberField(
-                                stringResource(R.string.quantity),
-                                quantity,
-                                { quantity = it },
-                                Modifier.weight(1f),
-                                integer = true
-                            )
-                        }
+                        NumberField(stringResource(R.string.length_m), length, { length = it })
                     }
                 }
                 result?.let { preview ->
@@ -645,11 +717,12 @@ private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
                     Button(
                         enabled = valid,
                         onClick = {
+                            haptic()
                             viewModel.addHollow(
                                 values[0]!!,
                                 values[1]!!,
                                 values[2]!!,
-                                parsedQuantity!!
+                                1
                             )
                             onDismiss()
                         },
@@ -673,10 +746,11 @@ private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
                                 FilledTonalButton(
                                     enabled = preview.equivalentDiameterCm > 1,
                                     onClick = {
+                                        haptic()
                                         viewModel.addEquivalentDiameter(
                                             preview.equivalentDiameterCm - 1,
                                             values[2]!!,
-                                            parsedQuantity!!
+                                            1
                                         )
                                         onDismiss()
                                     },
@@ -685,10 +759,11 @@ private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
                                 ) { Text(stringResource(R.string.add_diameter, preview.equivalentDiameterCm - 1)) }
                                 FilledTonalButton(
                                     onClick = {
+                                        haptic()
                                         viewModel.addEquivalentDiameter(
                                             preview.equivalentDiameterCm + 1,
                                             values[2]!!,
-                                            parsedQuantity!!
+                                            1
                                         )
                                         onDismiss()
                                     },
@@ -706,9 +781,15 @@ private fun HollowSheet(viewModel: AppViewModel, onDismiss: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SaveDialog(folders: List<FolderEntity>, viewModel: AppViewModel, onDismiss: () -> Unit) {
+private fun SaveDialog(
+    folders: List<FolderEntity>,
+    viewModel: AppViewModel,
+    hapticsEnabled: Boolean,
+    onDismiss: () -> Unit
+) {
     var name by rememberSaveable { mutableStateOf("") }
     var selectedFolderId by rememberSaveable { mutableStateOf<Long?>(null) }
+    val haptic = hapticAction(hapticsEnabled)
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
             Modifier
@@ -720,7 +801,7 @@ private fun SaveDialog(folders: List<FolderEntity>, viewModel: AppViewModel, onD
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.select_file), fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { haptic(); onDismiss() }) { Text(stringResource(R.string.cancel)) }
             }
             if (folders.isEmpty()) {
                 EmptyState(stringResource(R.string.folders_empty))
@@ -734,7 +815,7 @@ private fun SaveDialog(folders: List<FolderEntity>, viewModel: AppViewModel, onD
                                 else MaterialTheme.colorScheme.surfaceContainerLowest,
                                 RoundedCornerShape(12.dp)
                             )
-                            .clickable { selectedFolderId = folder.id }
+                            .clickable { haptic(); selectedFolderId = folder.id }
                             .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -746,7 +827,10 @@ private fun SaveDialog(folders: List<FolderEntity>, viewModel: AppViewModel, onD
                         )
                         Spacer(Modifier.width(12.dp))
                         Text(folderPath(folder, folders), Modifier.weight(1f))
-                        RadioButton(selectedFolderId == folder.id, onClick = { selectedFolderId = folder.id })
+                        RadioButton(
+                            selectedFolderId == folder.id,
+                            onClick = { haptic(); selectedFolderId = folder.id }
+                        )
                     }
                 }
             }
@@ -761,6 +845,7 @@ private fun SaveDialog(folders: List<FolderEntity>, viewModel: AppViewModel, onD
                 IconButton(
                     enabled = name.isNotBlank(),
                     onClick = {
+                        haptic()
                         viewModel.createFolder(name) { selectedFolderId = it }
                         name = ""
                     }
@@ -769,6 +854,7 @@ private fun SaveDialog(folders: List<FolderEntity>, viewModel: AppViewModel, onD
             Button(
                 enabled = selectedFolderId != null,
                 onClick = {
+                    haptic()
                     selectedFolderId?.let(viewModel::saveDrafts)
                     onDismiss()
                 },
@@ -786,52 +872,92 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
     var folderMenu by remember { mutableStateOf(false) }
     var exportType by remember { mutableStateOf<String?>(null) }
     var deleteConfirm by remember { mutableStateOf(false) }
+    var groupToDelete by remember { mutableStateOf<com.kubaj.android.domain.LogGroup?>(null) }
+    var pendingExportFile by remember { mutableStateOf<java.io.File?>(null) }
+    var pendingSaveLaunch by remember { mutableStateOf<Pair<String, String>?>(null) }
+    val haptic = hapticAction(state.preferences.hapticsEnabled)
+    val exportSavedMessage = stringResource(R.string.export_saved)
+    val exportFailedMessage = stringResource(R.string.export_failed)
     val groups = if (state.selectedFolderId == null) {
-        LogGrouping.sort(
-            state.drafts.groupBy { it.lengthM to it.diameterCm }.map { (key, drafts) ->
-                com.kubaj.android.domain.LogGroup(
-                    "${key.first}-${key.second}",
-                    key.second,
-                    key.first,
-                    drafts.sumOf { it.quantity },
-                    drafts.sumOf { it.totalVolumeM3 },
-                    emptyList()
-                )
-            },
-            state.sortAscending
-        )
+        LogGrouping.sort(LogGrouping.groupDrafts(state.drafts), state.sortAscending)
     } else state.groups
+
+    val savePdfLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        val file = pendingExportFile
+        pendingExportFile = null
+        if (uri != null && file != null) {
+            runCatching {
+                Exporters.copyToUri(context, file, uri)
+                Toast.makeText(context, exportSavedMessage, Toast.LENGTH_SHORT).show()
+            }.onFailure {
+                Toast.makeText(context, exportFailedMessage, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    val saveXlsxLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    ) { uri ->
+        val file = pendingExportFile
+        pendingExportFile = null
+        if (uri != null && file != null) {
+            runCatching {
+                Exporters.copyToUri(context, file, uri)
+                Toast.makeText(context, exportSavedMessage, Toast.LENGTH_SHORT).show()
+            }.onFailure {
+                Toast.makeText(context, exportFailedMessage, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    LaunchedEffect(pendingSaveLaunch) {
+        val launch = pendingSaveLaunch ?: return@LaunchedEffect
+        delay(350)
+        if (launch.first == "pdf") {
+            savePdfLauncher.launch(launch.second)
+        } else {
+            saveXlsxLauncher.launch(launch.second)
+        }
+        pendingSaveLaunch = null
+    }
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name)) {
-            IconButton(
-                enabled = groups.isNotEmpty(),
-                onClick = { exportType = "pdf" },
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 12.dp)
             ) {
-                Icon(Icons.Default.Description, null, modifier = Modifier.size(17.dp), tint = KubajDanger)
-            }
-            Spacer(Modifier.width(8.dp))
-            IconButton(
-                enabled = groups.isNotEmpty(),
-                onClick = { exportType = "xlsx" },
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-            ) {
-                Icon(Icons.Default.TableView, null, modifier = Modifier.size(17.dp), tint = KubajGreen)
-            }
-            Spacer(Modifier.width(8.dp))
-            IconButton(
-                enabled = state.selectedFolder != null,
-                onClick = { deleteConfirm = true },
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-            ) {
-                Icon(Icons.Default.Delete, null, tint = KubajDanger, modifier = Modifier.size(17.dp))
+                IconButton(
+                    enabled = groups.isNotEmpty(),
+                    onClick = { haptic(); exportType = "pdf" },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                ) {
+                    Icon(Icons.Default.Description, null, modifier = Modifier.size(17.dp), tint = KubajDanger)
+                }
+                IconButton(
+                    enabled = groups.isNotEmpty(),
+                    onClick = { haptic(); exportType = "xlsx" },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                ) {
+                    Icon(Icons.Default.TableView, null, modifier = Modifier.size(17.dp), tint = KubajGreen)
+                }
+                IconButton(
+                    enabled = state.selectedFolder != null,
+                    onClick = { haptic(); deleteConfirm = true },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                ) {
+                    Icon(Icons.Default.Delete, null, tint = KubajDanger, modifier = Modifier.size(17.dp))
+                }
             }
         }
         LazyColumn(
@@ -853,7 +979,7 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                             Modifier
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
-                                .clickable { folderMenu = true }
+                                .clickable { haptic(); folderMenu = true }
                                 .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -869,12 +995,12 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                         DropdownMenu(folderMenu, { folderMenu = false }) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.active_session)) },
-                                onClick = { viewModel.selectFolder(null); folderMenu = false }
+                                onClick = { haptic(); viewModel.selectFolder(null); folderMenu = false }
                             )
                             state.folders.forEach {
                                 DropdownMenuItem(
                                     text = { Text(folderPath(it, state.folders)) },
-                                    onClick = { viewModel.selectFolder(it.id); folderMenu = false }
+                                    onClick = { haptic(); viewModel.selectFolder(it.id); folderMenu = false }
                                 )
                             }
                         }
@@ -893,7 +1019,7 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                 GroupTable(
                     groups,
                     sortAscending = state.sortAscending,
-                    onToggleSort = viewModel::toggleSort,
+                    onToggleSort = { haptic(); viewModel.toggleSort() },
                     hapticsEnabled = state.preferences.hapticsEnabled,
                     onIncrease = {
                         if (state.selectedFolderId == null) viewModel.increaseDraftGroup(it)
@@ -904,8 +1030,8 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                         else viewModel.decreaseGroup(it)
                     },
                     onDelete = {
-                        if (state.selectedFolderId == null) viewModel.deleteDraftGroup(it)
-                        else viewModel.deleteGroup(it)
+                        haptic()
+                        groupToDelete = it
                     }
                 )
             }
@@ -913,28 +1039,48 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
     }
 
     exportType?.let { type ->
-        ExportDialog(type, groups, onDismiss = { exportType = null }) { fileName, metadata ->
-            val file = if (type == "pdf") {
-                Exporters.createPdf(context, fileName, groups, metadata)
-            } else {
-                Exporters.createXlsx(context, fileName, groups)
+        ExportDialog(
+            type,
+            groups,
+            state.preferences.hapticsEnabled,
+            onDismiss = { exportType = null }
+        ) { fileName, metadata ->
+            runCatching {
+                val safeName = fileName.trim().ifBlank { "kubaj-export" }
+                    .replace(Regex("""[\\/:*?"<>|\s]+"""), "_")
+                val file = if (type == "pdf") {
+                    Exporters.createPdf(context, safeName, groups, metadata)
+                } else {
+                    Exporters.createXlsx(context, safeName, groups)
+                }
+                pendingExportFile = file
+                exportType = null
+                pendingSaveLaunch = type to if (type == "pdf") "$safeName.pdf" else "$safeName.xlsx"
+            }.onFailure {
+                exportType = null
+                Toast.makeText(context, exportFailedMessage, Toast.LENGTH_SHORT).show()
             }
-            Exporters.share(
-                context,
-                file,
-                if (type == "pdf") "application/pdf"
-                else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-            exportType = null
         }
     }
     if (deleteConfirm) ConfirmDialog(
         onDismiss = { deleteConfirm = false },
         onConfirm = {
+            haptic()
             state.selectedFolder?.let(viewModel::deleteFolder)
             deleteConfirm = false
         }
     )
+    groupToDelete?.let { group ->
+        ConfirmDialog(
+            onDismiss = { groupToDelete = null },
+            onConfirm = {
+                haptic()
+                if (state.selectedFolderId == null) viewModel.deleteDraftGroup(group)
+                else viewModel.deleteGroup(group)
+                groupToDelete = null
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -942,6 +1088,7 @@ private fun GroupingScreen(state: AppUiState, viewModel: AppViewModel, modifier:
 private fun ExportDialog(
     type: String,
     groups: List<com.kubaj.android.domain.LogGroup>,
+    hapticsEnabled: Boolean,
     onDismiss: () -> Unit,
     onExport: (String, ExportMetadata) -> Unit
 ) {
@@ -951,6 +1098,7 @@ private fun ExportDialog(
     var location by rememberSaveable { mutableStateOf("") }
     var reporter by rememberSaveable { mutableStateOf("") }
     var code by rememberSaveable { mutableStateOf("") }
+    val haptic = hapticAction(hapticsEnabled)
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth()) {
             Row(
@@ -961,26 +1109,12 @@ private fun ExportDialog(
             ) {
                 Text(stringResource(R.string.export_settings), fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { haptic(); onDismiss() }) { Text(stringResource(R.string.cancel)) }
             }
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            stringResource(R.string.export_settings),
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Black
-                        )
-                        Text(
-                            if (type == "pdf") stringResource(R.string.export_pdf)
-                            else stringResource(R.string.export_excel),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
                 item {
                     Column(
                         Modifier
@@ -1001,6 +1135,7 @@ private fun ExportDialog(
                     Button(
                         enabled = groups.isNotEmpty(),
                         onClick = {
+                            haptic()
                             onExport(
                                 fileName,
                                 ExportMetadata(listOf(company, date, location, reporter, code))
@@ -1033,6 +1168,7 @@ private fun FoldersScreen(
     modifier: Modifier,
     onFolderSelected: (Long) -> Unit
 ) {
+    val haptic = hapticAction(state.preferences.hapticsEnabled)
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name))
         LazyColumn(
@@ -1060,7 +1196,7 @@ private fun FoldersScreen(
                     Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surfaceContainerLowest, RoundedCornerShape(12.dp))
-                        .clickable { onFolderSelected(folder.id) }
+                        .clickable { haptic(); onFolderSelected(folder.id) }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1085,6 +1221,7 @@ private fun FoldersScreen(
 private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier: Modifier) {
     var languageMenu by remember { mutableStateOf(false) }
     val languages = listOf("", "tr", "en", "de", "es", "pt", "fr", "sv", "fi", "ru")
+    val haptic = hapticAction(state.preferences.hapticsEnabled)
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name))
@@ -1109,7 +1246,13 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                             }
                             Spacer(Modifier.width(12.dp))
                             Text(stringResource(R.string.settings_haptics), Modifier.weight(1f))
-                            Switch(state.preferences.hapticsEnabled, viewModel::setHaptics)
+                            Switch(
+                                state.preferences.hapticsEnabled,
+                                onCheckedChange = {
+                                    haptic()
+                                    viewModel.setHaptics(it)
+                                }
+                            )
                         }
                         HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                         Column(Modifier.padding(12.dp)) {
@@ -1123,7 +1266,7 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                                         }
                                     ),
                                     selected = state.preferences.theme == theme,
-                                    onClick = { viewModel.setTheme(theme) }
+                                    onClick = { haptic(); viewModel.setTheme(theme) }
                                 )
                             }
                         }
@@ -1150,20 +1293,24 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                                 stringResource(R.string.formula_smalian),
                                 state.preferences.calculationMethod == CalculationMethod.SMALIAN,
                                 Modifier.weight(1f)
-                            ) { viewModel.setMethod(CalculationMethod.SMALIAN) }
+                            ) { haptic(); viewModel.setMethod(CalculationMethod.SMALIAN) }
                             FormulaOption(
                                 stringResource(R.string.formula_huber),
                                 state.preferences.calculationMethod == CalculationMethod.HUBER,
                                 Modifier.weight(1f)
-                            ) { viewModel.setMethod(CalculationMethod.HUBER) }
+                            ) { haptic(); viewModel.setMethod(CalculationMethod.HUBER) }
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             FormulaOption(
                                 stringResource(R.string.formula_newton),
                                 state.preferences.calculationMethod == CalculationMethod.NEWTON,
                                 Modifier.weight(1f)
-                            ) { viewModel.setMethod(CalculationMethod.NEWTON) }
-                            Spacer(Modifier.weight(1f))
+                            ) { haptic(); viewModel.setMethod(CalculationMethod.NEWTON) }
+                            FormulaOption(
+                                stringResource(R.string.formula_ulker),
+                                state.preferences.calculationMethod == CalculationMethod.LUMBER,
+                                Modifier.weight(1f)
+                            ) { haptic(); viewModel.setMethod(CalculationMethod.LUMBER) }
                         }
                     }
                 }
@@ -1175,7 +1322,7 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                             Modifier
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.surfaceContainerLowest, RoundedCornerShape(20.dp))
-                                .clickable { languageMenu = true }
+                                .clickable { haptic(); languageMenu = true }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -1209,6 +1356,7 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                                         )
                                     },
                                     onClick = {
+                                        haptic()
                                         viewModel.setLanguage(language)
                                         languageMenu = false
                                     }
@@ -1219,15 +1367,25 @@ private fun SettingsScreen(state: AppUiState, viewModel: AppViewModel, modifier:
                 }
             }
             item {
-                Text(
-                    "WOODLOG V${com.kubaj.android.BuildConfig.VERSION_NAME}",
-                    Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
-                    textAlign = TextAlign.Center
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "WOODLOG V${com.kubaj.android.BuildConfig.VERSION_NAME}",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        "Necmettin Özarslan",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
@@ -1332,3 +1490,28 @@ private fun folderPath(folder: FolderEntity, folders: List<FolderEntity>): Strin
 
 private fun String.toLocalizedDoubleOrNull(): Double? =
     trim().replace(',', '.').toDoubleOrNull()
+
+@Composable
+private fun hapticAction(enabled: Boolean): () -> Unit {
+    val context = LocalContext.current
+    return {
+        if (enabled) {
+            performAppHaptic(context)
+        }
+    }
+}
+
+fun performAppHaptic(context: Context) {
+    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        context.getSystemService(VibratorManager::class.java)?.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+    } ?: return
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        vibrator.vibrate(VibrationEffect.createOneShot(45, VibrationEffect.DEFAULT_AMPLITUDE))
+    } else {
+        @Suppress("DEPRECATION")
+        vibrator.vibrate(45)
+    }
+}

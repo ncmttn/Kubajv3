@@ -37,6 +37,8 @@
     <string name="export_excel">Skapa Excel</string>
     <string name="export_file_name">Namn på exportfil</string>
     <string name="export_settings">Exportinställningar</string>
+    <string name="export_saved">Fil sparad</string>
+    <string name="export_failed">Kunde inte spara filen</string>
     <string name="company_name">Företagsnamn</string>
     <string name="report_date">Rapportdatum</string>
     <string name="location">Plats / Region</string>

@@ -21,3 +21,9 @@ build/
 local.properties
 *.apk
 *.aab
+
+# Android signing (never commit)
+*.jks
+*.keystore
+keystore.properties
+!android/app/src/main/**/debug.keystore

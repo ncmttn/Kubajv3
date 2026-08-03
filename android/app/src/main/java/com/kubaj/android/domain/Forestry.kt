@@ -7,7 +7,8 @@ import kotlin.math.sqrt
 enum class CalculationMethod {
     HUBER,
     SMALIAN,
-    NEWTON
+    NEWTON,
+    LUMBER
 }
 
 data class HollowResult(
@@ -65,6 +66,9 @@ object ForestryCalculator {
         return roundVolume(PI * lengthM * sum / 240_000.0)
     }
 
+    fun lumber(widthCm: Double, thicknessCm: Double, lengthM: Double): Double =
+        roundVolume((widthCm / 100.0) * (thicknessCm / 100.0) * lengthM)
+
     fun hollow(outerDiameterCm: Double, innerDiameterCm: Double, lengthM: Double): HollowResult {
         val outer = PI * (outerDiameterCm / 200).let { it * it } * lengthM
         val inner = PI * (innerDiameterCm / 200).let { it * it } * lengthM
@@ -78,6 +82,21 @@ object ForestryCalculator {
 }
 
 object LogGrouping {
+    fun groupDrafts(drafts: List<DraftEntry>): List<LogGroup> =
+        drafts
+            .groupBy { it.lengthM to it.diameterCm }
+            .map { (key, entries) ->
+                val representative = entries.maxByOrNull { it.createdAt }!!
+                LogGroup(
+                    id = "${key.first}-${key.second}",
+                    diameterCm = key.second,
+                    lengthM = key.first,
+                    totalQuantity = entries.sumOf { it.quantity },
+                    totalVolumeM3 = entries.sumOf { it.totalVolumeM3 },
+                    records = listOf(LogEntryDisplay.draftToRecord(representative))
+                )
+            }
+
     fun group(records: List<com.kubaj.android.data.LogRecordEntity>): List<LogGroup> =
         records
             .groupBy { it.lengthM to it.diameterCm }

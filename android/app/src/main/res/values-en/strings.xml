@@ -36,6 +36,8 @@
     <string name="export_excel">Generate Excel</string>
     <string name="export_file_name">Export file name</string>
     <string name="export_settings">Report headers</string>
+    <string name="export_saved">File saved</string>
+    <string name="export_failed">Could not save file</string>
     <string name="company_name">Company name</string>
     <string name="report_date">Report date</string>
     <string name="location">Location</string>
@@ -51,7 +53,7 @@
     <string name="formula_huber">Huber</string>
     <string name="formula_smalian">Smalian</string>
     <string name="formula_newton">Newton</string>
-    <string name="formula_ulker">Ülker</string>
+    <string name="formula_ulker">Lumber</string>
     <string name="outer_diameter">Outer diameter (cm)</string>
     <string name="inner_diameter">Inner diameter (cm)</string>
     <string name="equivalent_diameter">Equivalent diameter: %1$d cm</string>

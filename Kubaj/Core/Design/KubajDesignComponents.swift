@@ -256,72 +256,58 @@ struct KubajSettingsLinkRow: View {
 struct KubajStatsCard: View {
   let totalVolume: String
   let logsCount: String
-  let averageDiameter: String
   let onReset: () -> Void
 
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      HStack(alignment: .top) {
-        VStack(alignment: .leading, spacing: 4) {
-          Text(L10n.Home.totalVolume)
-            .font(KubajFont.labelCaps())
-            .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
-            .tracking(2)
-            .textCase(.uppercase)
+    HStack(alignment: .center, spacing: 12) {
+      statBlock(
+        title: L10n.Home.totalVolume,
+        value: "\(totalVolume) \(L10n.Home.cubicMeterUnit)",
+        valueColor: KubajColor.primary
+      )
+      .frame(maxWidth: .infinity, alignment: .leading)
 
-          HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Text(totalVolume)
-              .font(KubajFont.volumeHero())
-              .foregroundStyle(KubajColor.primary)
-              .tracking(-0.9)
-            Text(L10n.Home.cubicMeterUnit)
-              .font(.system(size: 18, weight: .semibold))
-              .foregroundStyle(KubajThemeColors.textMuted(colorScheme))
+      statBlock(
+        title: L10n.Home.logsCount,
+        value: logsCount
+      )
+
+      Button(action: onReset) {
+        Circle()
+          .fill(KubajThemeColors.inputBackground(colorScheme))
+          .frame(width: 40, height: 40)
+          .overlay {
+            Image(systemName: "arrow.counterclockwise")
+              .font(.system(size: 14, weight: .semibold))
+              .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
           }
-        }
-
-        Spacer()
-
-        Button(action: onReset) {
-          Circle()
-            .fill(KubajThemeColors.inputBackground(colorScheme))
-            .frame(width: 40, height: 40)
-            .overlay {
-              Image(systemName: "arrow.counterclockwise")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
-            }
-        }
       }
-
-      HStack(spacing: 32) {
-        statBlock(title: L10n.Home.logsCount, value: logsCount)
-        statBlock(title: L10n.Home.avgDiameter, value: averageDiameter)
-      }
-      .padding(.top, 1)
-      .overlay(alignment: .top) {
-        Rectangle()
-          .fill(KubajThemeColors.borderSubtle(colorScheme))
-          .frame(height: 1)
-      }
-      .padding(.top, 16)
+      .buttonStyle(.plain)
     }
-    .padding(KubajMetric.horizontalPadding)
+    .padding(.horizontal, 18)
+    .padding(.vertical, 16)
     .background(KubajThemeColors.surface(colorScheme), in: RoundedRectangle(cornerRadius: KubajMetric.cornerRadiusLarge))
   }
 
-  private func statBlock(title: String, value: String) -> some View {
-    VStack(alignment: .leading, spacing: 0) {
+  private func statBlock(
+    title: String,
+    value: String,
+    valueColor: Color? = nil
+  ) -> some View {
+    VStack(alignment: .leading, spacing: 2) {
       Text(title)
         .font(KubajFont.labelCaps())
         .foregroundStyle(KubajThemeColors.textSecondary(colorScheme))
         .textCase(.uppercase)
         .tracking(1)
+        .lineLimit(1)
       Text(value)
         .font(KubajFont.statValue())
-        .foregroundStyle(KubajThemeColors.textPrimary(colorScheme))
+        .foregroundStyle(valueColor ?? KubajThemeColors.textPrimary(colorScheme))
+        .lineLimit(1)
+        .minimumScaleFactor(0.75)
     }
   }
 }

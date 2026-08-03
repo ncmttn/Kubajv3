@@ -16,4 +16,9 @@ class ForestryCalculatorTest {
         assertEquals(35, result.equivalentDiameterCm)
         assertEquals(0.283, result.netVolumeM3, 0.0001)
     }
+
+    @Test
+    fun lumberUsesRectangularCrossSection() {
+        assertEquals(0.04, ForestryCalculator.lumber(20.0, 5.0, 4.0), 0.0001)
+    }
 }
