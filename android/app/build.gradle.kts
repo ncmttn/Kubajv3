@@ -22,8 +22,8 @@ android {
         applicationId = "com.woodlog"
         minSdk = 26
         targetSdk = 36
-        versionCode = 60
-        versionName = "3.0.1"
+        versionCode = 61
+        versionName = "3.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -87,6 +87,7 @@ dependencies {
     ksp("androidx.room:room-compiler:2.7.1")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("com.android.billingclient:billing-ktx:8.3.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
