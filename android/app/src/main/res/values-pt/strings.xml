@@ -28,6 +28,11 @@
     <string name="grouping_empty">Nenhum registro nesta pasta</string>
     <string name="folders_empty">Nenhum arquivo com registros</string>
     <string name="create_file">Nova pasta</string>
+    <string name="create_subfolder">Criar subpasta</string>
+    <string name="no_folders">Ainda sem pastas</string>
+    <string name="no_subfolders">Sem subpastas</string>
+    <string name="create">Criar</string>
+    <string name="save_here">Salvar aqui</string>
     <string name="file_name">Nome da pasta</string>
     <string name="confirm">Salvar aqui</string>
     <string name="cancel">Cancelar</string>

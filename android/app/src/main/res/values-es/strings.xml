@@ -28,6 +28,11 @@
     <string name="grouping_empty">No hay registros en esta carpeta</string>
     <string name="folders_empty">No hay archivos con registros</string>
     <string name="create_file">Nueva carpeta</string>
+    <string name="create_subfolder">Crear subcarpeta</string>
+    <string name="no_folders">Aún no hay carpetas</string>
+    <string name="no_subfolders">Sin subcarpetas</string>
+    <string name="create">Crear</string>
+    <string name="save_here">Guardar aquí</string>
     <string name="file_name">Nombre de carpeta</string>
     <string name="confirm">Guardar aquí</string>
     <string name="cancel">Cancelar</string>

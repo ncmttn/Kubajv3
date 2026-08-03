@@ -27,8 +27,13 @@
     <string name="select_file">Dosya seç</string>
     <string name="grouping_empty">Gruplandırılacak kayıt yok</string>
     <string name="folders_empty">Kayıt içeren dosya yok</string>
-    <string name="create_file">Dosya oluştur</string>
+    <string name="create_file">Yeni Dosya</string>
+    <string name="create_subfolder">Alt Dosya Oluştur</string>
+    <string name="no_folders">Henüz klasör yok</string>
+    <string name="no_subfolders">Alt klasör yok</string>
+    <string name="create">Oluştur</string>
     <string name="file_name">Dosya adı</string>
+    <string name="save_here">Buraya Kaydet</string>
     <string name="confirm">Onayla</string>
     <string name="cancel">İptal</string>
     <string name="delete">Sil</string>

@@ -28,6 +28,11 @@
     <string name="grouping_empty">Keine Datensätze in diesem Ordner</string>
     <string name="folders_empty">Keine Dateien mit Einträgen</string>
     <string name="create_file">Neuer Ordner</string>
+    <string name="create_subfolder">Unterordner erstellen</string>
+    <string name="no_folders">Noch keine Ordner</string>
+    <string name="no_subfolders">Keine Unterordner</string>
+    <string name="create">Erstellen</string>
+    <string name="save_here">Hier speichern</string>
     <string name="file_name">Ordnername</string>
     <string name="confirm">Hier speichern</string>
     <string name="cancel">Abbrechen</string>

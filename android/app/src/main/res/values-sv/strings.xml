@@ -28,6 +28,11 @@
     <string name="grouping_empty">Inga poster i denna mapp</string>
     <string name="folders_empty">Inga filer med poster</string>
     <string name="create_file">Ny mapp</string>
+    <string name="create_subfolder">Skapa undermapp</string>
+    <string name="no_folders">Inga mappar ännu</string>
+    <string name="no_subfolders">Inga undermappar</string>
+    <string name="create">Skapa</string>
+    <string name="save_here">Spara här</string>
     <string name="file_name">Mappnamn</string>
     <string name="confirm">Spara här</string>
     <string name="cancel">Avbryt</string>

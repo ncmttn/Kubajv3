@@ -28,6 +28,11 @@
     <string name="grouping_empty">Ei tietueita tässä kansiossa</string>
     <string name="folders_empty">Ei tiedostoja, joissa on tietueita</string>
     <string name="create_file">Uusi kansio</string>
+    <string name="create_subfolder">Luo alikansio</string>
+    <string name="no_folders">Ei kansioita vielä</string>
+    <string name="no_subfolders">Ei alikansioita</string>
+    <string name="create">Luo</string>
+    <string name="save_here">Tallenna tähän</string>
     <string name="file_name">Kansion nimi</string>
     <string name="confirm">Tallenna tähän</string>
     <string name="cancel">Peruuta</string>

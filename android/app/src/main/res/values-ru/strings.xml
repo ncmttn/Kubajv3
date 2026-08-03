@@ -28,6 +28,11 @@
     <string name="grouping_empty">В этой папке нет записей</string>
     <string name="folders_empty">Нет файлов с записями</string>
     <string name="create_file">Новая папка</string>
+    <string name="create_subfolder">Создать подпапку</string>
+    <string name="no_folders">Папок пока нет</string>
+    <string name="no_subfolders">Нет подпапок</string>
+    <string name="create">Создать</string>
+    <string name="save_here">Сохранить сюда</string>
     <string name="file_name">Имя папки</string>
     <string name="confirm">Сохранить сюда</string>
     <string name="cancel">Отмена</string>

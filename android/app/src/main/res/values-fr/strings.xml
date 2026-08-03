@@ -28,6 +28,11 @@
     <string name="grouping_empty">Aucun enregistrement dans ce dossier</string>
     <string name="folders_empty">Aucun fichier avec des enregistrements</string>
     <string name="create_file">Nouveau dossier</string>
+    <string name="create_subfolder">Créer un sous-dossier</string>
+    <string name="no_folders">Aucun dossier pour le moment</string>
+    <string name="no_subfolders">Aucun sous-dossier</string>
+    <string name="create">Créer</string>
+    <string name="save_here">Enregistrer ici</string>
     <string name="file_name">Nom du dossier</string>
     <string name="confirm">Enregistrer ici</string>
     <string name="cancel">Annuler</string>

@@ -21,23 +21,34 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DonutLarge
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Park
@@ -70,6 +81,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -99,6 +111,7 @@ import com.kubaj.android.domain.LogGrouping
 import com.kubaj.android.export.ExportMetadata
 import com.kubaj.android.export.Exporters
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private enum class MainTab(val label: Int, val icon: ImageVector) {
     HOME(R.string.tab_home, Icons.Default.Home),
@@ -277,47 +290,54 @@ private fun OnboardingScreen(hapticsEnabled: Boolean, onComplete: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun MainScreen(state: AppUiState, viewModel: AppViewModel) {
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
     val haptic = hapticAction(state.preferences.hapticsEnabled)
+    val imeVisible = WindowInsets.isImeVisible
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            Row(
-                Modifier
-                    .navigationBarsPadding()
-                    .padding(horizontal = 8.dp)
-                    .height(62.dp)
-                    .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.96f), RoundedCornerShape(32.dp))
-                    .padding(horizontal = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                MainTab.entries.forEach { tab ->
-                    val active = selected == tab
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .clickable {
-                                haptic()
-                                selected = tab
-                            }
-                            .padding(vertical = 7.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        Icon(
-                            tab.icon,
-                            null,
-                            tint = if (active) MaterialTheme.colorScheme.primary else KubajTabInactive,
-                            modifier = Modifier.size(18.dp)
+            if (!imeVisible) {
+                Row(
+                    Modifier
+                        .navigationBarsPadding()
+                        .padding(horizontal = 8.dp)
+                        .height(62.dp)
+                        .background(
+                            MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.96f),
+                            RoundedCornerShape(32.dp)
                         )
-                        Text(
-                            stringResource(tab.label).uppercase(),
-                            maxLines = 1,
-                            fontSize = 10.sp,
-                            color = if (active) MaterialTheme.colorScheme.primary else KubajTabInactive
-                        )
+                        .padding(horizontal = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    MainTab.entries.forEach { tab ->
+                        val active = selected == tab
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .clickable {
+                                    haptic()
+                                    selected = tab
+                                }
+                                .padding(vertical = 7.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Icon(
+                                tab.icon,
+                                null,
+                                tint = if (active) MaterialTheme.colorScheme.primary else KubajTabInactive,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                stringResource(tab.label).uppercase(),
+                                maxLines = 1,
+                                fontSize = 10.sp,
+                                color = if (active) MaterialTheme.colorScheme.primary else KubajTabInactive
+                            )
+                        }
                     }
                 }
             }
@@ -378,6 +398,17 @@ private fun HomeScreen(
     val primaryFocusRequester = remember { FocusRequester() }
     var primarySelectAllTrigger by rememberSaveable { mutableIntStateOf(0) }
     val haptic = hapticAction(state.preferences.hapticsEnabled)
+    val listState = rememberLazyListState()
+    val previousTopDraftId = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(state.drafts.firstOrNull()?.id) {
+        val topId = state.drafts.firstOrNull()?.id
+        if (previousTopDraftId.value != null && topId != null && topId != previousTopDraftId.value) {
+            delay(80)
+            listState.animateScrollToItem(4)
+        }
+        previousTopDraftId.value = topId
+    }
 
     Column(modifier.fillMaxSize()) {
         ScreenHeader(stringResource(R.string.app_name)) {
@@ -392,6 +423,7 @@ private fun HomeScreen(
             }
         }
         LazyColumn(
+            state = listState,
             contentPadding = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
@@ -787,9 +819,16 @@ private fun SaveDialog(
     hapticsEnabled: Boolean,
     onDismiss: () -> Unit
 ) {
-    var name by rememberSaveable { mutableStateOf("") }
     var selectedFolderId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var expandedIds by remember { mutableStateOf(setOf<Long>()) }
+    var createParentId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var showCreateDialog by rememberSaveable { mutableStateOf(false) }
+    var newFolderName by rememberSaveable { mutableStateOf("") }
     val haptic = hapticAction(hapticsEnabled)
+    val roots = remember(folders) {
+        folders.filter { it.parentId == null }.sortedBy { it.name.lowercase() }
+    }
+
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
             Modifier
@@ -803,54 +842,57 @@ private fun SaveDialog(
                 Spacer(Modifier.weight(1f))
                 TextButton(onClick = { haptic(); onDismiss() }) { Text(stringResource(R.string.cancel)) }
             }
-            if (folders.isEmpty()) {
-                EmptyState(stringResource(R.string.folders_empty))
+
+            if (roots.isEmpty()) {
+                EmptyState(stringResource(R.string.no_folders))
             } else {
-                folders.forEach { folder ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .background(
-                                if (selectedFolderId == folder.id) KubajPrimary.copy(alpha = 0.10f)
-                                else MaterialTheme.colorScheme.surfaceContainerLowest,
-                                RoundedCornerShape(12.dp)
-                            )
-                            .clickable { haptic(); selectedFolderId = folder.id }
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.Folder,
-                            null,
-                            tint = if (selectedFolderId == folder.id) KubajPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Text(folderPath(folder, folders), Modifier.weight(1f))
-                        RadioButton(
-                            selectedFolderId == folder.id,
-                            onClick = { haptic(); selectedFolderId = folder.id }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 360.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(roots, key = { it.id }) { folder ->
+                        FolderTreeNode(
+                            folder = folder,
+                            folders = folders,
+                            depth = 0,
+                            selectedFolderId = selectedFolderId,
+                            expandedIds = expandedIds,
+                            onToggleExpand = { id ->
+                                haptic()
+                                expandedIds = if (id in expandedIds) expandedIds - id else expandedIds + id
+                            },
+                            onSelect = { id ->
+                                haptic()
+                                selectedFolderId = id
+                            },
+                            onCreateSubfolder = { parentId ->
+                                haptic()
+                                createParentId = parentId
+                                newFolderName = ""
+                                showCreateDialog = true
+                            }
                         )
                     }
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    name,
-                    { name = it },
-                    label = { Text(stringResource(R.string.file_name)) },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true
-                )
-                IconButton(
-                    enabled = name.isNotBlank(),
-                    onClick = {
-                        haptic()
-                        viewModel.createFolder(name) { selectedFolderId = it }
-                        name = ""
-                    }
-                ) { Icon(Icons.Default.Add, null) }
+
+            FilledTonalButton(
+                onClick = {
+                    haptic()
+                    createParentId = null
+                    newFolderName = ""
+                    showCreateDialog = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(Icons.Default.CreateNewFolder, null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.create_file), fontWeight = FontWeight.SemiBold)
             }
+
             Button(
                 enabled = selectedFolderId != null,
                 onClick = {
@@ -860,8 +902,147 @@ private fun SaveDialog(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp)
-            ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
+                    .height(52.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) { Text(stringResource(R.string.save_here), fontWeight = FontWeight.Bold) }
+        }
+    }
+
+    if (showCreateDialog) {
+        AlertDialog(
+            onDismissRequest = { showCreateDialog = false },
+            title = {
+                Text(
+                    stringResource(
+                        if (createParentId == null) R.string.create_file else R.string.create_subfolder
+                    )
+                )
+            },
+            text = {
+                OutlinedTextField(
+                    value = newFolderName,
+                    onValueChange = { newFolderName = it },
+                    label = { Text(stringResource(R.string.file_name)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = newFolderName.isNotBlank(),
+                    onClick = {
+                        haptic()
+                        val parentId = createParentId
+                        viewModel.createFolder(newFolderName, parentId) { createdId ->
+                            selectedFolderId = createdId
+                            if (parentId != null) {
+                                expandedIds = expandedIds + parentId
+                            }
+                        }
+                        newFolderName = ""
+                        createParentId = null
+                        showCreateDialog = false
+                    }
+                ) { Text(stringResource(R.string.create)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showCreateDialog = false
+                    createParentId = null
+                    newFolderName = ""
+                }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+}
+
+@Composable
+private fun FolderTreeNode(
+    folder: FolderEntity,
+    folders: List<FolderEntity>,
+    depth: Int,
+    selectedFolderId: Long?,
+    expandedIds: Set<Long>,
+    onToggleExpand: (Long) -> Unit,
+    onSelect: (Long) -> Unit,
+    onCreateSubfolder: (Long) -> Unit
+) {
+    val children = remember(folders, folder.id) {
+        folders.filter { it.parentId == folder.id }.sortedBy { it.name.lowercase() }
+    }
+    val expanded = folder.id in expandedIds
+    val selected = selectedFolderId == folder.id
+
+    Column {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    if (selected) KubajPrimary.copy(alpha = 0.10f)
+                    else MaterialTheme.colorScheme.surfaceContainerLowest,
+                    RoundedCornerShape(12.dp)
+                )
+                .clickable { onSelect(folder.id) }
+                .padding(start = (14 + depth * 16).dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { onToggleExpand(folder.id) },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                if (selected) Icons.Default.Folder else Icons.Default.FolderOpen,
+                null,
+                tint = if (selected) KubajPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                folder.name,
+                Modifier.weight(1f),
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+            )
+            if (selected) {
+                Icon(Icons.Default.CheckCircle, null, tint = KubajGreen, modifier = Modifier.size(20.dp))
+            }
+        }
+
+        if (expanded) {
+            if (children.isEmpty()) {
+                Text(
+                    stringResource(R.string.no_subfolders),
+                    modifier = Modifier.padding(start = (46 + depth * 16).dp, top = 4.dp, bottom = 4.dp),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                children.forEach { child ->
+                    FolderTreeNode(
+                        folder = child,
+                        folders = folders,
+                        depth = depth + 1,
+                        selectedFolderId = selectedFolderId,
+                        expandedIds = expandedIds,
+                        onToggleExpand = onToggleExpand,
+                        onSelect = onSelect,
+                        onCreateSubfolder = onCreateSubfolder
+                    )
+                }
+            }
+            TextButton(
+                onClick = { onCreateSubfolder(folder.id) },
+                modifier = Modifier.padding(start = (30 + depth * 16).dp)
+            ) {
+                Icon(Icons.Default.CreateNewFolder, null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.create_subfolder), fontSize = 13.sp)
+            }
         }
     }
 }
@@ -1189,7 +1370,9 @@ private fun FoldersScreen(
                 }
             }
             val usedFolderIds = state.records.map { it.folderId }.toSet()
-            val visible = state.folders.filter { it.id in usedFolderIds }
+            val visible = state.folders
+                .filter { it.id in usedFolderIds }
+                .sortedBy { folderPath(it, state.folders).lowercase() }
             if (visible.isEmpty()) item { EmptyState(stringResource(R.string.folders_empty)) }
             items(visible, key = { it.id }) { folder ->
                 Row(
