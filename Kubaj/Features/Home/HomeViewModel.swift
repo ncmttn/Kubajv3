@@ -14,7 +14,9 @@ final class HomeViewModel {
     var thicknessInput = ""
     var lengthInput = ""
     var quantityInput = "1"
-    var draftEntries: [DraftLogEntry] = []
+    var draftEntries: [DraftLogEntry] = ActiveSessionStore.load() {
+        didSet { ActiveSessionStore.save(draftEntries) }
+    }
     var isFolderSelectionPresented = false
     var focusedInputField: HomeInputField? = .diameter
     var shouldSelectAllOnDiameterFocus = false
@@ -144,6 +146,13 @@ final class HomeViewModel {
     func deleteEntry(id: UUID) {
         draftEntries.removeAll { $0.id == id }
     }
+
+    func deleteEntries(diameterCm: Double, lengthM: Double) {
+        draftEntries.removeAll {
+            $0.diameterCm == diameterCm && $0.lengthM == lengthM
+        }
+    }
+
     func increaseQuantity(id: UUID) {
         guard let index = draftEntries.firstIndex(where: { $0.id == id }) else {
             return

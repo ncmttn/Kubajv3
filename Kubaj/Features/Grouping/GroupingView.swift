@@ -340,9 +340,7 @@ struct GroupingView: View {
 
     private func performDelete(for group: LogGroup) {
         if viewModel.selectedFolder == nil {
-            homeViewModel.draftEntries.removeAll {
-                $0.diameterCm == group.diameterCm && $0.lengthM == group.lengthM
-            }
+            homeViewModel.deleteEntries(diameterCm: group.diameterCm, lengthM: group.lengthM)
             syncRecords()
         } else {
             viewModel.deleteGroup(group, modelContext: modelContext)
