@@ -22,8 +22,8 @@ android {
         applicationId = "com.woodlog"
         minSdk = 26
         targetSdk = 36
-        versionCode = 60
-        versionName = "3.0.1"
+        versionCode = 61
+        versionName = "3.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
