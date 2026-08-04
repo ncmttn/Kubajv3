@@ -33,7 +33,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -377,6 +378,7 @@ private fun ScreenHeader(title: String, actions: @Composable () -> Unit = {}) {
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun HomeScreen(
     state: AppUiState,
     viewModel: AppViewModel,
@@ -398,14 +400,24 @@ private fun HomeScreen(
     val primaryFocusRequester = remember { FocusRequester() }
     var primarySelectAllTrigger by rememberSaveable { mutableIntStateOf(0) }
     val haptic = hapticAction(state.preferences.hapticsEnabled)
-    val listState = rememberLazyListState()
+    val newestRowBringIntoView = remember { BringIntoViewRequester() }
     val previousTopDraftId = remember { mutableStateOf<String?>(null) }
+    val imeVisible = WindowInsets.isImeVisible
 
-    LaunchedEffect(state.drafts.firstOrNull()?.id) {
+    // Keep the newest calculation row visible above the keyboard without
+    // forcing the whole list to a fixed index (which hid the stats card).
+    LaunchedEffect(state.drafts.firstOrNull()?.id, imeVisible) {
         val topId = state.drafts.firstOrNull()?.id
-        if (previousTopDraftId.value != null && topId != null && topId != previousTopDraftId.value) {
-            delay(80)
-            listState.animateScrollToItem(4)
+        if (
+            imeVisible &&
+            previousTopDraftId.value != null &&
+            topId != null &&
+            topId != previousTopDraftId.value
+        ) {
+            delay(120)
+            newestRowBringIntoView.bringIntoView()
+            delay(100)
+            newestRowBringIntoView.bringIntoView()
         }
         previousTopDraftId.value = topId
     }
@@ -423,7 +435,7 @@ private fun HomeScreen(
             }
         }
         LazyColumn(
-            state = listState,
+            modifier = Modifier.imePadding(),
             contentPadding = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
@@ -570,7 +582,8 @@ private fun HomeScreen(
                         entries = state.drafts,
                         onIncrease = { haptic(); viewModel.increaseDraft(it) },
                         onDecrease = { haptic(); viewModel.decreaseDraft(it) },
-                        onDelete = { haptic(); deleteEntryId = it }
+                        onDelete = { haptic(); deleteEntryId = it },
+                        newestRowBringIntoView = newestRowBringIntoView
                     )
                 }
             }
@@ -620,7 +633,8 @@ private fun DraftTable(
     entries: List<DraftEntry>,
     onIncrease: (String) -> Unit,
     onDecrease: (String) -> Unit,
-    onDelete: (String) -> Unit
+    onDelete: (String) -> Unit,
+    newestRowBringIntoView: BringIntoViewRequester? = null
 ) {
     val bands = LogGrouping.lengthBands(entries.map { it.lengthM })
     Column(Modifier.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))) {
@@ -641,6 +655,13 @@ private fun DraftTable(
             Row(
                 Modifier
                     .fillMaxWidth()
+                    .then(
+                        if (index == 0 && newestRowBringIntoView != null) {
+                            Modifier.bringIntoViewRequester(newestRowBringIntoView)
+                        } else {
+                            Modifier
+                        }
+                    )
                     .background(
                         if (bands[index] == 1) MaterialTheme.colorScheme.primary.copy(alpha = 0.055f)
                         else Color.Transparent
